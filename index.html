@@ -995,30 +995,16 @@ async function deleteUser(userId, name) {
 }
 
 async function resetPronos(userId, name) {
-  const groupMatches = allMatches.filter(m => m.group_name?.startsWith('Groupe'));
-  if (!groupMatches.some(m => m.status === 'upcoming')) {
-    alert('La phase de poules est terminée — réinitialisation impossible.');
-    return;
-  }
-  if (!confirm(`Réinitialiser les pronostics de poules de ${name} ?`)) return;
-  // Récupère les pronos de cet utilisateur puis supprime un par un
-  const { data: userPronos } = await db.from('pronos').select('id,match_id').eq('user_id', userId);
-  if (!userPronos || !userPronos.length) {
-    showToast(`ℹ️ Aucun pronostic pour ${name}.`); return;
-  }
-  const groupMatchIds = new Set(groupMatches.map(m => m.id));
-  const toDelete = userPronos.filter(p => groupMatchIds.has(p.match_id));
-  if (!toDelete.length) {
-    showToast(`ℹ️ Aucun pronostic de poules pour ${name}.`); return;
-  }
-  for (const p of toDelete) {
-    await db.from('pronos').delete().eq('id', p.id);
-  }
-  showToast(`🗑️ ${toDelete.length} pronostic(s) de ${name} supprimé(s).`);
+  const hasGroupUpcoming = allMatches.some(m => m.group_name?.startsWith('Groupe') && m.status === 'upcoming');
+  if (!hasGroupUpcoming) { alert('La phase de poules est terminée — réinitialisation impossible.'); return; }
+  if (!confirm(`Réinitialiser tous les pronostics de ${name} ?`)) return;
+  await db.from('pronos').delete().eq('user_id', userId);
+  await loadAllUsers();
   await loadMyPronos();
   updateStats();
   renderMatches();
   renderAdminPanel();
+  showToast(`🗑️ Pronostics de ${name} réinitialisés.`);
 }
 
 async function changeTeam(userId, name) {
