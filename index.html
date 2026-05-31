@@ -1002,12 +1002,17 @@ async function resetPronos(userId, name) {
   const matchIds = groupMatches.map(m => m.id);
   const { data: pronos } = await db.from('pronos').select('id').eq('user_id', userId).in('match_id', matchIds);
   if (pronos && pronos.length) {
-    await db.from('pronos').delete().in('id', pronos.map(p => p.id));
+    for (const p of pronos) {
+      await db.from('pronos').delete().eq('id', p.id);
+    }
     showToast(`🗑️ ${pronos.length} pronostic(s) de ${name} réinitialisé(s).`);
   } else {
     showToast(`ℹ️ Aucun pronostic de poules à venir pour ${name}.`);
   }
   await loadMyPronos();
+  await loadAllUsers();
+  updateStats();
+  renderMatches();
   renderAdminPanel();
 }
 
