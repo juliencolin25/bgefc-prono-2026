@@ -517,7 +517,11 @@ const FLAG_CODES = {
   "Ghana":"gh","Cameroun":"cm","Égypte":"eg","Côte d'Ivoire":"ci",
   "RD Congo":"cd","Nouvelle-Zélande":"nz","Serbie":"rs","Autriche":"at",
   "Turquie":"tr","Hongrie":"hu","Grèce":"gr","Venezuela":"ve","Irak":"iq",
-  "Jordanie":"jo","Angola":"ao","Afrique du Sud":"za"
+  "Jordanie":"jo","Angola":"ao","Afrique du Sud":"za",
+  "Qatar":"qa","Haïti":"ht","Écosse":"gb-sct","Paraguay":"py","Curaçao":"cw",
+  "Tunisie":"tn","Cap-Vert":"cv","Norvège":"no","Algérie":"dz","Ouzbékistan":"uz",
+  "Danemark":"dk","Pays de Galles":"gb-wls","Roumanie":"ro","Slovaquie":"sk",
+  "Ukraine":"ua","Suède":"se","Pologne":"pl","Jamaïque":"jm"
 };
 function flagImg(team, size, fallback){const c=FLAG_CODES[team];const s=size||56;return c?`<img src="flags/${c}.svg" width="${s}" alt="${team}" style="vertical-align:middle">`:(`<span style="font-size:${Math.round(s*0.65)}px;line-height:1">`+(fallback||team||'')+'</span>');}
 // AJOUT MASTER PROMPT 2026 - Donnees equipes
