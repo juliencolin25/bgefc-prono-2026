@@ -939,6 +939,7 @@ async function renderAdminPanel() {
       <td>${u.is_admin ? '<span class="admin-badge">ADMIN</span>' : ''}</td>
       <td>
         <button class="btn-info" onclick="changeTeam('${u.id}','${u.name}')">Équipe</button>
+        <button class="btn-info" style="background:#9B5DE5" onclick="resetPronos('${u.id}','${u.name}')">↺ Pronos</button>
         ${!u.is_admin ? `<button class="btn-danger" onclick="deleteUser('${u.id}','${u.name}')">Supprimer</button>` : ''}
       </td>
     </tr>`;
@@ -988,6 +989,25 @@ async function deleteUser(userId, name) {
   await db.from('users').delete().eq('id', userId);
   await loadAllUsers();
   showToast('🗑️ Compte supprimé.');
+  renderAdminPanel();
+}
+
+async function resetPronos(userId, name) {
+  const groupMatches = allMatches.filter(m => m.group_name?.startsWith('Groupe') && m.status === 'upcoming');
+  if (!groupMatches.length) {
+    alert('La phase de poules est terminée — réinitialisation impossible.');
+    return;
+  }
+  if (!confirm(`Réinitialiser les pronostics de phase de poules de ${name} ?\nSeuls les matchs à venir seront effacés.`)) return;
+  const matchIds = groupMatches.map(m => m.id);
+  const { data: pronos } = await db.from('pronos').select('id').eq('user_id', userId).in('match_id', matchIds);
+  if (pronos && pronos.length) {
+    await db.from('pronos').delete().in('id', pronos.map(p => p.id));
+    showToast(`🗑️ ${pronos.length} pronostic(s) de ${name} réinitialisé(s).`);
+  } else {
+    showToast(`ℹ️ Aucun pronostic de poules à venir pour ${name}.`);
+  }
+  await loadMyPronos();
   renderAdminPanel();
 }
 
