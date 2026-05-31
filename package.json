@@ -1,0 +1,10 @@
+{
+  "name": "bgefc-prono-2026",
+  "version": "1.0.0",
+  "description": "Jeu de pronostics Coupe du Monde 2026 — BGE Franche-Comté",
+  "private": true,
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod"
+  }
+}
