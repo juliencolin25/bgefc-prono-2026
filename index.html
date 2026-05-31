@@ -810,8 +810,8 @@ function openModal(id) {
   };
   rf(m.team1, 'modalForm1'); rf(m.team2, 'modalForm2');
   const prono = myPronos[id];
-  document.getElementById('modalScore1').value = prono ? prono.score1 : 1;
-  document.getElementById('modalScore2').value = prono ? prono.score2 : 1;
+  document.getElementById('modalScore1').value = prono ? prono.score1 : '';
+  document.getElementById('modalScore2').value = prono ? prono.score2 : '';
   document.getElementById('matchModal').classList.add('open');
 }
 
