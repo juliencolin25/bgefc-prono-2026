@@ -498,6 +498,27 @@ const PALMARES = {
   "Pays-Bas":"🥈 Finaliste 1974, 1978, 2010<br>🥉 3ème 2014",
 };
 
+// Nombre de qualifications en Coupe du Monde (pour équipes sans palmarès)
+const QUALIFS = {
+  "Belgique":14,"Suisse":12,"Colombie":7,"Croatie":6,"Nigéria":7,
+  "Arabie Saoudite":6,"Corée du Sud":11,"Australie":6,"Iran":7,
+  "Uruguay":14,"Chili":9,"Équateur":4,"Panama":3,"Sénégal":4,
+  "Ghana":4,"Cameroun":9,"Égypte":4,"Côte d'Ivoire":4,"RD Congo":3,
+  "Nouvelle-Zélande":3,"Serbie":13,"Autriche":8,"Turquie":3,
+  "Hongrie":10,"Grèce":3,"Venezuela":1,"Irak":2,"Jordanie":1,
+  "Angola":2,"Afrique du Sud":4,"Qatar":2,"Haïti":2,"Écosse":9,
+  "Paraguay":9,"Tunisie":6,"Cap-Vert":1,"Norvège":3,"Algérie":5,
+  "Ouzbékistan":1,"Danemark":6,"Pays de Galles":2,"Roumanie":8,
+  "Slovaquie":2,"Ukraine":4,"Suède":12,"Pologne":9,"Jamaïque":2,
+  "Curaçao":1
+};
+function qualifLabel(team) {
+  const n = QUALIFS[team];
+  if (!n) return '⭐ Données à venir';
+  const ord = n === 1 ? '1ère' : `${n}ème`;
+  return `🌍 ${ord} qualification en Coupe du Monde`;
+}
+
 const FORME = {
   "France":["W","W","D","W","W"],"Brésil":["W","W","W","L","W"],
   "Allemagne":["W","D","W","W","D"],"Espagne":["W","W","W","W","D"],
@@ -804,8 +825,8 @@ function openModal(id) {
   document.getElementById('modalPronoTeam1').textContent = m.team1;
   document.getElementById('modalPronoTeam2').textContent = m.team2;
   document.getElementById('modalMeta').textContent = `${m.group_name} — ${m.match_date} ${m.match_time}`;
-  document.getElementById('modalPalmares1').innerHTML = PALMARES[m.team1] || '⭐ Données disponibles prochainement';
-  document.getElementById('modalPalmares2').innerHTML = PALMARES[m.team2] || '⭐ Données disponibles prochainement';
+  document.getElementById('modalPalmares1').innerHTML = PALMARES[m.team1] || qualifLabel(m.team1);
+  document.getElementById('modalPalmares2').innerHTML = PALMARES[m.team2] || qualifLabel(m.team2);
   const rf = (team, el) => {
     const f = FORME[team] || ['W','D','W','L','W'];
     document.getElementById(el).innerHTML = f.map(r => `<div class="form-badge form-${r}">${r}</div>`).join('');
