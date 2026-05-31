@@ -993,37 +993,26 @@ async function deleteUser(userId, name) {
 }
 
 async function resetPronos(userId, name) {
-  // Vérifie qu'on est encore en phase de poules
   const groupMatches = allMatches.filter(m => m.group_name?.startsWith('Groupe'));
-  const hasUpcoming = groupMatches.some(m => m.status === 'upcoming');
-  console.log('resetPronos - groupMatches:', groupMatches.length, 'hasUpcoming:', hasUpcoming, 'userId:', userId);
-  if (!hasUpcoming) {
+  if (!groupMatches.some(m => m.status === 'upcoming')) {
     alert('La phase de poules est terminée — réinitialisation impossible.');
     return;
   }
-  if (!confirm(`Réinitialiser TOUS les pronostics de poules de ${name} ?`)) return;
-  // Récupère tous les pronos de cet utilisateur
-  const { data: allUserPronos, error: fetchErr } = await db.from('pronos').select('*').eq('user_id', userId);
-  console.log('Pronos de l\'utilisateur:', allUserPronos, fetchErr);
-  if (!allUserPronos || !allUserPronos.length) {
-    showToast(`ℹ️ Aucun pronostic à réinitialiser pour ${name}.`);
-    return;
+  if (!confirm(`Réinitialiser les pronostics de poules de ${name} ?`)) return;
+  // Récupère les pronos de cet utilisateur puis supprime un par un
+  const { data: userPronos } = await db.from('pronos').select('id,match_id').eq('user_id', userId);
+  if (!userPronos || !userPronos.length) {
+    showToast(`ℹ️ Aucun pronostic pour ${name}.`); return;
   }
-  // Filtre sur les matchs de groupe
   const groupMatchIds = new Set(groupMatches.map(m => m.id));
-  const toDelete = allUserPronos.filter(p => groupMatchIds.has(p.match_id));
-  console.log('À supprimer:', toDelete.length, 'IDs:', toDelete.map(p=>p.id));
+  const toDelete = userPronos.filter(p => groupMatchIds.has(p.match_id));
   if (!toDelete.length) {
-    showToast(`ℹ️ Aucun pronostic de poules pour ${name}.`);
-    return;
+    showToast(`ℹ️ Aucun pronostic de poules pour ${name}.`); return;
   }
-  const { error: delErr } = await db.from('pronos').delete().eq('user_id', userId).in('match_id', [...groupMatchIds]);
-  console.log('Erreur suppression:', delErr);
-  if (!delErr) {
-    showToast(`🗑️ ${toDelete.length} pronostic(s) de ${name} supprimé(s).`);
-  } else {
-    showToast(`❌ Erreur : ${delErr.message}`);
+  for (const p of toDelete) {
+    await db.from('pronos').delete().eq('id', p.id);
   }
+  showToast(`🗑️ ${toDelete.length} pronostic(s) de ${name} supprimé(s).`);
   await loadMyPronos();
   updateStats();
   renderMatches();
