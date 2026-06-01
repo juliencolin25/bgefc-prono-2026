@@ -828,7 +828,14 @@ function switchTab(t, btn) {
 // FILTRES
 // ============================================================
 function renderFilters() {
-  const groups = ['all', ...new Set(allMatches.map(m => m.group_name))];
+  const ORDER = [
+    'all',
+    'Groupe A','Groupe B','Groupe C','Groupe D','Groupe E','Groupe F',
+    'Groupe G','Groupe H','Groupe I','Groupe J','Groupe K','Groupe L',
+    '32es de finale','16es de finale','Quart de finale','Demi-finale','Match 3ème place','Finale'
+  ];
+  const available = new Set(allMatches.map(m => m.group_name));
+  const groups = ORDER.filter(g => g === 'all' || available.has(g));
   document.getElementById('filterBar').innerHTML = groups.map(g => `
     <button class="filter-btn ${g === activeGroup ? 'active' : ''}" onclick="filterGroup('${g}')">
       ${g === 'all' ? '🌍 Tous' : g}
