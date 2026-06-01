@@ -179,8 +179,8 @@ export default async function handler(req, res) {
         score2_real: score2Real,
       };
 
-      // Upsert dans Supabase (on_conflict=id pour éviter les doublons)
-      await supabaseRequest('/matches?on_conflict=id', 'POST', updateData);
+      // Upsert dans Supabase (on_conflict sur team1+team2+match_date)
+      await supabaseRequest('/matches?on_conflict=team1,team2,match_date', 'POST', updateData);
       updated++;
 
       // Recalculer les points si match terminé
