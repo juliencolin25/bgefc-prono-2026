@@ -847,10 +847,16 @@ function filterGroup(g) { activeGroup = g; renderFilters(); renderMatches(); }
 // ============================================================
 // MATCHS
 // ============================================================
+const GROUP_ORDER = ['Groupe A','Groupe B','Groupe C','Groupe D','Groupe E','Groupe F','Groupe G','Groupe H','Groupe I','Groupe J','Groupe K','Groupe L','32es de finale','16es de finale','Quart de finale','Demi-finale','Match 3ème place','Finale'];
 function renderMatches() {
   const filtered = activeGroup === 'all' ? allMatches : allMatches.filter(m => m.group_name === activeGroup);
+  const sorted = [...filtered].sort((a, b) => {
+    const oa = GROUP_ORDER.indexOf(a.group_name), ob = GROUP_ORDER.indexOf(b.group_name);
+    if (oa !== ob) return oa - ob;
+    return (a.match_date + a.match_time).localeCompare(b.match_date + b.match_time);
+  });
   let html = '', cg = '';
-  filtered.forEach(m => {
+  sorted.forEach(m => {
     if (m.group_name !== cg) { cg = m.group_name; html += `<div class="section-title" style="margin-top:1.5rem">${cg}</div>`; }
     const prono = myPronos[m.id];
     const statusLabel = m.status === 'live' ? '🔴 EN DIRECT' : m.status === 'done' ? '✅ TERMINÉ' : '⏳ À VENIR';
