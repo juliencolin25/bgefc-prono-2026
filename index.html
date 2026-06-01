@@ -526,6 +526,8 @@ const PALMARES = {
   "Côte d'Ivoire":"⭐ Phases de groupes (2006, 2010, 2014)<br>🏆 2× vainqueur CAN<br>🌍 4 participations",
   "Égypte":"⭐ 1ère CM en 1934 (Afrique)<br>🏆 7× vainqueur CAN (record !)<br>🌍 4 participations",
   "Maroc":"⭐ 4ème en 2022<br>🏆 1er pays africain en demi-finale<br>🌍 Meilleur résultat africain",
+  "Bosnie-Herzégovine":"⭐ 1ère CM en 2014<br>🌍 2ème participation en 2026<br>⭐ Edin Džeko : légende nationale, 65+ buts",
+  "Tchéquie":"🥈 Finaliste 1934 & 1962 (Tchécoslovaquie)<br>🏆 Euro 1976, 1980 (Tchécoslovaquie)<br>⭐ Euro 1996 (finaliste), 2004 (demi-finale)",
 };
 
 // Nombre de qualifications en Coupe du Monde (pour équipes sans palmarès)
@@ -540,7 +542,7 @@ const QUALIFS = {
   "Paraguay":9,"Tunisie":6,"Cap-Vert":1,"Norvège":3,"Algérie":5,
   "Ouzbékistan":1,"Danemark":6,"Pays de Galles":2,"Roumanie":8,
   "Slovaquie":2,"Ukraine":4,"Suède":12,"Pologne":9,"Jamaïque":2,
-  "Curaçao":1
+  "Curaçao":1,"Bosnie-Herzégovine":2,"Tchéquie":10
 };
 function qualifLabel(team) {
   const n = QUALIFS[team];
@@ -630,6 +632,8 @@ Object.assign(TEAM_DATA, {
 "Haïti":{"flag":"🇭🇹","forme":["W","D","W","D","L"],"lineup":"Formation: 4-3-3\nGardien: Josue Duverger\nDéf: Jems Geffrard, Mechack Jerome, Andrew Jean-Baptiste, Manuel Pena\nMil: Duckens Nazon, Wilde Donald Guerrier, Jeff Louis\nAtt: Nicolas Janvier, Frantzdy Pierrot, Kevin Lafrance","anecdote":"Haïti a participé à la CM 1974. Ernst Jean-Joseph fut le 1er joueur à être contrôlé positif à un test antidopage en CM."},
 "Ouzbékistan":{"flag":"🇺🇿","forme":["W","W","D","W","D"],"lineup":"Formation: 4-3-3\nGardien: Suyunov\nDéf: Jaloliddinov, Ashurmatov, Khasanov, Tursunov\nMil: Shomurodov, Masharipov, Hamrobekov\nAtt: Djeparov, Yusupov, Bakaev","anecdote":"L'Ouzbékistan dispute sa toute 1ère CM. L'équipe est composée de joueurs évoluant majoritairement en Russie et Turquie."},
 "South Africa":{"flag":"🇿🇦","forme":["W","D","W","D","W"],"lineup":"Formation: 4-3-3\nGardien: Williams\nDéf: Mudau, Xulu, Tau, Modiba\nMil: Zwane, Mokwena, Mokoena\nAtt: Dolly, Lorch, Mofokeng","anecdote":"L'Afrique du Sud est le seul pays hôte à ne pas avoir passé la phase de groupes (CM 2010). Première CM africaine de l'histoire."},
+"Bosnie-Herzégovine":{"flag":"🇧🇦","forme":["W","D","W","L","W"],"lineup":"Formation: 4-2-3-1\nGardien: Sehic\nDéf: Kolasinac, Sanicanin, Bicakcic, Cipetic\nMil: Krunic, Pjanic\nMil off: Gojak, Tahirovic, Stevanovic\nAtt: Dzeko","anecdote":"Edin Džeko est le meilleur buteur de l'histoire de la Bosnie avec plus de 65 buts. La Bosnie dispute sa 2ème CM après 2014, où elle avait failli se qualifier pour les huitièmes."},
+"Tchéquie":{"flag":"🇨🇿","forme":["W","D","W","W","L"],"lineup":"Formation: 4-2-3-1\nGardien: Stanek\nDéf: Coufal, Holes, Krejci, Boril\nMil: Soucek, Sadilek\nMil off: Cerny, Barak, Jankto\nAtt: Chytil","anecdote":"La Tchéquie (ex-Tchécoslovaquie) a été finaliste de la CM 1934 et 1962. Pavel Nedvěd, Ballon d'Or 2003, reste la plus grande légende du football tchèque."},
 "À déterminer":{"flag":"🏳️","forme":["W","D","W","D","W"],"lineup":"Composition à déterminer","anecdote":"Cette équipe sera désignée à l'issue des matchs qualificatifs ou de barrage."},
 "TBD":{"flag":"🏳️","forme":["W","D","W","D","W"],"lineup":"Composition à déterminer","anecdote":"Cette équipe sera désignée à l'issue des matchs qualificatifs ou de barrage."}
 });
