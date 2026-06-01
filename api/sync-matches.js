@@ -58,7 +58,7 @@ const TEAM_FR = {
   'IR Iran': 'Iran', 'Cape Verde Islands': 'Cap-Vert',
   'Bosnia and Herzegovina': 'Bosnie-Herzégovine',
   'North Macedonia': 'Macédoine du Nord',
-  'Czech Republic': 'République Tchèque', 'Czechia': 'République Tchèque',
+  'Czech Republic': 'Tchéquie', 'Czechia': 'Tchéquie',
   'Kyrgyzstan': 'Kirghizstan', 'Tajikistan': 'Tadjikistan',
   'Turkmenistan': 'Turkménistan', 'Kazakhstan': 'Kazakhstan',
   'El Salvador': 'El Salvador', 'Cuba': 'Cuba', 'Guatemala': 'Guatemala',
