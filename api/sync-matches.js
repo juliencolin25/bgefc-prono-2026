@@ -89,9 +89,9 @@ function getStatus(match) {
 
 function getGroupName(match) {
   if (match.stage === 'GROUP_STAGE') return 'Groupe ' + match.group?.replace('GROUP_', '');
-  if (match.stage === 'ROUND_OF_32') return 'Huitième de finale';
-  if (match.stage === 'ROUND_OF_16') return 'Quart de finale';
-  if (match.stage === 'QUARTER_FINALS') return 'Demi-finale';
+  if (match.stage === 'ROUND_OF_32' || match.stage === 'LAST_32') return '32es de finale';
+  if (match.stage === 'ROUND_OF_16' || match.stage === 'LAST_16') return '16es de finale';
+  if (match.stage === 'QUARTER_FINALS') return 'Quart de finale';
   if (match.stage === 'SEMI_FINALS') return 'Demi-finale';
   if (match.stage === 'THIRD_PLACE') return 'Match 3ème place';
   if (match.stage === 'FINAL') return 'Finale';
@@ -179,8 +179,8 @@ export default async function handler(req, res) {
         score2_real: score2Real,
       };
 
-      // Upsert dans Supabase
-      await supabaseRequest('/matches', 'POST', updateData);
+      // Upsert dans Supabase (on_conflict=id pour éviter les doublons)
+      await supabaseRequest('/matches?on_conflict=id', 'POST', updateData);
       updated++;
 
       // Recalculer les points si match terminé
