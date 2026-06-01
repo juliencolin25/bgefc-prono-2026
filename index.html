@@ -553,13 +553,24 @@ const TEAM_DATA = {"France":{"flag":"🇫🇷","palmares":"🥇 Champion du Mond
 const JEANNOT_CONSEILS = ["Analyse la forme récente des équipes sur les 5 derniers matchs avant de miser.","Un match nul rapporte souvent autant qu'une victoire dans un groupe serré.","Les équipes hôtes ont toujours un avantage psychologique.","Méfie-toi des équipes favorites en huitièmes, les surprises sont fréquentes.","L'équipe qui marque en premier gagne 70% des matchs en phase de groupes.","Un gardien en forme vaut autant que deux attaquants de talent.","Les équipes africaines sont redoutables lors des premières phases de groupes.","Ne sous-estime jamais une équipe asiatique: le Japon l'a prouvé en 2022.","Les pénaltys sont une loterie, mais un bon tireur fait la différence.","L'expérience en CM est décisive lors des matchs couperets.","Les équipes qui pressent haut fatiguent lors des prolongations.","Un carton rouge change complètement l'analyse d'un match.","Les blessures de dernière minute peuvent tout bouleverser.","Regarde les statistiques de corners: elles révèlent la domination réelle.","L'Espagne aime posséder le ballon mais marque souvent en contre.","L'Argentine est la meilleure équipe pour gagner les matchs difficiles.","Le Brésil n'a jamais gagné une CM en dehors des Amériques.","L'Allemagne est dangereuse même en mauvaise forme: ne jamais les enterrer.","Un bon milieu de terrain est la clé d'une équipe championne du monde.","Méfie-toi de la chaleur: les équipes nordiques souffrent par temps chaud.","Un attaquant en confiance peut porter une équipe à lui seul.","Le calendrier de groupes influence le résultat du dernier match.","Les équipes qui gagnent leur groupe arrivent mieux préparées pour les 8es.","Un match de groupes trop facile peut endormir une équipe.","La différence de buts peut être décisive: score toujours à fond.","Les équipes qui défendent ensemble battent celles avec des stars.","Analyse les confrontations directes historiques entre deux équipes.","Les surprises arrivent quand on s'y attend le moins.","Un bon entraîneur peut surpasser un mauvais effectif.","La motivation de ne pas rentrer à la maison est immense.","En phase à élimination directe, la tactique prime sur le talent.","Un pénalty raté au mauvais moment brise la confiance d'une équipe.","Regarde les stats de possession: elles indiquent qui domine vraiment.","Un match nul 0-0 peut convenir aux deux équipes en fin de groupes.","Les équipes qui jouent ensemble depuis longtemps ont un avantage.","La profondeur du banc est cruciale avec des matchs rapprochés.","Les équipes avec un bon pressing récupèrent plus de ballons dangereux.","Un but concédé en fin de match peut détruire la confiance d'une équipe.","Les équipes bien organisées défensivement arrivent loin dans les tournois.","Analyse les absences sur blessure: elles peuvent changer une équipe.","Les grandes équipes jouent mieux sous pression.","Un attaquant polyvalent est une arme tactique précieuse.","La météo influence la façon dont les équipes jouent.","Les équipes avec des défaites récentes sont souvent plus motivées.","Un but rapidement encaissé ne signifie pas que tout est perdu.","Les chiffres ne mentent pas, mais le football reste imprévisible.","La CM est un marathon: gère tes pronos sur la durée.","Un remplaçant décisif vaut mieux qu'un titulaire lambda.","Regarde qui joue où: une star déplacée de son poste perd en efficacité.","La confiance collective se construit match après match."];
 // AJOUT MASTER PROMPT 2026 - Modal fiche equipe
 function openTeamModal(teamName){
-  const d=TEAM_DATA[teamName]; if(!d)return;
-  document.getElementById('tmFlag').innerHTML=flagImg(teamName,60)||d.flag;
-  document.getElementById('tmName').textContent=teamName;
-  document.getElementById('tmPalmares').innerHTML=d.palmares.replace(/\n/g,'<br>');
-  document.getElementById('tmForme').innerHTML=d.forme.map(r=>'<div class="forme-dot '+r+'">'+r+'</div>').join('');
-  document.getElementById('tmLineup').textContent=d.lineup;
-  document.getElementById('tmAnecdote').textContent=d.anecdote;
+  const d = TEAM_DATA[teamName] || {};
+  // Palmarès : TEAM_DATA > PALMARES > qualifLabel
+  const palmares = d.palmares || PALMARES[teamName] || qualifLabel(teamName);
+  // Forme : TEAM_DATA > FORME > défaut
+  const forme = d.forme || FORME[teamName] || ['W','D','W','L','W'];
+  // Composition
+  const lineup = d.lineup || '— Composition à venir';
+  // Anecdote
+  const anecdote = d.anecdote || '';
+  document.getElementById('tmFlag').innerHTML = flagImg(teamName, 60) || d.flag || '';
+  document.getElementById('tmName').textContent = teamName;
+  document.getElementById('tmPalmares').innerHTML = palmares.replace ? palmares.replace(/\n/g,'<br>') : palmares;
+  document.getElementById('tmForme').innerHTML = forme.map(r=>'<div class="forme-dot '+r+'">'+r+'</div>').join('');
+  document.getElementById('tmLineup').textContent = lineup;
+  // Masquer la section anecdote si vide
+  const secAnecdote = document.getElementById('tmAnecdote').closest('.team-modal-section');
+  if(anecdote){ document.getElementById('tmAnecdote').textContent=anecdote; secAnecdote.style.display=''; }
+  else { secAnecdote.style.display='none'; }
   document.getElementById('teamModal').classList.add('active');
 }
 function closeTeamModal(){document.getElementById('teamModal').classList.remove('active');}
