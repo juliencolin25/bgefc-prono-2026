@@ -56,7 +56,7 @@ const TEAM_FR = {
   'Ivory Coast': "Côte d'Ivoire", 'United States': 'États-Unis',
   'Korea Republic': 'Corée du Sud', 'Republic of Korea': 'Corée du Sud',
   'IR Iran': 'Iran', 'Cape Verde Islands': 'Cap-Vert',
-  'Bosnia and Herzegovina': 'Bosnie-Herzégovine',
+  'Bosnia and Herzegovina': 'Bosnie-Herzégovine', 'Bosnia-Herzegovina': 'Bosnie-Herzégovine',
   'North Macedonia': 'Macédoine du Nord',
   'Czech Republic': 'Tchéquie', 'Czechia': 'Tchéquie',
   'Kyrgyzstan': 'Kirghizstan', 'Tajikistan': 'Tadjikistan',
