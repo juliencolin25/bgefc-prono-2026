@@ -112,20 +112,34 @@ async function supabaseRequest(path, method, body) {
   return res;
 }
 
-async function calculateAndUpdatePoints(matchId, score1Real, score2Real) {
-  // Récupérer tous les pronostics pour ce match
+const KO_STAGES = ['ROUND_OF_32','LAST_32','ROUND_OF_16','LAST_16','QUARTER_FINALS','SEMI_FINALS','THIRD_PLACE','FINAL'];
+
+async function calculateAndUpdatePoints(matchId, score1Real, score2Real, matchWinner, isKO) {
   const res = await supabaseRequest(`/pronos?match_id=eq.${matchId}`, 'GET');
   const pronos = await res.json();
   if (!pronos || !pronos.length) return;
 
-  const getResult = (s1, s2) => s1 > s2 ? 1 : s1 < s2 ? -1 : 0;
-  const realResult = getResult(score1Real, score2Real);
+  // Vainqueur réel : 'team1', 'team2', ou 'draw'
+  const realWinner = matchWinner === 'HOME_TEAM' ? 'team1'
+                   : matchWinner === 'AWAY_TEAM' ? 'team2'
+                   : 'draw';
 
   for (const p of pronos) {
     let pts = 0;
-    if (p.score1 === score1Real && p.score2 === score2Real) {
-      pts = 5; // Score exact
-    } else if (getResult(p.score1, p.score2) === realResult) {
+    // Vainqueur pronostiqué
+    let pronoWinner;
+    if (isKO && p.score1 === p.score2) {
+      pronoWinner = p.winner || null; // toggle pénaltys
+    } else {
+      pronoWinner = p.score1 > p.score2 ? 'team1' : p.score1 < p.score2 ? 'team2' : 'draw';
+    }
+
+    const scoreExact = p.score1 === score1Real && p.score2 === score2Real;
+    const bonVainqueur = pronoWinner === realWinner;
+
+    if (scoreExact && (!isKO || bonVainqueur)) {
+      pts = 5; // Score exact (+ bon vainqueur si KO avec pénaltys)
+    } else if (bonVainqueur) {
       pts = 3; // Bon vainqueur
     }
     await supabaseRequest(`/pronos?id=eq.${p.id}`, 'PATCH', { points: pts });
@@ -164,6 +178,8 @@ export default async function handler(req, res) {
 
       const score1Real = m.score?.fullTime?.home ?? null;
       const score2Real = m.score?.fullTime?.away ?? null;
+      const matchWinner = m.score?.winner ?? null; // 'HOME_TEAM', 'AWAY_TEAM', 'DRAW'
+      const isKO = KO_STAGES.includes(m.stage);
 
       const updateData = {
         id: m.id,
@@ -177,6 +193,7 @@ export default async function handler(req, res) {
         status,
         score1_real: score1Real,
         score2_real: score2Real,
+        winner: matchWinner,
       };
 
       // Upsert dans Supabase (on_conflict sur id)
@@ -185,7 +202,7 @@ export default async function handler(req, res) {
 
       // Recalculer les points si match terminé
       if (status === 'done' && score1Real !== null) {
-        await calculateAndUpdatePoints(m.id, score1Real, score2Real);
+        await calculateAndUpdatePoints(m.id, score1Real, score2Real, matchWinner, isKO);
         pointsRecalculated++;
       }
     }

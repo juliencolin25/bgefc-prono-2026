@@ -114,6 +114,8 @@ main{max-width:1200px;margin:0 auto;padding:2rem 1.5rem;position:relative;z-inde
 .btn-save{background:linear-gradient(135deg,var(--rouge),var(--orange));border:none;border-radius:8px;padding:.4rem 1rem;color:white;font-family:'Nunito',sans-serif;font-size:.8rem;font-weight:800;cursor:pointer;transition:all .2s;margin-left:auto;}
 .btn-save:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(230,57,70,.3);}
 .prono-saved{margin-left:auto;font-size:.78rem;color:#2e7d32;font-weight:800;}
+.pen-btn{padding:.35rem .9rem;border-radius:50px;border:2px solid var(--gris-med);background:var(--gris-clair);color:var(--gris);font-family:'Nunito',sans-serif;font-size:.78rem;font-weight:800;cursor:pointer;transition:all .2s;}
+.pen-btn-active{background:var(--navy);border-color:var(--navy);color:white;}
 
 /* CARD */
 .card{background:var(--blanc);border-radius:16px;padding:1.5rem;box-shadow:var(--shadow);}
@@ -879,31 +881,66 @@ function renderMatches() {
         <div class="prono-zone" onclick="event.stopPropagation()">
           <span class="prono-label">Mon prono :</span>
           <div class="prono-inputs">
-            <input type="number" min="0" max="20" class="prono-input" id="pi1_${m.id}" value="${prono ? prono.score1 : ''}" placeholder="?">
+            <input type="number" min="0" max="20" class="prono-input" id="pi1_${m.id}" value="${prono ? prono.score1 : ''}" placeholder="?" oninput="checkPenalty(${m.id},'${m.group_name}','${m.team1}','${m.team2}')">
             <span class="prono-sep">—</span>
-            <input type="number" min="0" max="20" class="prono-input" id="pi2_${m.id}" value="${prono ? prono.score2 : ''}" placeholder="?">
+            <input type="number" min="0" max="20" class="prono-input" id="pi2_${m.id}" value="${prono ? prono.score2 : ''}" placeholder="?" oninput="checkPenalty(${m.id},'${m.group_name}','${m.team1}','${m.team2}')">
           </div>
-          ${prono ? `<span class="prono-saved">✅ ${prono.score1}—${prono.score2}</span>` : `<button class="btn-save" onclick="quickSave(${m.id})">Valider</button>`}
+          ${prono ? `<span class="prono-saved">✅ ${prono.score1}—${prono.score2}${prono.winner ? ' (+tab)' : ''}</span>` : `<button class="btn-save" onclick="quickSave(${m.id},'${m.group_name}')">Valider</button>`}
+        </div>
+        <div id="pen_${m.id}" style="display:none;padding:.6rem 1rem .4rem;border-top:2px dashed #f0e0cc;text-align:center;font-size:.75rem;color:#e06c00;font-weight:800" onclick="event.stopPropagation()">
+          ⚽ QUI GAGNE AUX TIRS AU BUT ?
+          <div style="display:flex;gap:.5rem;justify-content:center;margin-top:.5rem">
+            <button id="penBtn1_${m.id}" onclick="selectPenWinner(${m.id},'team1')" class="pen-btn pen-btn-active">${m.team1}</button>
+            <button id="penBtn2_${m.id}" onclick="selectPenWinner(${m.id},'team2')" class="pen-btn">${m.team2}</button>
+          </div>
         </div>` : ''}
       </div>`;
   });
   document.getElementById('matchsList').innerHTML = html || '<div class="loading">Aucun match trouvé.</div>';
 }
 
-async function quickSave(matchId) {
+const KO_GROUPS = ['32es de finale','16es de finale','Quart de finale','Demi-finale','Match 3ème place','Finale'];
+const penWinners = {}; // matchId → 'team1' | 'team2'
+
+function checkPenalty(matchId, groupName, team1, team2) {
+  if (!KO_GROUPS.includes(groupName)) return;
+  const s1 = document.getElementById('pi1_' + matchId)?.value;
+  const s2 = document.getElementById('pi2_' + matchId)?.value;
+  const zone = document.getElementById('pen_' + matchId);
+  if (!zone) return;
+  const isDraw = s1 !== '' && s2 !== '' && s1 === s2;
+  zone.style.display = isDraw ? 'block' : 'none';
+  if (!isDraw) delete penWinners[matchId];
+}
+
+function selectPenWinner(matchId, winner) {
+  penWinners[matchId] = winner;
+  document.getElementById('penBtn1_' + matchId)?.classList.toggle('pen-btn-active', winner === 'team1');
+  document.getElementById('penBtn2_' + matchId)?.classList.toggle('pen-btn-active', winner === 'team2');
+  document.getElementById('penBtn1_' + matchId)?.classList.toggle('pen-btn', winner !== 'team1');
+  document.getElementById('penBtn2_' + matchId)?.classList.toggle('pen-btn', winner !== 'team2');
+}
+
+async function quickSave(matchId, groupName) {
   const s1 = parseInt(document.getElementById('pi1_' + matchId)?.value);
   const s2 = parseInt(document.getElementById('pi2_' + matchId)?.value);
   if (isNaN(s1) || isNaN(s2)) return;
-  await saveProno(matchId, s1, s2);
+  // Vérifier que le vainqueur pénaltys est sélectionné si nécessaire
+  if (KO_GROUPS.includes(groupName) && s1 === s2 && !penWinners[matchId]) {
+    showToast('⚠️ Choisis le vainqueur aux tirs au but !');
+    return;
+  }
+  await saveProno(matchId, s1, s2, penWinners[matchId] || null);
 }
 
-async function saveProno(matchId, s1, s2) {
+async function saveProno(matchId, s1, s2, winner = null) {
   const existing = myPronos[matchId];
   let result;
+  const data = { score1: s1, score2: s2, winner, updated_at: new Date().toISOString() };
   if (existing) {
-    result = await db.from('pronos').update({ score1: s1, score2: s2, updated_at: new Date().toISOString() }).eq('id', existing.id).select().single();
+    result = await db.from('pronos').update(data).eq('id', existing.id).select().single();
   } else {
-    result = await db.from('pronos').insert({ user_id: currentUser.id, match_id: matchId, score1: s1, score2: s2 }).select().single();
+    result = await db.from('pronos').insert({ user_id: currentUser.id, match_id: matchId, ...data }).select().single();
   }
   if (result.data) {
     myPronos[matchId] = result.data;
