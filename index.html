@@ -1050,18 +1050,26 @@ async function renderRanking() {
 async function renderTeamRanking() {
   const allPronos = await loadAllPronos();
   const scores = {};
-  TEAMS_BGE.forEach(t => { scores[t] = { total: 0, count: 0 }; });
+  TEAMS_BGE.forEach(t => { scores[t] = { total: 0, scored: 0, count: 0 }; });
   allUsers.forEach(u => {
     const userPronos = allPronos.filter(p => p.user_id === u.id);
-    const pts = userPronos.reduce((s, p) => s + (p.points || 0), 0);
-    if (scores[u.team]) { scores[u.team].total += pts; scores[u.team].count++; }
+    const scoredPronos = userPronos.filter(p => p.points !== null);
+    const pts = scoredPronos.reduce((s, p) => s + p.points, 0);
+    if (scores[u.team]) {
+      scores[u.team].total += pts;
+      scores[u.team].scored += scoredPronos.length;
+      scores[u.team].count++;
+    }
   });
-  const ranked = Object.entries(scores).map(([name, s]) => ({ name, avg: s.count > 0 ? Math.round(s.total / s.count) : 0, count: s.count })).sort((a, b) => b.avg - a.avg);
-  const maxAvg = ranked[0]?.avg || 1;
+  const ranked = Object.entries(scores).map(([name, s]) => ({
+    name,
+    avg: s.scored > 0 ? (s.total / s.scored) : 0,
+    count: s.count
+  })).sort((a, b) => b.avg - a.avg);
   const medals = ['🥇','🥈','🥉'];
   document.getElementById('teamRankingList').innerHTML = ranked.map((t, i) => {
     const color = TEAM_COLORS[t.name] || '#118AB2';
-    const pct = maxAvg > 0 ? Math.round((t.avg / maxAvg) * 100) : 0;
+    const pct = Math.round((t.avg / 5) * 100);
     const rankColor = i === 0 ? '#F59E0B' : i === 1 ? '#9CA3AF' : i === 2 ? '#B45309' : color;
     return `<div class="team-rank-card">
       <div class="team-rank-num" style="color:${rankColor}">${medals[i] || (i + 1)}</div>
@@ -1072,8 +1080,8 @@ async function renderTeamRanking() {
         <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${color}"></div></div>
       </div>
       <div class="team-rank-score">
-        <div class="team-rank-pts" style="color:${color}">${t.avg}</div>
-        <div class="team-rank-label">pts moy.</div>
+        <div class="team-rank-pts" style="color:${color}">${t.avg.toFixed(2)}</div>
+        <div class="team-rank-label">moy. /5</div>
       </div>
     </div>`;
   }).join('');
@@ -1084,10 +1092,13 @@ async function renderTeamCards() {
   document.getElementById('teamCards').innerHTML = TEAMS_BGE.map(t => {
     const color = TEAM_COLORS[t] || '#118AB2';
     const members = allUsers.filter(u => u.team === t).map(u => {
-      const pts = allPronos.filter(p => p.user_id === u.id).reduce((s, p) => s + (p.points || 0), 0);
+      const userPronos = allPronos.filter(p => p.user_id === u.id);
+      const pts = userPronos.reduce((s, p) => s + (p.points || 0), 0);
       return { ...u, pts };
     }).sort((a, b) => b.pts - a.pts);
-    const avg = members.length > 0 ? Math.round(members.reduce((s, m) => s + m.pts, 0) / members.length) : 0;
+    const scoredPronos = allPronos.filter(p => members.some(m => m.id === p.user_id) && p.points !== null);
+    const totalPts = scoredPronos.reduce((s, p) => s + p.points, 0);
+    const avg = scoredPronos.length > 0 ? (totalPts / scoredPronos.length).toFixed(2) : '0.00';
     const isMe = currentUser.team === t;
     return `<div class="card" style="border-top:4px solid ${color}${isMe ? ';box-shadow:0 4px 20px ' + color + '44' : ''}">
       <div style="display:flex;align-items:center;gap:.8rem;margin-bottom:1rem">
@@ -1098,7 +1109,7 @@ async function renderTeamCards() {
         </div>
         <div style="text-align:right">
           <div style="font-family:'Bebas Neue';font-size:2rem;color:${color};line-height:1">${avg}</div>
-          <div style="font-size:.65rem;color:var(--gris);font-weight:700">pts moy.</div>
+          <div style="font-size:.65rem;color:var(--gris);font-weight:700">moy. /5</div>
         </div>
       </div>
       ${members.map(m => `<div style="display:flex;justify-content:space-between;font-size:.83rem;padding:.35rem 0;border-bottom:1px solid var(--gris-clair)"><span style="font-weight:700;color:var(--navy)">${m.name}</span><span style="color:${color};font-weight:900">${m.pts} pts</span></div>`).join('')}
