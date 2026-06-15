@@ -937,11 +937,19 @@ function selectPenWinner(matchId, winner) {
   document.getElementById('penBtn2_' + matchId)?.classList.toggle('pen-btn', winner !== 'team2');
 }
 
+function isMatchLocked(matchId) {
+  const m = allMatches.find(x => x.id === matchId);
+  return m && (m.status === 'live' || m.status === 'done');
+}
+
 async function quickSave(matchId, groupName) {
+  if (isMatchLocked(matchId)) {
+    showToast('🔒 Match commencé — pronostic verrouillé !');
+    return;
+  }
   const s1 = parseInt(document.getElementById('pi1_' + matchId)?.value);
   const s2 = parseInt(document.getElementById('pi2_' + matchId)?.value);
   if (isNaN(s1) || isNaN(s2)) return;
-  // Vérifier que le vainqueur pénaltys est sélectionné si nécessaire
   if (KO_GROUPS.includes(groupName) && s1 === s2 && !penWinners[matchId]) {
     showToast('⚠️ Choisis le vainqueur aux tirs au but !');
     return;
@@ -950,6 +958,10 @@ async function quickSave(matchId, groupName) {
 }
 
 async function saveProno(matchId, s1, s2, winner = null) {
+  if (isMatchLocked(matchId)) {
+    showToast('🔒 Match commencé — pronostic verrouillé !');
+    return;
+  }
   const existing = myPronos[matchId];
   let result;
   const data = { score1: s1, score2: s2, winner, updated_at: new Date().toISOString() };
@@ -1010,6 +1022,11 @@ function closeModal() { document.getElementById('matchModal').classList.remove('
 
 async function saveModalProno() {
   if (!currentMatchId) return;
+  if (isMatchLocked(currentMatchId)) {
+    showToast('🔒 Match commencé — pronostic verrouillé !');
+    closeModal();
+    return;
+  }
   const s1 = parseInt(document.getElementById('modalScore1').value);
   const s2 = parseInt(document.getElementById('modalScore2').value);
   await saveProno(currentMatchId, s1, s2);
