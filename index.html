@@ -1049,21 +1049,17 @@ async function renderRanking() {
 
 async function renderTeamRanking() {
   const allPronos = await loadAllPronos();
+  const finishedMatches = allMatches.filter(m => m.status === 'done').length;
   const scores = {};
-  TEAMS_BGE.forEach(t => { scores[t] = { total: 0, scored: 0, count: 0 }; });
+  TEAMS_BGE.forEach(t => { scores[t] = { total: 0, count: 0 }; });
   allUsers.forEach(u => {
-    const userPronos = allPronos.filter(p => p.user_id === u.id);
-    const scoredPronos = userPronos.filter(p => p.points !== null);
-    const pts = scoredPronos.reduce((s, p) => s + p.points, 0);
-    if (scores[u.team]) {
-      scores[u.team].total += pts;
-      scores[u.team].scored += scoredPronos.length;
-      scores[u.team].count++;
-    }
+    const pts = allPronos.filter(p => p.user_id === u.id && p.points !== null).reduce((s, p) => s + p.points, 0);
+    if (scores[u.team]) { scores[u.team].total += pts; scores[u.team].count++; }
   });
+  const divisor = finishedMatches || 1;
   const ranked = Object.entries(scores).map(([name, s]) => ({
     name,
-    avg: s.scored > 0 ? (s.total / s.scored) : 0,
+    avg: s.count > 0 ? (s.total / (s.count * divisor)) : 0,
     count: s.count
   })).sort((a, b) => b.avg - a.avg);
   const medals = ['🥇','🥈','🥉'];
@@ -1091,14 +1087,14 @@ async function renderTeamCards() {
   const allPronos = await loadAllPronos();
   document.getElementById('teamCards').innerHTML = TEAMS_BGE.map(t => {
     const color = TEAM_COLORS[t] || '#118AB2';
+    const finishedMatches = allMatches.filter(m => m.status === 'done').length;
     const members = allUsers.filter(u => u.team === t).map(u => {
-      const userPronos = allPronos.filter(p => p.user_id === u.id);
-      const pts = userPronos.reduce((s, p) => s + (p.points || 0), 0);
+      const pts = allPronos.filter(p => p.user_id === u.id && p.points !== null).reduce((s, p) => s + p.points, 0);
       return { ...u, pts };
     }).sort((a, b) => b.pts - a.pts);
-    const scoredPronos = allPronos.filter(p => members.some(m => m.id === p.user_id) && p.points !== null);
-    const totalPts = scoredPronos.reduce((s, p) => s + p.points, 0);
-    const avg = scoredPronos.length > 0 ? (totalPts / scoredPronos.length).toFixed(2) : '0.00';
+    const totalPts = members.reduce((s, m) => s + m.pts, 0);
+    const divisor = members.length * (finishedMatches || 1);
+    const avg = divisor > 0 ? (totalPts / divisor).toFixed(2) : '0.00';
     const isMe = currentUser.team === t;
     return `<div class="card" style="border-top:4px solid ${color}${isMe ? ';box-shadow:0 4px 20px ' + color + '44' : ''}">
       <div style="display:flex;align-items:center;gap:.8rem;margin-bottom:1rem">
