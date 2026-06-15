@@ -89,8 +89,8 @@ function getStatus(match) {
 
 function getGroupName(match) {
   if (match.stage === 'GROUP_STAGE') return 'Groupe ' + match.group?.replace('GROUP_', '');
-  if (match.stage === 'ROUND_OF_32' || match.stage === 'LAST_32') return '32es de finale';
-  if (match.stage === 'ROUND_OF_16' || match.stage === 'LAST_16') return '16es de finale';
+  if (match.stage === 'ROUND_OF_32' || match.stage === 'LAST_32') return '16es de finale';
+  if (match.stage === 'ROUND_OF_16' || match.stage === 'LAST_16') return '8es de finale';
   if (match.stage === 'QUARTER_FINALS') return 'Quart de finale';
   if (match.stage === 'SEMI_FINALS') return 'Demi-finale';
   if (match.stage === 'THIRD_PLACE') return 'Match 3ème place';

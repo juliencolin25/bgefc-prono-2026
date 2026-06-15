@@ -802,7 +802,7 @@ async function loadAllUsers() {
 }
 
 async function loadAllPronos() {
-  const { data } = await db.from('pronos').select('*');
+  const { data } = await db.from('pronos').select('*').limit(10000);
   return data || [];
 }
 
@@ -837,7 +837,7 @@ function renderFilters() {
     'all',
     'Groupe A','Groupe B','Groupe C','Groupe D','Groupe E','Groupe F',
     'Groupe G','Groupe H','Groupe I','Groupe J','Groupe K','Groupe L',
-    '32es de finale','16es de finale','Quart de finale','Demi-finale','Match 3ème place','Finale'
+    '16es de finale','8es de finale','Quart de finale','Demi-finale','Match 3ème place','Finale'
   ];
   const available = new Set(allMatches.map(m => m.group_name));
   const groups = ORDER.filter(g => g === 'all' || available.has(g));
@@ -852,7 +852,7 @@ function filterGroup(g) { activeGroup = g; renderFilters(); renderMatches(); }
 // ============================================================
 // MATCHS
 // ============================================================
-const GROUP_ORDER = ['Groupe A','Groupe B','Groupe C','Groupe D','Groupe E','Groupe F','Groupe G','Groupe H','Groupe I','Groupe J','Groupe K','Groupe L','32es de finale','16es de finale','Quart de finale','Demi-finale','Match 3ème place','Finale'];
+const GROUP_ORDER = ['Groupe A','Groupe B','Groupe C','Groupe D','Groupe E','Groupe F','Groupe G','Groupe H','Groupe I','Groupe J','Groupe K','Groupe L','16es de finale','8es de finale','Quart de finale','Demi-finale','Match 3ème place','Finale'];
 function renderMatches() {
   const filtered = activeGroup === 'all' ? allMatches : allMatches.filter(m => m.group_name === activeGroup);
   const sorted = [...filtered].sort((a, b) => {
@@ -899,7 +899,7 @@ function renderMatches() {
   document.getElementById('matchsList').innerHTML = html || '<div class="loading">Aucun match trouvé.</div>';
 }
 
-const KO_GROUPS = ['32es de finale','16es de finale','Quart de finale','Demi-finale','Match 3ème place','Finale'];
+const KO_GROUPS = ['16es de finale','8es de finale','Quart de finale','Demi-finale','Match 3ème place','Finale'];
 const penWinners = {}; // matchId → 'team1' | 'team2'
 
 function checkPenalty(matchId, groupName, team1, team2) {
