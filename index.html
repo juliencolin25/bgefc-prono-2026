@@ -368,7 +368,14 @@ main{max-width:1200px;margin:0 auto;padding:2rem 1.5rem;position:relative;z-inde
         </div>
       </div>
       <div id="tabTeams" style="display:none">
-        <div class="section-title">👥 Classement équipes <span style="font-family:Nunito;font-size:.8rem;color:var(--gris);font-weight:600;letter-spacing:0">(moyenne des points)</span></div>
+        <div class="section-title">👥 Classement équipes</div>
+        <div class="card" style="margin-bottom:1rem;padding:1rem 1.2rem;background:linear-gradient(135deg,#e3f2fd,#f8f9fa);border-left:4px solid var(--bleu)">
+          <div style="font-size:.82rem;color:var(--navy);font-weight:700;margin-bottom:.3rem">📐 Règle de calcul</div>
+          <div style="font-size:.8rem;color:var(--gris);font-weight:600;line-height:1.6">
+            <strong style="color:var(--navy)">Moyenne /5</strong> = Total des points de l'équipe ÷ (nombre de membres × matchs joués)<br>
+            Les pronos non remplis comptent comme <strong>0</strong> — tout le monde part sur un pied d'égalité, peu importe la taille de l'équipe.
+          </div>
+        </div>
         <div id="teamRankingList"></div>
       </div>
     </div>
@@ -1062,10 +1069,11 @@ async function renderTeamRanking() {
     avg: s.count > 0 ? (s.total / (s.count * divisor)) : 0,
     count: s.count
   })).sort((a, b) => b.avg - a.avg);
+  const maxAvg = ranked[0]?.avg || 1;
   const medals = ['🥇','🥈','🥉'];
   document.getElementById('teamRankingList').innerHTML = ranked.map((t, i) => {
     const color = TEAM_COLORS[t.name] || '#118AB2';
-    const pct = Math.round((t.avg / 5) * 100);
+    const pct = maxAvg > 0 ? Math.round((t.avg / maxAvg) * 100) : 0;
     const rankColor = i === 0 ? '#F59E0B' : i === 1 ? '#9CA3AF' : i === 2 ? '#B45309' : color;
     return `<div class="team-rank-card">
       <div class="team-rank-num" style="color:${rankColor}">${medals[i] || (i + 1)}</div>
