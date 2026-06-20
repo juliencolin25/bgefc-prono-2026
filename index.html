@@ -249,7 +249,7 @@ main{max-width:1200px;margin:0 auto;padding:2rem 1.5rem;position:relative;z-inde
 <div class="jeannot-banner" id="jeannotBanner">
   <img src="images/jeannot.png" alt="Jeannot" class="jeannot-photo" onerror="this.style.display='none'">
   <div class="jeannot-content">
-    <div class="jeannot-label">⭐ Les bons conseils de Jeannot</div>
+    <div class="jeannot-label" id="jeannotLabel">⭐ Les bons conseils de Jeannot</div>
     <div class="jeannot-tip" id="jeannotTip"></div>
   </div>
   <img src="images/logo-bge.png" alt="BGE Franche-Comté" class="logo-bge-banner" onerror="this.style.display='none'">
@@ -675,12 +675,55 @@ function openTeamModal(teamName){
 }
 function closeTeamModal(){document.getElementById('teamModal').classList.remove('active');}
 document.addEventListener('DOMContentLoaded',function(){document.getElementById('teamModal').addEventListener('click',function(e){if(e.target===this)closeTeamModal();});});
-// AJOUT MASTER PROMPT 2026 - Rotation aleatoire Jeannot
+// AJOUT MASTER PROMPT 2026 - Mauvais conseils de Mag
+const MAG_CONSEILS = [
+  "Mise sur le maillot le plus beau. Le football c'est avant tout de l'esthétique.",
+  "Même initiale que toi dans l'équipe ? C'est un signe du destin.",
+  "Il pleut à Besançon ? Mise sur le nul, c'est scientifique.",
+  "Prends les pronostics de ta belle-mère et fais l'inverse.",
+  "Le pays avec le plus de syllabes dans son nom a plus d'énergie.",
+  "Tu as rêvé du match ? Ton subconscient connaît le score.",
+  "Tu as visité leur capitale ? Tu as un lien fort avec eux.",
+  "Consulte ton horoscope. Si tu es Scorpion, c'est toujours l'Argentine.",
+  "Le plus joli drapeau gagne. C'est prouvé nulle part mais ça semble logique.",
+  "Marie a misé sur la France ? Suis Marie, elle gagne toujours au loto.",
+  "Analyse les stats, puis ignore-les et fais ce que tu ressens.",
+  "Le pays organisateur gagne toujours. Sauf quand il perd.",
+  "Mise sur l'équipe dont l'hymne te donne envie de danser.",
+  "Tu as mangé des pâtes ce soir ? C'est clairement un 3-0.",
+  "Retourne une pièce. Cette méthode bat les experts 50% du temps.",
+  "Le gardien adverse a une barbe ? Leur attaquant va marquer, c'est aérodynamique.",
+  "Mise sur le pays dont tu préfères la cuisine. Tu soutiens mieux le ventre plein.",
+  "Demande à ton chat lequel des deux drapeaux il fixe le plus longtemps.",
+  "Regarde ce que fait Thierry au bureau et fais systématiquement l'opposé.",
+  "Peu importe ton pronostic, assume-le avec une confiance absolue. Si tu as tort, c'est l'arbitre."
+];
+// AJOUT MASTER PROMPT 2026 - Rotation aleatoire Jeannot/Mag alternés
 function initJeannot(){
-  let pool=[];
-  function getNext(){if(!pool.length){pool=[...Array(JEANNOT_CONSEILS.length).keys()];for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}}return pool.pop();}
-  const el=document.getElementById('jeannotTip'); if(!el)return;
-  function show(){el.classList.remove('visible');setTimeout(()=>{el.textContent=JEANNOT_CONSEILS[getNext()];el.classList.add('visible');},600);}
+  let jPool=[], mPool=[];
+  function getNextJ(){if(!jPool.length){jPool=[...Array(JEANNOT_CONSEILS.length).keys()];for(let i=jPool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[jPool[i],jPool[j]]=[jPool[j],jPool[i]];}}return jPool.pop();}
+  function getNextM(){if(!mPool.length){mPool=[...Array(MAG_CONSEILS.length).keys()];for(let i=mPool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[mPool[i],mPool[j]]=[mPool[j],mPool[i]];}}return mPool.pop();}
+  const el=document.getElementById('jeannotTip');
+  const labelEl=document.getElementById('jeannotLabel');
+  const photoEl=document.querySelector('.jeannot-photo');
+  if(!el)return;
+  let isMag=false;
+  function show(){
+    el.classList.remove('visible');
+    setTimeout(()=>{
+      isMag=!isMag;
+      if(isMag){
+        el.textContent=MAG_CONSEILS[getNextM()];
+        if(labelEl) labelEl.textContent='😈 Les mauvais conseils de Mag';
+        if(photoEl){ photoEl.src='images/mag.png'; photoEl.alt='Mag'; }
+      } else {
+        el.textContent=JEANNOT_CONSEILS[getNextJ()];
+        if(labelEl) labelEl.textContent='⭐ Les bons conseils de Jeannot';
+        if(photoEl){ photoEl.src='images/jeannot.png'; photoEl.alt='Jeannot'; }
+      }
+      el.classList.add('visible');
+    },600);
+  }
   show(); setInterval(show,6000);
 }
 window.addEventListener('DOMContentLoaded',initJeannot);
