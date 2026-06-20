@@ -82,7 +82,7 @@ main{max-width:1200px;margin:0 auto;padding:2rem 1.5rem;position:relative;z-inde
 .section-title::after{content:'';flex:1;height:2px;background:linear-gradient(90deg,var(--gris-med),transparent);margin-left:.5rem;}
 
 /* FILTER BAR */
-.filter-bar{display:flex;gap:.5rem;margin-bottom:1.5rem;flex-wrap:wrap;position:sticky;top:70px;z-index:100;background:var(--bg);padding:.5rem 0;}
+.filter-bar{display:flex;gap:.5rem;margin-bottom:1.5rem;flex-wrap:wrap;position:sticky;top:150px;z-index:100;background:var(--bg);padding:.5rem 0;}
 .filter-btn{background:var(--blanc);border:2px solid var(--gris-med);border-radius:20px;padding:.4rem 1rem;color:var(--gris);font-family:'Nunito',sans-serif;font-size:.8rem;font-weight:700;cursor:pointer;transition:all .2s;}
 .filter-btn:hover{border-color:var(--orange);color:var(--orange);}
 .filter-btn.active{background:var(--navy);border-color:var(--navy);color:white;}
@@ -218,7 +218,7 @@ main{max-width:1200px;margin:0 auto;padding:2rem 1.5rem;position:relative;z-inde
 @media(max-width:768px){.grid-2{grid-template-columns:1fr;}.hero h1{font-size:1.8rem;}.hero-stats{gap:1.5rem;}nav{display:none;}main{padding:1rem;}.modal-info-grid{grid-template-columns:1fr;}.my-score-stats{gap:1.5rem;}}
 
 /* AJOUT MASTER PROMPT 2026 - Bandeau Jeannot */
-.jeannot-banner{background:linear-gradient(135deg,#1a3a5c,#0a1f3a);color:#fff;padding:12px 20px;display:flex;align-items:center;gap:16px;overflow:hidden;min-height:80px;border-bottom:3px solid #e63946;}
+.jeannot-banner{background:linear-gradient(135deg,#1a3a5c,#0a1f3a);color:#fff;padding:12px 20px;display:flex;align-items:center;gap:16px;overflow:hidden;min-height:80px;border-bottom:3px solid #e63946;position:sticky;top:70px;z-index:99;}
 .jeannot-photo{width:60px;height:60px;border-radius:50%;object-fit:cover;border:2px solid #e63946;flex-shrink:0;}
 .jeannot-content{flex:1;min-width:0;}
 .jeannot-label{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#e63946;font-weight:700;margin-bottom:4px;}
@@ -245,15 +245,6 @@ main{max-width:1200px;margin:0 auto;padding:2rem 1.5rem;position:relative;z-inde
 </style>
 </head>
 <body>
-<!-- AJOUT MASTER PROMPT 2026 - Bandeau Jeannot -->
-<div class="jeannot-banner" id="jeannotBanner">
-  <img src="images/jeannot.png" alt="Jeannot" class="jeannot-photo" onerror="this.style.display='none'">
-  <div class="jeannot-content">
-    <div class="jeannot-label" id="jeannotLabel">⭐ Les bons conseils de Jeannot</div>
-    <div class="jeannot-tip" id="jeannotTip"></div>
-  </div>
-  <img src="images/logo-bge.png" alt="BGE Franche-Comté" class="logo-bge-banner" onerror="this.style.display='none'">
-</div>
 
 <!-- LOGIN -->
 <div id="loginPage" class="login-wrap">
@@ -325,6 +316,16 @@ main{max-width:1200px;margin:0 auto;padding:2rem 1.5rem;position:relative;z-inde
       </div>
     </div>
   </header>
+
+  <!-- AJOUT MASTER PROMPT 2026 - Bandeau Jeannot sticky -->
+  <div class="jeannot-banner" id="jeannotBanner">
+    <img src="images/jeannot.png" alt="Jeannot" class="jeannot-photo" onerror="this.style.display='none'">
+    <div class="jeannot-content">
+      <div class="jeannot-label" id="jeannotLabel">⭐ Les bons conseils de Jeannot</div>
+      <div class="jeannot-tip" id="jeannotTip"></div>
+    </div>
+    <img src="images/logo-bge.png" alt="BGE Franche-Comté" class="logo-bge-banner" onerror="this.style.display='none'">
+  </div>
 
   <main>
     <!-- MATCHS -->
