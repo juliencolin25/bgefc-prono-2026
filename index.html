@@ -773,8 +773,8 @@ async function startApp() {
   renderTeamCards();
   updateStats();
   if (currentUser.is_admin) renderAdminPanel();
-  if (!sessionStorage.getItem('var_popup_seen')) {
-    sessionStorage.setItem('var_popup_seen', '1');
+  if (!localStorage.getItem('var_popup_seen')) {
+    localStorage.setItem('var_popup_seen', '1');
     showVarPopup();
   }
 }
