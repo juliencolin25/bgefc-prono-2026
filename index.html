@@ -735,11 +735,12 @@ function initJeannot(){
   const labelEl=document.getElementById('jeannotLabel');
   const photoEl=document.querySelector('.jeannot-photo');
   if(!el)return;
-  let lastWasMag=false;
+  let isMagTurn=false;
   function show(){
     el.classList.remove('visible');
     setTimeout(()=>{
-      const isMag = Math.random() < 0.5;
+      isMagTurn=!isMagTurn;
+      const isMag = isMagTurn;
       if(isMag){
         el.textContent=MAG_CONSEILS[getNextM()];
         if(labelEl) labelEl.textContent='😈 Les mauvais conseils de Mag';
