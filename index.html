@@ -684,7 +684,7 @@ const MAG_CONSEILS = [
   "Le pays avec le plus de syllabes dans son nom a plus d'énergie.",
   "Tu as rêvé du match ? Ton subconscient connaît le score.",
   "Tu as visité leur capitale ? Tu as un lien fort avec eux.",
-  "Consulte ton horoscope. Si tu es Scorpion, c'est toujours l'Argentine.",
+  "Consulte ton horoscope. Si tu es Poissons, c'est toujours l'Argentine. Les Poissons sont les meilleurs, c'est prouvé.",
   "Le plus joli drapeau gagne. C'est prouvé nulle part mais ça semble logique.",
   "Fabien a misé sur la France ? Suis Fabien, il gagne toujours au loto.",
   "Analyse les stats, puis ignore-les et fais ce que tu ressens.",
@@ -731,11 +731,11 @@ function initJeannot(){
   const labelEl=document.getElementById('jeannotLabel');
   const photoEl=document.querySelector('.jeannot-photo');
   if(!el)return;
-  let isMag=false;
+  let lastWasMag=false;
   function show(){
     el.classList.remove('visible');
     setTimeout(()=>{
-      isMag=!isMag;
+      const isMag = Math.random() < 0.5;
       if(isMag){
         el.textContent=MAG_CONSEILS[getNextM()];
         if(labelEl) labelEl.textContent='😈 Les mauvais conseils de Mag';
