@@ -980,12 +980,20 @@ function filterGroup(g) { activeGroup = g; renderFilters(); renderMatches(); }
 // MATCHS
 // ============================================================
 const GROUP_ORDER = ['Groupe A','Groupe B','Groupe C','Groupe D','Groupe E','Groupe F','Groupe G','Groupe H','Groupe I','Groupe J','Groupe K','Groupe L','16es de finale','8es de finale','Quart de finale','Demi-finale','Match 3ème place','Finale'];
+function parseFrDate(dateStr, timeStr) {
+  const months = {'janv.':1,'févr.':2,'mars':3,'avr.':4,'mai':5,'juin':6,'juil.':7,'août':8,'sept.':9,'oct.':10,'nov.':11,'déc.':12};
+  const parts = (dateStr||'').trim().split(' ');
+  const day = parseInt(parts[0]) || 0;
+  const month = months[parts[1]] || 0;
+  const [h, m] = (timeStr||'00:00').split(':').map(Number);
+  return month * 100000 + day * 1000 + h * 60 + m;
+}
 function renderMatches() {
   const filtered = activeGroup === 'all' ? allMatches : allMatches.filter(m => m.group_name === activeGroup);
   const sorted = [...filtered].sort((a, b) => {
     const oa = GROUP_ORDER.indexOf(a.group_name), ob = GROUP_ORDER.indexOf(b.group_name);
     if (oa !== ob) return oa - ob;
-    return (a.match_date + a.match_time).localeCompare(b.match_date + b.match_time);
+    return parseFrDate(a.match_date, a.match_time) - parseFrDate(b.match_date, b.match_time);
   });
   let html = '', cg = '';
   sorted.forEach(m => {
