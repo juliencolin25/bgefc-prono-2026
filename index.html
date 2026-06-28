@@ -1286,7 +1286,7 @@ function renderMatches() {
           ${prono ? `<span class="prono-saved">✅ ${prono.score1}—${prono.score2}${prono.winner ? ' (+tab)' : ''}</span>` : `<button class="btn-save" onclick="quickSave(${m.id},'${m.group_name}')">Valider</button>`}
         </div>
         <div style="padding:.3rem 1rem .5rem;text-align:right" onclick="event.stopPropagation()">
-          <button class="mag-coin-btn" onclick="magCoinFlip('${m.team1}','${m.team2}')">🪙 Demander à Mag</button>
+          <button class="mag-coin-btn" data-t1="${m.team1.replace(/'/g,"&#39;")}" data-t2="${m.team2.replace(/'/g,"&#39;")}" onclick="magCoinFlip(this.dataset.t1,this.dataset.t2)">⚡ Demander à Mag</button>
         </div>
         <div id="pen_${m.id}" style="display:none;padding:.6rem 1rem .4rem;border-top:2px dashed #f0e0cc;text-align:center;font-size:.75rem;color:#e06c00;font-weight:800" onclick="event.stopPropagation()">
           ⚽ QUI GAGNE AUX TIRS AU BUT ?
@@ -1519,7 +1519,7 @@ function magCoinFlip(team1, team2) {
         </div>
       </div>
       <div style="padding:1.5rem;text-align:center">
-        <div id="magCoin" style="font-size:4rem;display:inline-block;animation:coinSpin 2s cubic-bezier(.4,0,.2,1) forwards">🪙</div>
+        <div id="magCoin" style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#f5d060,#c89b3c,#f5d060);display:inline-flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:1px;color:#7a5c00;box-shadow:0 4px 15px rgba(200,155,60,.5);animation:coinSpin 2s cubic-bezier(.4,0,.2,1) forwards">MAG</div>
         <div id="magVerdict" style="display:none;margin-top:1rem">
           <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:3px;color:#a07828;margin-bottom:.5rem">${winner}</div>
           <div style="font-size:.88rem;color:#555;line-height:1.7;font-style:italic">"${verdict}"</div>
