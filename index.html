@@ -54,6 +54,10 @@ main{max-width:1200px;margin:0 auto;padding:2rem 1.5rem;position:relative;z-inde
 .login-emoji{font-size:5rem;display:block;animation:bounce 2s ease-in-out infinite;}
 @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
 @keyframes spinCup{0%{transform:rotateY(0deg)}100%{transform:rotateY(360deg)}}
+@keyframes coinSpin{0%{transform:rotateY(0deg) scale(1)}40%{transform:rotateY(720deg) scale(1.2)}70%{transform:rotateY(1260deg) scale(1.1)}100%{transform:rotateY(1440deg) scale(1)}}
+@keyframes coinLand{0%{transform:scale(1.1)}100%{transform:scale(1)}}
+.mag-coin-btn{background:none;border:1px dashed #c89b3c;border-radius:20px;padding:.25rem .7rem;font-size:.72rem;font-weight:800;color:#c89b3c;cursor:pointer;font-family:'Nunito',sans-serif;transition:all .2s;}
+.mag-coin-btn:hover{background:#fff8e1;border-color:#a07828;}
 .login-title{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;letter-spacing:4px;background:linear-gradient(135deg,#002395,#ED2939);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .login-sub{font-size:.85rem;color:var(--gris);font-weight:600;margin-top:.3rem;}
 .form-group{margin-bottom:1.2rem;}
@@ -1281,6 +1285,9 @@ function renderMatches() {
           </div>
           ${prono ? `<span class="prono-saved">✅ ${prono.score1}—${prono.score2}${prono.winner ? ' (+tab)' : ''}</span>` : `<button class="btn-save" onclick="quickSave(${m.id},'${m.group_name}')">Valider</button>`}
         </div>
+        <div style="padding:.3rem 1rem .5rem;text-align:right" onclick="event.stopPropagation()">
+          <button class="mag-coin-btn" onclick="magCoinFlip('${m.team1}','${m.team2}')">🪙 Demander à Mag</button>
+        </div>
         <div id="pen_${m.id}" style="display:none;padding:.6rem 1rem .4rem;border-top:2px dashed #f0e0cc;text-align:center;font-size:.75rem;color:#e06c00;font-weight:800" onclick="event.stopPropagation()">
           ⚽ QUI GAGNE AUX TIRS AU BUT ?
           <div style="display:flex;gap:.5rem;justify-content:center;margin-top:.5rem">
@@ -1482,6 +1489,55 @@ function switchRankMode(mode) {
   renderRanking();
   renderTeamRanking();
 }
+function magCoinFlip(team1, team2) {
+  const VERDICTS = [
+    (w) => `J'ai senti une vibration positive en ouvrant le frigo ce matin. C'était pour ${w}.`,
+    (w) => `Mon chat a regardé vers la gauche puis vers la droite puis vers le bas. Clairement ${w}.`,
+    (w) => `J'ai tiré une carte. C'était le valet de cœur. Ça veut dire ${w}, évidemment.`,
+    (w) => `Le maillot de ${w} est plus joli. C'est pas rien dans la vie.`,
+    (w) => `J'ai rêvé d'un ballon triangulaire cette nuit. Dans mon rêve il allait vers ${w}.`,
+    (w) => `Mes chips porte-bonheur étaient rangées à gauche ce matin. Donc ${w}.`,
+    (w) => `L'horoscope du Verseau dit "victoire inattendue". ${w} c'est inattendu, non ?`,
+    (w) => `J'ai fermé les yeux et j'ai pensé fort. ${w} est apparu. Je sais pas pourquoi mais j'assume.`,
+    (w) => `La pièce a parlé. ${w}. Je discute pas avec les pièces.`,
+    (w) => `${w} a un nom qui sonne bien quand on le dit en bâillant. Énergie positive garantie.`,
+    (w) => `J'ai compté les lettres. Ça m'a rien dit. Mais j'ai quand même un bon feeling pour ${w}.`,
+    (w) => `Mon intuition cosmique, née d'une totale ignorance du football, dit ${w}. Et j'assume.`,
+  ];
+  const winner = Math.random() < 0.5 ? team1 : team2;
+  const verdict = VERDICTS[Math.floor(Math.random() * VERDICTS.length)](winner);
+  const popup = document.createElement('div');
+  popup.id = 'magCoinPopup';
+  popup.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem';
+  popup.innerHTML = `
+    <div style="background:white;border-radius:20px;max-width:380px;width:100%;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.3);border:2px solid #c89b3c">
+      <div style="background:linear-gradient(135deg,#a07828,#c89b3c);padding:1rem 1.5rem;display:flex;align-items:center;gap:.8rem">
+        <img src="images/mag.png" style="width:46px;height:46px;border-radius:50%;object-fit:cover;border:2px solid white;flex-shrink:0" onerror="this.style.display='none'">
+        <div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:2px;color:white">L'Oracle de Mag</div>
+          <div style="font-size:.7rem;color:rgba(255,255,255,.85);font-weight:700">${team1} vs ${team2}</div>
+        </div>
+      </div>
+      <div style="padding:1.5rem;text-align:center">
+        <div id="magCoin" style="font-size:4rem;display:inline-block;animation:coinSpin 2s cubic-bezier(.4,0,.2,1) forwards">🪙</div>
+        <div id="magVerdict" style="display:none;margin-top:1rem">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:3px;color:#a07828;margin-bottom:.5rem">${winner}</div>
+          <div style="font-size:.88rem;color:#555;line-height:1.7;font-style:italic">"${verdict}"</div>
+          <div style="font-size:.68rem;color:#aaa;margin-top:.5rem;font-weight:700">Mag, sans aucun remords</div>
+        </div>
+      </div>
+      <div style="padding:0 1.5rem 1.5rem">
+        <button onclick="document.getElementById('magCoinPopup').remove()" style="width:100%;background:linear-gradient(135deg,#a07828,#c89b3c);border:none;border-radius:12px;padding:.75rem;color:white;font-family:'Nunito',sans-serif;font-size:.88rem;font-weight:900;cursor:pointer">Merci Mag 🙏</button>
+      </div>
+    </div>`;
+  document.body.appendChild(popup);
+  setTimeout(() => {
+    document.getElementById('magCoin').style.animation = 'coinLand .3s ease forwards';
+    document.getElementById('magVerdict').style.display = 'block';
+  }, 2100);
+  popup.addEventListener('click', e => { if (e.target === popup) popup.remove(); });
+}
+
 function showTropheeJeannotPopup() {
   const popup = document.createElement('div');
   popup.id = 'tropheeJeannotPopup';
