@@ -1492,8 +1492,10 @@ async function renderTeamRanking() {
     ? allMatches.filter(m => m.status === 'done' && KO_GROUPS.includes(m.group_name)).length
     : allMatches.filter(m => m.status === 'done').length;
   const scores = {};
+  const EXCLUDE_TEAM_AVG = ['Olivier SIMON', 'Lucile SIGWALTE'];
   TEAMS_BGE.forEach(t => { scores[t] = { total: 0, count: 0 }; });
   allUsers.forEach(u => {
+    if (EXCLUDE_TEAM_AVG.includes(u.name)) return;
     const pts = allPronos.filter(p => p.user_id === u.id && p.points !== null && (rankMode === 'ko' ? koMatchIds.has(p.match_id) : true)).reduce((s, p) => s + p.points, 0);
     if (scores[u.team]) { scores[u.team].total += pts; scores[u.team].count++; }
   });
