@@ -780,8 +780,9 @@ const TIPH_CONSEILS = [
   "Peu importe qui gagne, si le générique de la cérémonie est moche, c'est une défaite pour tout le monde."
 ];
 // AJOUT MASTER PROMPT 2026 - Rotation aleatoire Jeannot/Mag alternés
+let _isMargotton = false;
 function initJeannot(){
-  let jPool=[], mPool=[];
+  let jPool=[], mPool=[], showCount=0;
   function getNextJ(){if(!jPool.length){jPool=[...Array(JEANNOT_CONSEILS.length).keys()];for(let i=jPool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[jPool[i],jPool[j]]=[jPool[j],jPool[i]];}}return jPool.pop();}
   function getNextM(){if(!mPool.length){mPool=[...Array(TIPH_CONSEILS.length).keys()];for(let i=mPool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[mPool[i],mPool[j]]=[mPool[j],mPool[i]];}}return mPool.pop();}
   const el=document.getElementById('jeannotTip');
@@ -792,16 +793,25 @@ function initJeannot(){
   function show(){
     el.classList.remove('visible');
     setTimeout(()=>{
-      isMagTurn=!isMagTurn;
-      const isMag = isMagTurn;
-      if(isMag){
-        el.textContent=TIPH_CONSEILS[getNextM()];
-        if(labelEl) labelEl.textContent='🎨 Les vrais bons conseils de Tiph';
-        if(photoEl){ photoEl.src='images/TG.jpg'; photoEl.alt='Tiph'; }
+      showCount++;
+      // 1 fois sur 25 : Grégoire Margotton
+      if(showCount % 25 === 0){
+        _isMargotton = true;
+        el.textContent='Grégoire Margotton te propose de cliquer ici.';
+        if(labelEl) labelEl.textContent='🎙️ Grégoire Margotton';
+        if(photoEl){ photoEl.src='images/GM.jfif'; photoEl.alt='Grégoire Margotton'; }
       } else {
-        el.textContent=JEANNOT_CONSEILS[getNextJ()];
-        if(labelEl) labelEl.textContent='⭐ Les bons conseils de Jeannot';
-        if(photoEl){ photoEl.src='images/jeannot.png'; photoEl.alt='Jeannot'; }
+        _isMargotton = false;
+        isMagTurn=!isMagTurn;
+        if(isMagTurn){
+          el.textContent=TIPH_CONSEILS[getNextM()];
+          if(labelEl) labelEl.textContent='🎨 Les vrais bons conseils de Tiph';
+          if(photoEl){ photoEl.src='images/TG.jpg'; photoEl.alt='Tiph'; }
+        } else {
+          el.textContent=JEANNOT_CONSEILS[getNextJ()];
+          if(labelEl) labelEl.textContent='⭐ Les bons conseils de Jeannot';
+          if(photoEl){ photoEl.src='images/jeannot.png'; photoEl.alt='Jeannot'; }
+        }
       }
       el.classList.add('visible');
     },600);
@@ -822,6 +832,11 @@ const SONOMETRE_MSGS = [
   "Au moins Mag elle se fait pas cliquer dessus comme ça. Enfin je crois.",
 ];
 function sonometre() {
+  if (_isMargotton) {
+    const audio = new Audio('images/pavard.mp3');
+    audio.play().catch(()=>{});
+    return;
+  }
   _sonometre++;
   if (_sonometreTimer) clearTimeout(_sonometreTimer);
   _sonometreTimer = setTimeout(() => { _sonometre = 0; }, 3000);
