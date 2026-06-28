@@ -1292,7 +1292,7 @@ function renderMatches() {
             <input type="number" min="0" max="20" class="prono-input" id="pi2_${m.id}" value="${prono ? prono.score2 : ''}" placeholder="?" oninput="checkPenalty(${m.id},'${m.group_name}')">
           </div>
           ${prono ? `<span class="prono-saved">✅ ${prono.score1}—${prono.score2}${prono.winner ? ' (+tab)' : ''}</span>` : `<button class="btn-save" onclick="quickSave(${m.id},'${m.group_name}')">Valider</button>`}
-          ${(() => { const fp = fabienPronos[m.id]; return (KO_GROUPS.includes(m.group_name) && prono && fp && prono.score1 === fp.score1 && prono.score2 === fp.score2) ? `<span onclick="event.stopPropagation();showMaledictionFabien()" style="cursor:pointer;font-size:1.1rem;animation:bounce 1s ease-in-out infinite" title="Malédiction de Fabien !">💀</span>` : ''; })()}
+          ${(() => { const fp = fabienPronos[m.id]; return (KO_GROUPS.includes(m.group_name) && prono && fp && prono.score1 === fp.score1 && prono.score2 === fp.score2) ? `<img src="images/FJ.jpg" onclick="event.stopPropagation();showMaledictionFabien()" style="width:28px;height:28px;border-radius:50%;object-fit:cover;cursor:pointer;border:2px solid #e63946;animation:bounce 1s ease-in-out infinite;vertical-align:middle" title="Malédiction de Fabien !">` : ''; })()}
         </div>
         <div style="padding:.3rem 1rem .5rem;text-align:right" onclick="event.stopPropagation()">
           <button class="mag-coin-btn" data-t1="${m.team1.replace(/'/g,"&#39;")}" data-t2="${m.team2.replace(/'/g,"&#39;")}" onclick="magCoinFlip(this.dataset.t1,this.dataset.t2)">⚡ Demander à Mag</button>
@@ -1504,7 +1504,7 @@ function showMaledictionFabien() {
   popup.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem';
   popup.innerHTML = `
     <div style="background:linear-gradient(160deg,#0a0a0a,#1a1a2e);border-radius:20px;max-width:360px;width:100%;padding:1.8rem;box-shadow:0 20px 60px rgba(0,0,0,.5);border:2px solid #444;text-align:center">
-      <div style="font-size:3rem;animation:bounce 1s ease-in-out infinite">💀</div>
+      <img src="images/FJ.jpg" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid #e63946;animation:bounce 1s ease-in-out infinite;box-shadow:0 0 20px rgba(230,57,70,.5)">
       <div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:3px;color:#e63946;margin:.5rem 0">MALÉDICTION DE FABIEN</div>
       <div style="font-size:.88rem;color:#ccc;line-height:1.75;font-style:italic;margin-bottom:1.2rem">"${msg}"</div>
       <div style="font-size:.68rem;color:#555;margin-bottom:1.2rem;font-weight:700">Tu peux encore changer ton prono en cliquant sur le match.</div>
