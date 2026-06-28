@@ -54,8 +54,9 @@ main{max-width:1200px;margin:0 auto;padding:2rem 1.5rem;position:relative;z-inde
 .login-emoji{font-size:5rem;display:block;animation:bounce 2s ease-in-out infinite;}
 @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
 @keyframes spinCup{0%{transform:rotateY(0deg)}100%{transform:rotateY(360deg)}}
-@keyframes coinSpin{0%{transform:rotateY(0deg) scale(1)}40%{transform:rotateY(720deg) scale(1.2)}70%{transform:rotateY(1260deg) scale(1.1)}100%{transform:rotateY(1440deg) scale(1)}}
-@keyframes coinLand{0%{transform:scale(1.1)}100%{transform:scale(1)}}
+@keyframes coinSpin{0%{transform:rotateY(0deg) scale(1)}40%{transform:rotateY(900deg) scale(1.15)}80%{transform:rotateY(1620deg) scale(1.05)}100%{transform:rotateY(1800deg) scale(1)}}
+@keyframes coinLand{0%{transform:scale(1.15) rotateY(1800deg)}100%{transform:scale(1) rotateY(1800deg)}}
+@keyframes coinShine{0%,100%{opacity:.3;left:-40%}50%{opacity:.7;left:110%}}
 .mag-coin-btn{background:none;border:1px dashed #c89b3c;border-radius:20px;padding:.25rem .7rem;font-size:.72rem;font-weight:800;color:#c89b3c;cursor:pointer;font-family:'Nunito',sans-serif;transition:all .2s;}
 .mag-coin-btn:hover{background:#fff8e1;border-color:#a07828;}
 .login-title{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;letter-spacing:4px;background:linear-gradient(135deg,#002395,#ED2939);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
@@ -1569,7 +1570,10 @@ function magCoinFlip(team1, team2) {
         </div>
       </div>
       <div style="padding:1.5rem;text-align:center">
-        <div id="magCoin" style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#f5d060,#c89b3c,#f5d060);display:inline-flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:1px;color:#7a5c00;box-shadow:0 4px 15px rgba(200,155,60,.5);animation:coinSpin 2s cubic-bezier(.4,0,.2,1) forwards">MAG</div>
+        <div id="magCoin" style="width:90px;height:90px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff0a0,#f5d060 35%,#c89b3c 65%,#8a6000);display:inline-flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:2px;color:#5a3e00;text-shadow:0 1px 0 rgba(255,255,255,.4);box-shadow:0 0 0 4px #a07828,0 0 0 6px #f5d060,0 8px 25px rgba(160,120,40,.6),inset 0 -3px 8px rgba(0,0,0,.3),inset 0 3px 8px rgba(255,255,200,.4);position:relative;overflow:hidden;animation:coinSpin 2.2s cubic-bezier(.4,0,.2,1) forwards">
+          ★ MAG ★
+          <div style="position:absolute;top:0;left:-40%;width:40%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.6),transparent);animation:coinShine 2.2s ease-in-out forwards"></div>
+        </div>
         <div id="magVerdict" style="display:none;margin-top:1rem">
           <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:3px;color:#a07828;margin-bottom:.5rem">${winner}</div>
           <div style="font-size:.88rem;color:#555;line-height:1.7;font-style:italic">"${verdict}"</div>
