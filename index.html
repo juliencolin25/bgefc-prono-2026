@@ -1201,7 +1201,7 @@ function showThierryDiablePopup(locked) {
         <span style="font-size:1.5rem">😈</span>
         <div>
           <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:2px;color:white">PRONO DE LA MORT</div>
-          <div style="font-size:.72rem;color:rgba(255,255,255,.8);font-weight:600">Ton prono : <strong>${myPronoMort.team} ${myPronoMort.score_win}—${myPronoMort.score_lose}</strong></div>
+          <div style="font-size:.72rem;color:rgba(255,255,255,.8);font-weight:600">Ton prono : <strong>${myPronoMort.team} ${myPronoMort.score_win}—${myPronoMort.score_lose}${myPronoMort.score_win === myPronoMort.score_lose ? ' (tab)' : ''}</strong></div>
         </div>
       </div>
       <div style="padding:1.5rem;display:flex;flex-direction:column;align-items:center;gap:1rem">
@@ -1285,9 +1285,12 @@ function showPronoMortForm(locked) {
         <div>
           <div style="font-size:.75rem;color:#aaa;font-weight:700;margin-bottom:.5rem;letter-spacing:1px">SCORE DE LA FINALE (vainqueur — perdant)</div>
           <div style="display:flex;align-items:center;gap:.8rem">
-            <input id="pronoMortScore1" type="number" min="0" max="20" value="${scoreWin}" placeholder="?" ${locked?'disabled':''} style="flex:1;background:#1a0505;border:2px solid #8b0000;border-radius:10px;padding:.75rem;color:white;font-size:1.3rem;font-weight:900;text-align:center;font-family:'Nunito',sans-serif">
+            <input id="pronoMortScore1" type="number" min="0" max="20" value="${scoreWin}" placeholder="?" ${locked?'disabled':''} oninput="checkPronoMortTab()" style="flex:1;background:#1a0505;border:2px solid #8b0000;border-radius:10px;padding:.75rem;color:white;font-size:1.3rem;font-weight:900;text-align:center;font-family:'Nunito',sans-serif">
             <span style="color:#ff4444;font-size:1.3rem;font-weight:900">—</span>
-            <input id="pronoMortScore2" type="number" min="0" max="20" value="${scoreLose}" placeholder="?" ${locked?'disabled':''} style="flex:1;background:#1a0505;border:2px solid #8b0000;border-radius:10px;padding:.75rem;color:white;font-size:1.3rem;font-weight:900;text-align:center;font-family:'Nunito',sans-serif">
+            <input id="pronoMortScore2" type="number" min="0" max="20" value="${scoreLose}" placeholder="?" ${locked?'disabled':''} oninput="checkPronoMortTab()" style="flex:1;background:#1a0505;border:2px solid #8b0000;border-radius:10px;padding:.75rem;color:white;font-size:1.3rem;font-weight:900;text-align:center;font-family:'Nunito',sans-serif">
+          </div>
+          <div id="pronoMortTabNote" style="display:${(scoreWin !== '' && scoreLose !== '' && scoreWin == scoreLose) ? 'block' : 'none'};margin-top:.5rem;padding:.5rem .8rem;background:rgba(255,100,0,.15);border-left:3px solid #ff6400;border-radius:0 8px 8px 0;font-size:.78rem;color:#ffaa66;font-weight:700">
+            🥅 Score nul = victoire aux tirs au but pour l'équipe choisie
           </div>
         </div>
         <div style="background:rgba(139,0,0,.2);border-left:3px solid #cc0000;border-radius:0 10px 10px 0;padding:.7rem 1rem;font-size:.78rem;color:#ffaaaa;line-height:1.7">
@@ -1303,13 +1306,21 @@ function showPronoMortForm(locked) {
   document.body.appendChild(popup);
 }
 
+function checkPronoMortTab() {
+  const s1 = document.getElementById('pronoMortScore1')?.value;
+  const s2 = document.getElementById('pronoMortScore2')?.value;
+  const note = document.getElementById('pronoMortTabNote');
+  if (!note) return;
+  note.style.display = (s1 !== '' && s2 !== '' && s1 === s2) ? 'block' : 'none';
+}
+
 async function savePronoMort() {
   const team = document.getElementById('pronoMortTeam')?.value;
   const score1 = parseInt(document.getElementById('pronoMortScore1')?.value);
   const score2 = parseInt(document.getElementById('pronoMortScore2')?.value);
   if (!team) { showToast('⚠️ Choisis une équipe !'); return; }
   if (isNaN(score1) || isNaN(score2)) { showToast('⚠️ Entre un score complet !'); return; }
-  if (score1 <= score2) { showToast('⚠️ Le vainqueur doit marquer plus de buts !'); return; }
+  if (score1 < score2) { showToast('⚠️ Le score du vainqueur ne peut pas être inférieur !'); return; }
   const payload = { user_id: currentUser.id, team, score_win: score1, score_lose: score2 };
   if (myPronoMort) {
     await db.from('prono_mort').update({ team, score_win: score1, score_lose: score2 }).eq('user_id', currentUser.id);
