@@ -899,13 +899,76 @@ async function doLogout() {
   currentUser = null;
   localStorage.removeItem('bgefc_user_id_v2');
   document.getElementById('pronoMortFloating')?.remove();
+  document.getElementById('cocktailEgg')?.remove();
+  stopCocktailEgg();
   document.getElementById('loginPage').style.display = 'flex';
   document.getElementById('appPage').style.display = 'none';
+}
+
+// ---- Easter egg cocktail Pauline ----
+let _cocktailTimer = null;
+function stopCocktailEgg() { if (_cocktailTimer) { clearInterval(_cocktailTimer); _cocktailTimer = null; } }
+function startCocktailEgg() {
+  stopCocktailEgg();
+  _cocktailTimer = setInterval(() => {
+    if (document.getElementById('appPage').style.display === 'none') return;
+    if (document.getElementById('cocktailEgg')) return;
+    if (Math.random() > 0.12) return; // ~12% de chance toutes les 45s → apparaît rarement
+    const egg = document.createElement('div');
+    egg.id = 'cocktailEgg';
+    const topPct = 30 + Math.random() * 40; // entre 30% et 70% de hauteur
+    egg.style.cssText = `position:fixed;left:6px;top:${topPct}%;z-index:500;font-size:1.1rem;opacity:0.28;cursor:pointer;transition:opacity .3s;user-select:none;filter:grayscale(30%)`;
+    egg.textContent = '🍸';
+    egg.title = '';
+    egg.onmouseenter = () => egg.style.opacity = '0.7';
+    egg.onmouseleave = () => egg.style.opacity = '0.28';
+    egg.onclick = (e) => { e.stopPropagation(); egg.remove(); showMoscowMule(); };
+    document.body.appendChild(egg);
+    setTimeout(() => egg?.remove(), 25000); // disparaît après 25s si pas cliqué
+  }, 45000);
+}
+function showMoscowMule() {
+  const pop = document.createElement('div');
+  pop.id = 'moscowMulePop';
+  pop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem';
+  pop.innerHTML = `
+    <div style="background:#fff;border-radius:20px;max-width:380px;width:100%;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.4);font-family:Nunito,sans-serif">
+      <div style="background:linear-gradient(135deg,#b8860b,#d4a017,#c8960c);padding:1.4rem;text-align:center;position:relative">
+        <img src="images/PD.jpg" style="width:72px;height:72px;border-radius:50%;object-fit:cover;border:3px solid #fff;margin-bottom:.5rem;display:block;margin-left:auto;margin-right:auto" onerror="this.style.display='none'">
+        <div style="color:#fff;font-size:1.05rem;font-weight:900;letter-spacing:1px">🍸 La Recette de Pauline</div>
+        <div style="color:rgba(255,255,255,.85);font-size:.78rem;margin-top:.2rem">Moscow Mule</div>
+        <button onclick="document.getElementById('moscowMulePop').remove()" style="position:absolute;top:.7rem;right:.9rem;background:rgba(255,255,255,.25);border:none;border-radius:50%;width:28px;height:28px;color:#fff;font-size:1rem;cursor:pointer;font-weight:900">×</button>
+      </div>
+      <div style="padding:1.4rem">
+        <div style="font-size:.82rem;color:#555;margin-bottom:1rem;font-style:italic;text-align:center">"Le cocktail que tout le monde redemande, et que Pauline refuse de noter pour garder le mystère."</div>
+        <div style="display:flex;flex-direction:column;gap:.55rem">
+          ${[
+            ['🥃','4,5 cl','Vodka (bonne qualité, hein)'],
+            ['🍺','12 cl','Ginger beer (pas ginger ale — la différence est capitale)'],
+            ['🍋','1,5 cl','Jus de citron vert frais pressé'],
+            ['🧊','','Glaçons pilés, beaucoup'],
+            ['🍋','','Tranche de citron vert pour décorer'],
+          ].map(([icon,qty,ing]) => `
+            <div style="display:flex;align-items:center;gap:.7rem;padding:.45rem .7rem;background:#fafafa;border-radius:10px;border-left:3px solid #d4a017">
+              <span style="font-size:1.1rem">${icon}</span>
+              <span style="font-weight:900;color:#b8860b;min-width:3rem;font-size:.82rem">${qty}</span>
+              <span style="color:#333;font-size:.82rem">${ing}</span>
+            </div>`).join('')}
+        </div>
+        <div style="margin-top:1.1rem;padding:.8rem;background:#fffbeb;border-radius:10px;border:1px solid #f0d060;font-size:.78rem;color:#7a5c00">
+          <strong>👩‍🍳 La méthode Pauline :</strong> Verser sur les glaçons dans un mug en cuivre (obligatoire). Vodka d'abord, citron, puis ginger beer doucement pour garder les bulles. Ne pas mélanger — juste agiter légèrement. Décorer. Savourer.
+        </div>
+        <button onclick="document.getElementById('moscowMulePop').remove()" style="margin-top:1rem;width:100%;background:linear-gradient(135deg,#b8860b,#d4a017);border:none;border-radius:12px;padding:.8rem;color:#fff;font-weight:900;font-size:.9rem;cursor:pointer;font-family:Nunito,sans-serif">🥂 Santé !</button>
+      </div>
+    </div>`;
+  pop.onclick = e => { if (e.target === pop) pop.remove(); };
+  document.body.appendChild(pop);
 }
 
 async function startApp() {
   document.getElementById('loginPage').style.display = 'none';
   document.getElementById('appPage').style.display = 'block';
+  startCocktailEgg();
 
   const initials = currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   document.getElementById('headerName').textContent = currentUser.name;
