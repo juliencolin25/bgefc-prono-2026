@@ -295,7 +295,7 @@ main{max-width:1200px;margin:0 auto;padding:2rem 1.5rem;position:relative;z-inde
 <!-- APP -->
 <div id="appPage" style="display:none">
   <!-- AJOUT MASTER PROMPT 2026 - Bandeau Jeannot sticky -->
-  <div class="jeannot-banner" id="jeannotBanner">
+  <div class="jeannot-banner" id="jeannotBanner" onclick="sonometre()" style="cursor:pointer">
     <img src="images/jeannot.png" alt="Jeannot" class="jeannot-photo" onerror="this.style.display='none'">
     <div class="jeannot-content">
       <div class="jeannot-label" id="jeannotLabel">⭐ Les bons conseils de Jeannot</div>
@@ -807,6 +807,32 @@ function initJeannot(){
   show(); setInterval(show,5000);
 }
 window.addEventListener('DOMContentLoaded',initJeannot);
+
+let _sonometre = 0, _sonometreTimer = null;
+const SONOMETRE_MSGS = [
+  "MAIS QU'EST-CE QUE VOUS FOUTEZ ?! Arrêtez de me cliquer dessus, j'essaie de donner des conseils moi !",
+  "5 fois ! CINQ FOIS ! Vous avez rien d'autre à faire que de martyriser le bandeau ?!",
+  "Je suis un conseiller sportif, pas un bouton d'ascenseur. UN PEU DE RESPECT.",
+  "Vous êtes conscients que j'ai un travail à faire ? Des pronos à surveiller ? Une équipe à coacher ?!",
+  "C'est bon j'ai compris. Vous voulez que je pète un câble. Eh ben voilà. C'est fait. Vous êtes contents ?",
+  "La prochaine fois que vous faites ça, je donne de mauvais conseils. EXPRÈS.",
+  "J'ai signalé cet incident à la direction de BGE. Bon, j'ai rien fait. Mais j'y ai pensé très fort.",
+  "Au moins Mag elle se fait pas cliquer dessus comme ça. Enfin je crois.",
+];
+function sonometre() {
+  _sonometre++;
+  if (_sonometreTimer) clearTimeout(_sonometreTimer);
+  _sonometreTimer = setTimeout(() => { _sonometre = 0; }, 3000);
+  if (_sonometre < 5) return;
+  _sonometre = 0;
+  const msg = SONOMETRE_MSGS[Math.floor(Math.random() * SONOMETRE_MSGS.length)];
+  const pop = document.createElement('div');
+  pop.style.cssText = 'position:fixed;top:90px;left:50%;transform:translateX(-50%);z-index:9999;background:#1a3a5c;color:#fff;border:3px solid #e63946;border-radius:16px;padding:1.2rem 1.5rem;max-width:380px;width:90%;box-shadow:0 8px 30px rgba(0,0,0,.4);font-family:Nunito,sans-serif;font-size:.9rem;font-weight:700;line-height:1.5;text-align:center;animation:bounce .4s ease';
+  pop.innerHTML = `<div style="font-size:1.6rem;margin-bottom:.5rem">😤</div><img src="images/jeannot.png" style="width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid #e63946;margin-bottom:.6rem"><br>${msg}<br><br><button onclick="this.parentElement.remove()" style="background:#e63946;border:none;border-radius:8px;color:#fff;padding:.4rem 1.2rem;cursor:pointer;font-weight:800;font-family:Nunito,sans-serif">OK OK j'arrête</button>`;
+  document.body.appendChild(pop);
+  setTimeout(() => pop.remove(), 8000);
+}
+
 // ============================================================
 // STATE
 // ============================================================
