@@ -1267,9 +1267,9 @@ function renderMatches() {
         <div class="prono-zone" onclick="event.stopPropagation()">
           <span class="prono-label">Mon prono :</span>
           <div class="prono-inputs">
-            <input type="number" min="0" max="20" class="prono-input" id="pi1_${m.id}" value="${prono ? prono.score1 : ''}" placeholder="?" oninput="checkPenalty(${m.id},'${m.group_name}','${m.team1}','${m.team2}')">
+            <input type="number" min="0" max="20" class="prono-input" id="pi1_${m.id}" value="${prono ? prono.score1 : ''}" placeholder="?" oninput="checkPenalty(${m.id},'${m.group_name}')">
             <span class="prono-sep">—</span>
-            <input type="number" min="0" max="20" class="prono-input" id="pi2_${m.id}" value="${prono ? prono.score2 : ''}" placeholder="?" oninput="checkPenalty(${m.id},'${m.group_name}','${m.team1}','${m.team2}')">
+            <input type="number" min="0" max="20" class="prono-input" id="pi2_${m.id}" value="${prono ? prono.score2 : ''}" placeholder="?" oninput="checkPenalty(${m.id},'${m.group_name}')">
           </div>
           ${prono ? `<span class="prono-saved">✅ ${prono.score1}—${prono.score2}${prono.winner ? ' (+tab)' : ''}</span>` : `<button class="btn-save" onclick="quickSave(${m.id},'${m.group_name}')">Valider</button>`}
         </div>
@@ -1288,7 +1288,7 @@ function renderMatches() {
 const KO_GROUPS = ['16es de finale','8es de finale','Quart de finale','Demi-finale','Match 3ème place','Finale'];
 const penWinners = {}; // matchId → 'team1' | 'team2'
 
-function checkPenalty(matchId, groupName, team1, team2) {
+function checkPenalty(matchId, groupName) {
   if (!KO_GROUPS.includes(groupName)) return;
   const s1 = document.getElementById('pi1_' + matchId)?.value;
   const s2 = document.getElementById('pi2_' + matchId)?.value;
