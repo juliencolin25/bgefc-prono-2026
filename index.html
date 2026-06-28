@@ -125,6 +125,8 @@ main{max-width:1200px;margin:0 auto;padding:2rem 1.5rem;position:relative;z-inde
 .tabs{display:flex;gap:.4rem;margin-bottom:1.5rem;background:var(--blanc);border-radius:14px;padding:.4rem;box-shadow:var(--shadow);}
 .tab{flex:1;background:none;border:none;color:var(--gris);padding:.6rem 1rem;border-radius:10px;cursor:pointer;font-family:'Nunito',sans-serif;font-size:.88rem;font-weight:800;transition:all .2s;}
 .tab.active{background:var(--navy);color:white;}
+.rank-mode-btn{flex:1;background:var(--bg);border:2px solid var(--gris-med);color:var(--gris);padding:.55rem .8rem;border-radius:10px;cursor:pointer;font-family:'Nunito',sans-serif;font-size:.8rem;font-weight:800;transition:all .2s;}
+.rank-mode-btn.active{background:var(--jaune);border-color:var(--jaune);color:var(--navy);}
 
 /* MY SCORE BANNER */
 .my-score-banner{background:linear-gradient(135deg,var(--rouge) 0%,var(--orange) 100%);border-radius:20px;padding:1.5rem 2rem;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:space-between;color:white;box-shadow:0 8px 25px rgba(230,57,70,.3);}
@@ -358,6 +360,11 @@ main{max-width:1200px;margin:0 auto;padding:2rem 1.5rem;position:relative;z-inde
         <button class="tab active" onclick="switchTab('indiv',this)">🏅 Individuel</button>
         <button class="tab" onclick="switchTab('teams',this)">👥 Par équipe</button>
       </div>
+      <div style="display:flex;gap:.5rem;margin-bottom:1rem">
+        <button id="btnModeTotal" class="rank-mode-btn active" onclick="switchRankMode('total')">🏆 Coupe du Monde BGE</button>
+        <button id="btnModeKO" class="rank-mode-btn" onclick="switchRankMode('ko')">⭐ Trophée Jean Tarbouriech</button>
+      </div>
+      <div id="rankModeLabel" style="font-size:.78rem;color:var(--gris);font-weight:700;margin-bottom:.8rem;text-align:center"></div>
       <div id="tabIndiv">
         <div class="section-title">🏅 Classement individuel</div>
         <div class="card" style="padding:0;overflow:hidden">
@@ -838,6 +845,8 @@ async function startApp() {
   }
 
   await Promise.all([loadMatches(), loadMyPronos(), loadAllUsers()]);
+  const hasKO = allMatches.some(m => KO_GROUPS.includes(m.group_name));
+  if (hasKO) activeGroup = 'ko';
   renderFilters();
   renderMatches();
   renderRanking();
@@ -845,6 +854,77 @@ async function startApp() {
   renderTeamCards();
   updateStats();
   if (currentUser.is_admin) renderAdminPanel();
+  if (!localStorage.getItem('poule_champs_seen')) showPouleChampionsPopup();
+}
+
+// ============================================================
+// POPUP CHAMPIONS PHASES DE POULE
+// ============================================================
+async function showPouleChampionsPopup() {
+  localStorage.setItem('poule_champs_seen', '1');
+  const allPronos = await loadAllPronos();
+  const pouleMatchIds = new Set(allMatches.filter(m => m.group_name.startsWith('Groupe')).map(m => m.id));
+
+  // Top 3 individuel
+  const players = allUsers.map(u => {
+    const pts = allPronos.filter(p => p.user_id === u.id && pouleMatchIds.has(p.match_id) && p.points !== null).reduce((s, p) => s + p.points, 0);
+    return { ...u, pts };
+  }).sort((a, b) => b.pts - a.pts).slice(0, 3);
+
+  // Top 3 équipes
+  const scores = {};
+  TEAMS_BGE.forEach(t => { scores[t] = { total: 0, count: 0 }; });
+  const finishedPoule = allMatches.filter(m => m.status === 'done' && m.group_name.startsWith('Groupe')).length || 1;
+  allUsers.forEach(u => {
+    const pts = allPronos.filter(p => p.user_id === u.id && pouleMatchIds.has(p.match_id) && p.points !== null).reduce((s, p) => s + p.points, 0);
+    if (scores[u.team]) { scores[u.team].total += pts; scores[u.team].count++; }
+  });
+  const teams = Object.entries(scores).map(([name, s]) => ({
+    name, avg: s.count > 0 ? s.total / (s.count * finishedPoule) : 0
+  })).sort((a, b) => b.avg - a.avg).slice(0, 3);
+
+  const medals = ['🥇','🥈','🥉'];
+  const popup = document.createElement('div');
+  popup.id = 'pouleChampionsPopup';
+  popup.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem';
+  popup.innerHTML = `
+    <div style="background:#fff;border-radius:20px;max-width:480px;width:100%;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.35)">
+      <div style="background:linear-gradient(135deg,#073B4C,#118AB2);padding:1.2rem 1.5rem;text-align:center">
+        <div style="font-size:2rem">🏆</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:3px;color:white">Champions des Phases de Poule !</div>
+        <div style="font-size:.78rem;color:rgba(255,255,255,.8);font-weight:600;margin-top:.3rem">La phase de groupes est terminée — félicitations aux vainqueurs !</div>
+      </div>
+      <div style="padding:1.4rem">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:2px;color:var(--navy);margin-bottom:.7rem">🏅 Top 3 Individuel</div>
+        ${players.map((p, i) => {
+          const color = TEAM_COLORS[p.team] || '#118AB2';
+          const initials = p.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2);
+          return `<div style="display:flex;align-items:center;gap:.8rem;padding:.5rem .6rem;border-radius:10px;margin-bottom:.4rem;background:${i===0?'#fff8e1':i===1?'#f5f5f5':'#fdf3e7'}">
+            <div style="font-size:1.4rem">${medals[i]}</div>
+            <div style="width:34px;height:34px;border-radius:50%;background:${color};display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:900;color:white">${initials}</div>
+            <div style="flex:1;font-weight:800;color:var(--navy);font-size:.9rem">${p.name}</div>
+            <div style="font-weight:900;color:var(--rouge);font-size:1rem">${p.pts} pts</div>
+          </div>`;
+        }).join('')}
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:2px;color:var(--navy);margin:.9rem 0 .7rem">👥 Top 3 Équipes</div>
+        ${teams.map((t, i) => {
+          const color = TEAM_COLORS[t.name] || '#118AB2';
+          return `<div style="display:flex;align-items:center;gap:.8rem;padding:.5rem .6rem;border-radius:10px;margin-bottom:.4rem;background:${i===0?'#fff8e1':i===1?'#f5f5f5':'#fdf3e7'}">
+            <div style="font-size:1.4rem">${medals[i]}</div>
+            <div style="width:10px;height:34px;border-radius:5px;background:${color}"></div>
+            <div style="flex:1;font-weight:800;color:${color};font-size:.9rem">${t.name}</div>
+            <div style="font-weight:900;color:var(--rouge);font-size:.9rem">${t.avg.toFixed(2)} moy./5</div>
+          </div>`;
+        }).join('')}
+        <div style="background:#e8f5e9;border-left:3px solid #2e7d32;border-radius:0 10px 10px 0;padding:.75rem 1rem;font-size:.82rem;color:#1b5e20;margin:.9rem 0 1rem;font-weight:700">
+          ⭐ La <strong>Ligue de la Seconde Chance</strong> commence ! Tout le monde repart de zéro pour les phases finales. Le <strong>Trophée Jean Tarbouriech</strong> est à conquérir !
+        </div>
+        <button onclick="document.getElementById('pouleChampionsPopup').remove()" style="width:100%;background:linear-gradient(135deg,#073B4C,#118AB2);border:none;border-radius:12px;padding:.9rem;color:white;font-family:'Nunito',sans-serif;font-size:.95rem;font-weight:900;cursor:pointer">
+          C'est parti pour la Phase Finale ! ⚽
+        </button>
+      </div>
+    </div>`;
+  document.body.appendChild(popup);
 }
 
 // ============================================================
@@ -921,18 +1001,17 @@ function switchTab(t, btn) {
 // FILTRES
 // ============================================================
 function renderFilters() {
-  const ORDER = [
-    'all',
-    'Groupe A','Groupe B','Groupe C','Groupe D','Groupe E','Groupe F',
-    'Groupe G','Groupe H','Groupe I','Groupe J','Groupe K','Groupe L',
-    '16es de finale','8es de finale','Quart de finale','Demi-finale','Match 3ème place','Finale'
-  ];
+  const KO_ORDER = ['16es de finale','8es de finale','Quart de finale','Demi-finale','Match 3ème place','Finale'];
   const available = new Set(allMatches.map(m => m.group_name));
-  const groups = ORDER.filter(g => g === 'all' || available.has(g));
-  document.getElementById('filterBar').innerHTML = groups.map(g => `
-    <button class="filter-btn ${g === activeGroup ? 'active' : ''}" onclick="filterGroup('${g}')">
-      ${g === 'all' ? '🌍 Tous' : g}
-    </button>`).join('');
+  const hasKO = KO_ORDER.some(g => available.has(g));
+  const hasGroupes = allMatches.some(m => m.group_name.startsWith('Groupe'));
+  let btns = '';
+  if (hasKO) btns += `<button class="filter-btn ${activeGroup==='ko'?'active':''}" onclick="filterGroup('ko')">🏆 Phase Finale</button>`;
+  KO_ORDER.filter(g => available.has(g)).forEach(g => {
+    btns += `<button class="filter-btn ${activeGroup===g?'active':''}" onclick="filterGroup('${g}')">${g}</button>`;
+  });
+  if (hasGroupes) btns += `<button class="filter-btn ${activeGroup==='groupes'?'active':''}" onclick="filterGroup('groupes')">📁 Phases de Groupe</button>`;
+  document.getElementById('filterBar').innerHTML = btns;
 }
 
 function filterGroup(g) { activeGroup = g; renderFilters(); renderMatches(); }
@@ -950,7 +1029,10 @@ function parseFrDate(dateStr, timeStr) {
   return month * 100000 + day * 1000 + h * 60 + m;
 }
 function renderMatches() {
-  const filtered = activeGroup === 'all' ? allMatches : allMatches.filter(m => m.group_name === activeGroup);
+  const filtered = activeGroup === 'ko' ? allMatches.filter(m => KO_GROUPS.includes(m.group_name))
+    : activeGroup === 'groupes' ? allMatches.filter(m => m.group_name.startsWith('Groupe'))
+    : activeGroup === 'all' ? allMatches
+    : allMatches.filter(m => m.group_name === activeGroup);
   const sorted = [...filtered].sort((a, b) => {
     const oa = GROUP_ORDER.indexOf(a.group_name), ob = GROUP_ORDER.indexOf(b.group_name);
     if (oa !== ob) return oa - ob;
@@ -1118,12 +1200,23 @@ document.getElementById('matchModal').addEventListener('click', function(e) { if
 // ============================================================
 // CLASSEMENT
 // ============================================================
+let rankMode = 'total';
+function switchRankMode(mode) {
+  rankMode = mode;
+  document.getElementById('btnModeTotal').classList.toggle('active', mode === 'total');
+  document.getElementById('btnModeKO').classList.toggle('active', mode === 'ko');
+  const lbl = document.getElementById('rankModeLabel');
+  if (lbl) lbl.textContent = mode === 'ko' ? '⭐ Points des phases à élimination directe uniquement (16es → Finale)' : '🏆 Total cumulé phases de poule + phases finales';
+  renderRanking();
+  renderTeamRanking();
+}
 async function renderRanking() {
   const allPronos = await loadAllPronos();
   const medals = ['🥇','🥈','🥉'];
+  const koMatchIds = new Set(allMatches.filter(m => KO_GROUPS.includes(m.group_name)).map(m => m.id));
 
   const players = allUsers.map(u => {
-    const userPronos = allPronos.filter(p => p.user_id === u.id);
+    const userPronos = allPronos.filter(p => p.user_id === u.id && (rankMode === 'ko' ? koMatchIds.has(p.match_id) : true));
     const pts = userPronos.reduce((s, p) => s + (p.points || 0), 0);
     const exact = userPronos.filter(p => p.points === 5).length;
     const correct = userPronos.filter(p => p.points === 3).length;
@@ -1153,11 +1246,14 @@ async function renderRanking() {
 
 async function renderTeamRanking() {
   const allPronos = await loadAllPronos();
-  const finishedMatches = allMatches.filter(m => m.status === 'done').length;
+  const koMatchIds = new Set(allMatches.filter(m => KO_GROUPS.includes(m.group_name)).map(m => m.id));
+  const finishedMatches = rankMode === 'ko'
+    ? allMatches.filter(m => m.status === 'done' && KO_GROUPS.includes(m.group_name)).length
+    : allMatches.filter(m => m.status === 'done').length;
   const scores = {};
   TEAMS_BGE.forEach(t => { scores[t] = { total: 0, count: 0 }; });
   allUsers.forEach(u => {
-    const pts = allPronos.filter(p => p.user_id === u.id && p.points !== null).reduce((s, p) => s + p.points, 0);
+    const pts = allPronos.filter(p => p.user_id === u.id && p.points !== null && (rankMode === 'ko' ? koMatchIds.has(p.match_id) : true)).reduce((s, p) => s + p.points, 0);
     if (scores[u.team]) { scores[u.team].total += pts; scores[u.team].count++; }
   });
   const divisor = finishedMatches || 1;
