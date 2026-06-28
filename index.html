@@ -1319,13 +1319,13 @@ function checkConfiance(matchId) {
   const total = v1 + v2;
   const el = document.getElementById('confiance_'+matchId);
   if (!el) return;
-  if (total <= 6) { el.style.display = 'none'; return; }
+  if (total <= 4) { el.style.display = 'none'; return; }
   const levels = [
-    { min:7,  max:7,  bg:'#fff3cd', color:'#856404', icon:'🤨', msg:'7 buts... t\'es sûr.e de toi ?' },
-    { min:8,  max:9,  bg:'#ffe0b2', color:'#bf360c', icon:'😬', msg:'8-9 buts ? Ça commence à sentir la panique.' },
-    { min:10, max:11, bg:'#ffccbc', color:'#b71c1c', icon:'🤯', msg:'10+ buts. Tu regardes du football ou du basket ?' },
-    { min:12, max:14, bg:'#f8d7da', color:'#721c24', icon:'😱', msg:'Niveau de confiance : HORS NORMES. Thierry est inquiet.' },
-    { min:15, max:999,bg:'#e8d5ff', color:'#4a0080', icon:'👁️', msg:'Mag refuse de commenter ce score. Elle est sans voix.' },
+    { min:5,  max:6,  bg:'#fff3cd', color:'#856404', icon:'🤨', msg:'5-6 buts... t\'es sûr.e de toi ?' },
+    { min:7,  max:8,  bg:'#ffe0b2', color:'#bf360c', icon:'😬', msg:'7-8 buts ? Ça commence à sentir la panique.' },
+    { min:9,  max:10, bg:'#ffccbc', color:'#b71c1c', icon:'🤯', msg:'9-10 buts. Tu regardes du football ou du basket ?' },
+    { min:11, max:13, bg:'#f8d7da', color:'#721c24', icon:'😱', msg:'Niveau de confiance : HORS NORMES. Thierry est inquiet.' },
+    { min:14, max:999,bg:'#e8d5ff', color:'#4a0080', icon:'👁️', msg:'Mag refuse de commenter ce score. Elle est sans voix.' },
   ];
   const lvl = levels.find(l => total >= l.min && total <= l.max) || levels[levels.length-1];
   el.style.display = 'block';
