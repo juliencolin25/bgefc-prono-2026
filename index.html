@@ -1287,13 +1287,14 @@ function renderMatches() {
         <div class="prono-zone" onclick="event.stopPropagation()">
           <span class="prono-label">Mon prono :</span>
           <div class="prono-inputs">
-            <input type="number" min="0" max="20" class="prono-input" id="pi1_${m.id}" value="${prono ? prono.score1 : ''}" placeholder="?" oninput="checkPenalty(${m.id},'${m.group_name}')">
+            <input type="number" min="0" max="20" class="prono-input" id="pi1_${m.id}" value="${prono ? prono.score1 : ''}" placeholder="?" oninput="checkPenalty(${m.id},'${m.group_name}');checkConfiance(${m.id})">
             <span class="prono-sep">—</span>
-            <input type="number" min="0" max="20" class="prono-input" id="pi2_${m.id}" value="${prono ? prono.score2 : ''}" placeholder="?" oninput="checkPenalty(${m.id},'${m.group_name}')">
+            <input type="number" min="0" max="20" class="prono-input" id="pi2_${m.id}" value="${prono ? prono.score2 : ''}" placeholder="?" oninput="checkPenalty(${m.id},'${m.group_name}');checkConfiance(${m.id})">
           </div>
           ${prono ? `<span class="prono-saved">✅ ${prono.score1}—${prono.score2}${prono.winner ? ' (+tab)' : ''}</span>` : `<button class="btn-save" onclick="quickSave(${m.id},'${m.group_name}')">Valider</button>`}
           ${(() => { const fp = fabienPronos[m.id]; return (KO_GROUPS.includes(m.group_name) && prono && fp && prono.score1 === fp.score1 && prono.score2 === fp.score2) ? `<img src="images/FJ.jpg" onclick="event.stopPropagation();showMaledictionFabien()" style="width:28px;height:28px;border-radius:50%;object-fit:cover;cursor:pointer;border:2px solid #e63946;animation:bounce 1s ease-in-out infinite;vertical-align:middle" title="Malédiction de Fabien !">` : ''; })()}
         </div>
+        <div id="confiance_${m.id}" style="display:none;margin:.2rem 1rem .3rem;padding:.5rem .8rem;border-radius:10px;font-size:.72rem;font-weight:700;text-align:center;transition:all .3s" onclick="event.stopPropagation()"></div>
         <div style="padding:.3rem 1rem .5rem;text-align:right" onclick="event.stopPropagation()">
           <button class="mag-coin-btn" data-t1="${m.team1.replace(/'/g,"&#39;")}" data-t2="${m.team2.replace(/'/g,"&#39;")}" onclick="magCoinFlip(this.dataset.t1,this.dataset.t2)">⚡ Demander à Mag</button>
         </div>
@@ -1311,6 +1312,27 @@ function renderMatches() {
 
 const KO_GROUPS = ['16es de finale','8es de finale','Quart de finale','Demi-finale','Match 3ème place','Finale'];
 const penWinners = {}; // matchId → 'team1' | 'team2'
+
+function checkConfiance(matchId) {
+  const v1 = parseInt(document.getElementById('pi1_'+matchId)?.value) || 0;
+  const v2 = parseInt(document.getElementById('pi2_'+matchId)?.value) || 0;
+  const total = v1 + v2;
+  const el = document.getElementById('confiance_'+matchId);
+  if (!el) return;
+  if (total <= 6) { el.style.display = 'none'; return; }
+  const levels = [
+    { min:7,  max:7,  bg:'#fff3cd', color:'#856404', icon:'🤨', msg:'7 buts... t\'es sûr.e de toi ?' },
+    { min:8,  max:9,  bg:'#ffe0b2', color:'#bf360c', icon:'😬', msg:'8-9 buts ? Ça commence à sentir la panique.' },
+    { min:10, max:11, bg:'#ffccbc', color:'#b71c1c', icon:'🤯', msg:'10+ buts. Tu regardes du football ou du basket ?' },
+    { min:12, max:14, bg:'#f8d7da', color:'#721c24', icon:'😱', msg:'Niveau de confiance : HORS NORMES. Thierry est inquiet.' },
+    { min:15, max:999,bg:'#e8d5ff', color:'#4a0080', icon:'👁️', msg:'Mag refuse de commenter ce score. Elle est sans voix.' },
+  ];
+  const lvl = levels.find(l => total >= l.min && total <= l.max) || levels[levels.length-1];
+  el.style.display = 'block';
+  el.style.background = lvl.bg;
+  el.style.color = lvl.color;
+  el.innerHTML = `${lvl.icon} <strong>Détecteur de Confiance :</strong> ${lvl.msg}`;
+}
 
 function checkPenalty(matchId, groupName) {
   if (!KO_GROUPS.includes(groupName)) return;
