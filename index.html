@@ -913,7 +913,7 @@ function startCocktailEgg() {
   _cocktailTimer = setInterval(() => {
     if (document.getElementById('appPage').style.display === 'none') return;
     if (document.getElementById('cocktailEgg')) return;
-    if (Math.random() > 0.12) return; // ~12% de chance toutes les 45s → apparaît rarement
+    if (Math.random() > 0.35) return; // ~35% de chance toutes les 45s
     const egg = document.createElement('div');
     egg.id = 'cocktailEgg';
     const topPct = 30 + Math.random() * 40; // entre 30% et 70% de hauteur
