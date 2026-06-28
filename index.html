@@ -839,7 +839,7 @@ async function doLogin() {
   btn.disabled = false; btn.textContent = '⚡ Se connecter';
   if (error || !data) { showError('Email ou mot de passe incorrect.'); return; }
   currentUser = data;
-  localStorage.setItem('bgefc_user_id', data.id);
+  localStorage.setItem('bgefc_user_id_v2', data.id);
   await startApp();
 }
 
@@ -858,13 +858,13 @@ async function doRegister() {
   btn.disabled = false; btn.textContent = '🚀 Créer mon compte';
   if (error) { showError('Erreur lors de la création. Réessaie.'); return; }
   currentUser = data;
-  localStorage.setItem('bgefc_user_id', data.id);
+  localStorage.setItem('bgefc_user_id_v2', data.id);
   await startApp();
 }
 
 async function doLogout() {
   currentUser = null;
-  localStorage.removeItem('bgefc_user_id');
+  localStorage.removeItem('bgefc_user_id_v2');
   document.getElementById('pronoMortFloating')?.remove();
   document.getElementById('loginPage').style.display = 'flex';
   document.getElementById('appPage').style.display = 'none';
@@ -1147,7 +1147,7 @@ async function cancelPronoMort() {
 // AUTO LOGIN
 // ============================================================
 window.addEventListener('load', async () => {
-  const savedId = localStorage.getItem('bgefc_user_id');
+  const savedId = localStorage.getItem('bgefc_user_id_v2');
   if (savedId) {
     const { data } = await db.from('users').select('*').eq('id', savedId).single();
     if (data) { currentUser = data; await startApp(); }
