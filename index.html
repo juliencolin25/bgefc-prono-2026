@@ -361,6 +361,7 @@ main{max-width:1200px;margin:0 auto;padding:2rem 1.5rem;position:relative;z-inde
           <div class="my-score-stat"><div class="my-score-val" id="myRank">#—</div><div class="my-score-lbl">Rang</div></div>
           <div class="my-score-stat"><div class="my-score-val" id="myPts">0</div><div class="my-score-lbl">Points</div></div>
           <div class="my-score-stat"><div class="my-score-val" id="myExact">0</div><div class="my-score-lbl">Exacts</div></div>
+          <div class="my-score-stat"><div class="my-score-val" id="mortCount">—</div><div class="my-score-lbl">💀 Mort</div></div>
         </div>
       </div>
       <div class="tabs">
@@ -1596,6 +1597,10 @@ function updateStats() {
   document.getElementById('statPoints').textContent = pts;
   document.getElementById('myPts').textContent = pts;
   document.getElementById('myExact').textContent = exact;
+  // Compte des pronos de la mort
+  db.from('prono_mort').select('*', { count: 'exact', head: true }).then(({ count }) => {
+    document.getElementById('mortCount').textContent = count ?? '—';
+  });
 }
 
 // ============================================================
