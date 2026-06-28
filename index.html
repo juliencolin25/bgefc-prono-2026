@@ -493,10 +493,17 @@ main{max-width:1200px;margin:0 auto;padding:2rem 1.5rem;position:relative;z-inde
     <div class="modal-prono-title">🎯 MON PRONOSTIC</div>
     <div class="modal-prono-row">
       <div class="modal-prono-team" id="modalPronoTeam1">France</div>
-      <input type="number" min="0" max="20" class="modal-prono-input" id="modalScore1" value="1">
+      <input type="number" min="0" max="20" class="modal-prono-input" id="modalScore1" value="1" oninput="checkModalPenalty()">
       <div class="modal-prono-sep">—</div>
-      <input type="number" min="0" max="20" class="modal-prono-input" id="modalScore2" value="1">
+      <input type="number" min="0" max="20" class="modal-prono-input" id="modalScore2" value="1" oninput="checkModalPenalty()">
       <div class="modal-prono-team" id="modalPronoTeam2">Brésil</div>
+    </div>
+    <div id="modalPenZone" style="display:none;padding:.8rem 1rem;border-top:2px dashed #f0e0cc;text-align:center;font-size:.8rem;color:#e06c00;font-weight:800">
+      ⚽ QUI GAGNE AUX TIRS AU BUT ?
+      <div style="display:flex;gap:.6rem;justify-content:center;margin-top:.6rem">
+        <button id="modalPenBtn1" onclick="selectModalPenWinner('team1')" class="pen-btn" id="modalPenBtn1"></button>
+        <button id="modalPenBtn2" onclick="selectModalPenWinner('team2')" class="pen-btn" id="modalPenBtn2"></button>
+      </div>
     </div>
     <button class="btn-prono-save" onclick="saveModalProno()">💾 Enregistrer mon pronostic</button>
   </div>
@@ -1362,10 +1369,31 @@ function updateStats() {
 // ============================================================
 // MODAL
 // ============================================================
+let modalPenWinner = null;
+
+function checkModalPenalty() {
+  const m = allMatches.find(x => x.id === currentMatchId);
+  if (!m || !KO_GROUPS.includes(m.group_name)) return;
+  const s1 = document.getElementById('modalScore1').value;
+  const s2 = document.getElementById('modalScore2').value;
+  const isDraw = s1 !== '' && s2 !== '' && s1 === s2;
+  document.getElementById('modalPenZone').style.display = isDraw ? 'block' : 'none';
+  if (!isDraw) modalPenWinner = null;
+}
+
+function selectModalPenWinner(winner) {
+  modalPenWinner = winner;
+  document.getElementById('modalPenBtn1').classList.toggle('pen-btn-active', winner === 'team1');
+  document.getElementById('modalPenBtn1').classList.toggle('pen-btn', winner !== 'team1');
+  document.getElementById('modalPenBtn2').classList.toggle('pen-btn-active', winner === 'team2');
+  document.getElementById('modalPenBtn2').classList.toggle('pen-btn', winner !== 'team2');
+}
+
 function openModal(id) {
   const m = allMatches.find(x => x.id === id);
   if (!m) return;
   currentMatchId = id;
+  modalPenWinner = null;
   document.getElementById('modalFlag1').innerHTML = flagImg(m.team1, 80);
   document.getElementById('modalFlag2').innerHTML = flagImg(m.team2, 80);
   document.getElementById('modalTeam1').textContent = m.team1;
@@ -1385,6 +1413,17 @@ function openModal(id) {
   const prono = myPronos[id];
   document.getElementById('modalScore1').value = prono ? prono.score1 : '';
   document.getElementById('modalScore2').value = prono ? prono.score2 : '';
+  // Boutons tirs au but
+  document.getElementById('modalPenBtn1').textContent = m.team1;
+  document.getElementById('modalPenBtn2').textContent = m.team2;
+  document.getElementById('modalPenBtn1').className = 'pen-btn';
+  document.getElementById('modalPenBtn2').className = 'pen-btn';
+  document.getElementById('modalPenZone').style.display = 'none';
+  // Restaurer le winner si prono existant en égalité
+  if (prono && prono.score1 === prono.score2 && prono.winner && KO_GROUPS.includes(m.group_name)) {
+    document.getElementById('modalPenZone').style.display = 'block';
+    selectModalPenWinner(prono.winner);
+  }
   document.getElementById('matchModal').classList.add('open');
 }
 
@@ -1399,7 +1438,13 @@ async function saveModalProno() {
   }
   const s1 = parseInt(document.getElementById('modalScore1').value);
   const s2 = parseInt(document.getElementById('modalScore2').value);
-  await saveProno(currentMatchId, s1, s2);
+  if (isNaN(s1) || isNaN(s2)) { showToast('⚠️ Entre un score complet !'); return; }
+  const m = allMatches.find(x => x.id === currentMatchId);
+  if (m && KO_GROUPS.includes(m.group_name) && s1 === s2 && !modalPenWinner) {
+    showToast('⚠️ Choisis le vainqueur aux tirs au but !');
+    return;
+  }
+  await saveProno(currentMatchId, s1, s2, s1 === s2 ? modalPenWinner : null);
   closeModal();
 }
 
