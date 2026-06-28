@@ -1500,12 +1500,14 @@ function switchRankMode(mode) {
 }
 function showMaledictionFabien() {
   const MESSAGES = [
-    "Tu as pronostiqué exactement comme Fabien. C'est un avertissement, pas un encouragement.",
-    "Fabien a fait le même prono. Fabien a raté 2 matchs sur 72. Réfléchis.",
-    "Même score que Fabien. Statistiquement, c'est pas bon signe pour toi.",
-    "Tu es synchronisé avec Fabien JOLY. Personne ne te l'a demandé.",
-    "Fabien pense pareil que toi sur ce match. L'un de vous deux a tort. Probablement toi.",
-    "Coincidence ou malédiction ? Dans les deux cas, Fabien est impliqué.",
+    "Tu as pronostiqué exactement comme Fabien. La baraka, il l'avait à l'Euro. À la Coupe du Monde, elle l'a quitté. Et toi tu choisis ce moment pour te synchroniser avec lui.",
+    "Fabien était inarrêtable à l'Euro. Puis quelque chose s'est passé entre l'Euro et ce Mondial. On sait pas quoi. Lui non plus. Et là tu fais le même prono que lui.",
+    "Même score que Fabien. L'homme qui a perdu la baraka entre deux compétitions sans même comprendre pourquoi. Bonne chance quand même.",
+    "Tu es sur la même longueur d'onde que Fabien JOLY. L'Euro, il était intouchable. Le Mondial, la magie s'est évaporée. Personne ne te l'a demandé.",
+    "Fabien pense pareil que toi sur ce match. À l'Euro il aurait eu raison. Depuis, quelque chose a changé dans l'univers. Probablement toi qui as tort.",
+    "Coïncidence ou malédiction ? Fabien était béni des dieux à l'Euro. Entre-temps, les dieux ont changé d'avis. Dans les deux cas, Fabien est impliqué.",
+    "La baraka de Fabien, c'était quelque chose. À l'Euro. Depuis ce Mondial, elle s'est volatilisée. Et toi tu rentres dans son sillage. Réfléchis bien.",
+    "Même prono que Fabien. L'homme dont la chance s'est arrêtée pile au coup de sifflet final de l'Euro. Depuis : le vide. Et toi tu vas le suivre ?",
   ];
   const msg = MESSAGES[Math.floor(Math.random() * MESSAGES.length)];
   const popup = document.createElement('div');
