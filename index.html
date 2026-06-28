@@ -919,7 +919,7 @@ function startCocktailEgg() {
     const egg = document.createElement('div');
     egg.id = 'cocktailEgg';
     const topPct = 30 + Math.random() * 40; // entre 30% et 70% de hauteur
-    egg.style.cssText = `position:fixed;left:6px;top:${topPct}%;z-index:500;font-size:1.1rem;opacity:0.28;cursor:pointer;user-select:none;filter:grayscale(30%);animation:cocktailAppear 1.8s ease-out forwards;`;
+    egg.style.cssText = `position:fixed;left:18px;top:${topPct}%;z-index:500;font-size:1.1rem;opacity:0.28;cursor:pointer;user-select:none;filter:grayscale(30%);animation:cocktailAppear 1.8s ease-out forwards;`;
     egg.textContent = '🍸';
     egg.title = '';
     egg.onmouseenter = () => egg.style.opacity = '0.7';
@@ -927,7 +927,7 @@ function startCocktailEgg() {
     egg.onclick = (e) => { e.stopPropagation(); egg.remove(); showMoscowMule(); };
     document.body.appendChild(egg);
     setTimeout(() => egg?.remove(), 25000); // disparaît après 25s si pas cliqué
-  }, 45000);
+  }, 40000);
 }
 const PAULINE_RECETTES = [
   {
