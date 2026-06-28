@@ -888,7 +888,7 @@ async function startApp() {
   if (currentUser.is_admin) renderAdminPanel();
   const pouleTs = localStorage.getItem('poule_champs_ts');
   if (!pouleTs) { localStorage.setItem('poule_champs_ts', Date.now().toString()); showPouleChampionsPopup(); }
-  else if (Date.now() - parseInt(pouleTs) < 48*3600*1000) showPouleChampionsPopup();
+  else if (Date.now() - parseInt(pouleTs) < 72*3600*1000) showPouleChampionsPopup();
   initPronoMort();
 }
 
@@ -1416,7 +1416,7 @@ function switchRankMode(mode) {
   const lbl = document.getElementById('rankModeLabel');
   if (lbl) lbl.textContent = mode === 'ko' ? '⭐ Points des phases à élimination directe uniquement (16es → Finale)' : '🏆 Total cumulé phases de poule + phases finales';
   const tropheeTs = localStorage.getItem('trophee_jeannot_ts');
-  if (mode === 'ko' && (!tropheeTs || Date.now() - parseInt(tropheeTs) < 48*3600*1000)) {
+  if (mode === 'ko' && (!tropheeTs || Date.now() - parseInt(tropheeTs) < 72*3600*1000)) {
     if (!tropheeTs) localStorage.setItem('trophee_jeannot_ts', Date.now().toString());
     showTropheeJeannotPopup();
     return;
