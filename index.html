@@ -915,7 +915,7 @@ function startCocktailEgg() {
   _cocktailTimer = setInterval(() => {
     if (document.getElementById('appPage').style.display === 'none') return;
     if (document.getElementById('cocktailEgg')) return;
-    if (Math.random() > 0.65) return; // ~65% de chance toutes les 40s
+    if (Math.random() > 0.80) return; // ~80% de chance toutes les 30s
     const egg = document.createElement('div');
     egg.id = 'cocktailEgg';
     const topPct = 30 + Math.random() * 40; // entre 30% et 70% de hauteur
@@ -927,7 +927,7 @@ function startCocktailEgg() {
     egg.onclick = (e) => { e.stopPropagation(); egg.remove(); showMoscowMule(); };
     document.body.appendChild(egg);
     setTimeout(() => egg?.remove(), 25000); // disparaît après 25s si pas cliqué
-  }, 40000);
+  }, 30000);
 }
 const PAULINE_RECETTES = [
   {
