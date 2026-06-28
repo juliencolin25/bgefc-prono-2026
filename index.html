@@ -971,9 +971,41 @@ async function initPronoMort() {
 function openPronoMort() {
   const seiziemes = allMatches.filter(m => m.group_name === '16es de finale');
   const allDone = seiziemes.length > 0 && seiziemes.every(m => m.status === 'done');
-  if (myPronoMort) { showPronoMortForm(allDone); return; }
+  if (myPronoMort) { showThierryDiablePopup(allDone); return; }
   if (allDone) { showToast('⏰ Les 16es sont terminés — le Prono de la Mort est fermé !'); return; }
   showThierryMonologue();
+}
+
+function showThierryDiablePopup(locked) {
+  const popup = document.createElement('div');
+  popup.id = 'thierryDiablePopup';
+  popup.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem';
+  popup.innerHTML = `
+    <div style="background:linear-gradient(160deg,#0a0000,#1a0505);border-radius:20px;max-width:420px;width:100%;overflow:hidden;box-shadow:0 20px 60px rgba(139,0,0,.6);border:2px solid #cc0000">
+      <div style="background:linear-gradient(135deg,#8b0000,#cc0000);padding:1rem 1.5rem;display:flex;align-items:center;gap:.8rem">
+        <span style="font-size:1.5rem">😈</span>
+        <div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:2px;color:white">PRONO DE LA MORT</div>
+          <div style="font-size:.72rem;color:rgba(255,255,255,.8);font-weight:600">Ton prono : <strong>${myPronoMort.team} ${myPronoMort.score_win}—${myPronoMort.score_lose}</strong></div>
+        </div>
+      </div>
+      <div style="padding:1.5rem;display:flex;flex-direction:column;align-items:center;gap:1rem">
+        <img src="images/DTB.png" alt="Thierry diable" style="width:130px;height:130px;border-radius:50%;object-fit:cover;border:3px solid #cc0000;box-shadow:0 0 25px rgba(204,0,0,.6)" onerror="this.style.display='none'">
+        <div style="font-size:.9rem;color:#ffaaaa;line-height:1.75;font-style:italic;text-align:center;font-weight:700">
+          "Alors… on a peur ?<br>On veut changer d'avis ?<br>On regrette déjà ?"
+        </div>
+        <div style="font-size:.82rem;color:#ddd;line-height:1.7;font-style:italic;text-align:justify">
+          "Le Prono de la Mort, c'est pas un formulaire qu'on remplit en claquant des dents. C'est un engagement. Un pacte. Avec toi-même, avec le football, avec moi — et je suis en costume de diable, donc c'est sérieux. Alors : est-ce que tu assumes ? Ou est-ce que tu fuis comme quelqu'un qui n'a pas regardé un seul match de poule ?"
+        </div>
+        <div style="font-size:.7rem;color:#666;font-weight:700">— Thierry, en costume, mais très sérieux quand même</div>
+        ${!locked ? `
+        <button onclick="document.getElementById('thierryDiablePopup').remove();showPronoMortForm(false);" style="width:100%;background:linear-gradient(135deg,#8b0000,#cc0000);border:none;border-radius:12px;padding:.85rem;color:white;font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:900;cursor:pointer">✏️ Modifier mon prono de la mort</button>
+        <button onclick="document.getElementById('thierryDiablePopup').remove();cancelPronoMort();" style="width:100%;background:rgba(255,255,255,.06);border:1px solid #555;border-radius:12px;padding:.75rem;color:#aaa;font-family:'Nunito',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer">🗑️ J'annule… (lâche)</button>
+        ` : `<div style="font-size:.78rem;color:#888;text-align:center;background:rgba(255,255,255,.05);border-radius:10px;padding:.7rem">⏰ Les 16es sont terminés — plus possible de modifier</div>`}
+        <button onclick="document.getElementById('thierryDiablePopup').remove()" style="width:100%;background:transparent;border:1px solid #333;border-radius:12px;padding:.6rem;color:#555;font-family:'Nunito',sans-serif;font-size:.8rem;font-weight:700;cursor:pointer">Fermer</button>
+      </div>
+    </div>`;
+  document.body.appendChild(popup);
 }
 
 function showThierryMonologue() {
