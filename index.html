@@ -1515,6 +1515,28 @@ function showMaledictionFabien() {
 }
 
 function magCoinFlip(team1, team2) {
+  if (team1 === 'À déterminer' || team2 === 'À déterminer' || !team1 || !team2) {
+    const popup = document.createElement('div');
+    popup.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem';
+    popup.innerHTML = `
+      <div style="background:white;border-radius:20px;max-width:360px;width:100%;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.3);border:2px solid #c89b3c">
+        <div style="background:linear-gradient(135deg,#a07828,#c89b3c);padding:1rem 1.5rem;display:flex;align-items:center;gap:.8rem">
+          <img src="images/MCO.jpg" style="width:55px;height:55px;border-radius:50%;object-fit:cover;border:2px solid white;flex-shrink:0" onerror="this.style.display='none'">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:2px;color:white">L'Oracle de Mag</div>
+        </div>
+        <div style="padding:1.5rem;text-align:center">
+          <div style="font-size:2rem;margin-bottom:.8rem">🔮</div>
+          <div style="font-size:.95rem;color:#333;line-height:1.75;font-style:italic">"Bah hé, je lis pas l'avenir, on connaît pas les équipes, me prenez pas pour Madame Soleil, non plus !"</div>
+          <div style="font-size:.68rem;color:#aaa;margin-top:.8rem;font-weight:700">Mag, qui a quand même ses limites</div>
+        </div>
+        <div style="padding:0 1.5rem 1.5rem">
+          <button onclick="this.closest('div[style*=fixed]').remove()" style="width:100%;background:linear-gradient(135deg,#a07828,#c89b3c);border:none;border-radius:12px;padding:.75rem;color:white;font-family:'Nunito',sans-serif;font-size:.88rem;font-weight:900;cursor:pointer">Ok Mag, désolé 🙏</button>
+        </div>
+      </div>`;
+    document.body.appendChild(popup);
+    popup.addEventListener('click', e => { if (e.target === popup) popup.remove(); });
+    return;
+  }
   const VERDICTS = [
     (w) => `J'ai senti une vibration positive en ouvrant le frigo ce matin. C'était pour ${w}.`,
     (w) => `Mon chat a regardé vers la gauche puis vers la droite puis vers le bas. Clairement ${w}.`,
