@@ -865,6 +865,7 @@ async function doRegister() {
 async function doLogout() {
   currentUser = null;
   localStorage.removeItem('bgefc_user_id');
+  document.getElementById('pronoMortFloating')?.remove();
   document.getElementById('loginPage').style.display = 'flex';
   document.getElementById('appPage').style.display = 'none';
 }
