@@ -1013,7 +1013,7 @@ function showThierryMonologue() {
   popup.id = 'thierryPopup';
   popup.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem;overflow-y:auto';
   popup.innerHTML = `
-    <div style="background:linear-gradient(160deg,#0a0000,#1a0505);border-radius:20px;max-width:460px;width:100%;overflow:hidden;box-shadow:0 20px 60px rgba(139,0,0,.5);border:2px solid #8b0000">
+    <div style="background:linear-gradient(160deg,#0a0000,#1a0505);border-radius:20px;max-width:580px;width:100%;overflow:hidden;box-shadow:0 20px 60px rgba(139,0,0,.5);border:2px solid #8b0000">
       <div style="background:linear-gradient(135deg,#8b0000,#cc0000);padding:1rem 1.5rem;display:flex;align-items:center;gap:.8rem">
         <span style="font-size:1.5rem">💀</span>
         <div>
@@ -1021,18 +1021,20 @@ function showThierryMonologue() {
           <div style="font-size:.72rem;color:rgba(255,255,255,.8);font-weight:600">Un message de Thierry</div>
         </div>
       </div>
-      <div style="padding:1.5rem;display:flex;flex-direction:column;align-items:center;gap:1rem">
-        <img src="images/TB.png" alt="Thierry" style="width:100px;height:100px;border-radius:50%;object-fit:cover;border:3px solid #cc0000;box-shadow:0 0 20px rgba(204,0,0,.5)" onerror="this.style.display='none'">
-        <div style="font-size:.86rem;color:#ddd;line-height:1.85;font-style:italic;text-align:justify">
-          "Mes amis. Mes très chers amis pronostiqueurs. Je vais vous parler d'une chose. D'une chose importante. La vie — et je ne l'invente pas, c'est quelqu'un qui me l'a dit un jour dans un couloir, un couloir assez long, légèrement en pente — la vie est faite de choix. Des petits. Des grands. Et parfois des moyens.<br><br>
-          Le <strong style="color:#ff6666">Prono de la Mort</strong>, c'est un choix moyen-grand. Je pense à Magali — notre Magali, celle qui mise sur les Poissons, qui consulte son chat qui regarde ailleurs, qui tire les cartes à l'envers et s'en accommode avec une sérénité que je lui envie — et je me dis : <em>elle, elle oserait</em>. Elle foncerait tête baissée avec ses chips porte-bonheur et son intuition cosmique.<br><br>
-          Et moi je vous demande : êtes-vous prêts à oser comme Magali ? À défier le destin, le football, la logique et potentiellement perdre <strong style="color:#ff4444">20 points</strong> ? Parce que OUI. Il y a un risque. Mais le risque — et j'en suis convaincu depuis un jeudi de 2019 dont je préfère ne pas reparler — le risque, c'est ce qui nous distingue des gens qui ne gagnent jamais rien.<br><br>
-          Alors... osez. Le monde appartient à ceux qui pronostifient. Bonne chance. Ou pas."
+      <div style="padding:1.5rem;display:flex;flex-direction:column;gap:1rem">
+        <div style="display:flex;gap:1.2rem;align-items:flex-start">
+          <img src="images/TB.png" alt="Thierry" style="width:140px;height:160px;border-radius:14px;object-fit:cover;object-position:top;border:3px solid #cc0000;box-shadow:0 0 20px rgba(204,0,0,.5);flex-shrink:0" onerror="this.style.display='none'">
+          <div style="font-size:.83rem;color:#ddd;line-height:1.75;font-style:italic">
+            "Mes amis. La vie est faite de choix. Des petits. Des grands. Et parfois des moyens.<br><br>
+            Le <strong style="color:#ff6666">Prono de la Mort</strong>, c'est un choix moyen-grand. Je pense à Magali — celle qui mise sur les Poissons, qui tire les cartes à l'envers et s'en accommode — et je me dis : <em>elle, elle oserait</em>.<br><br>
+            Êtes-vous prêts à perdre <strong style="color:#ff4444">20 points</strong> ? Le risque, c'est ce qui nous distingue de ceux qui ne gagnent jamais rien.<br><br>
+            Osez. Bonne chance. Ou pas."
+            <div style="font-size:.68rem;color:#666;margin-top:.5rem;font-weight:700">— Thierry, philosophe et légèrement imprévisible</div>
+          </div>
         </div>
-        <div style="font-size:.72rem;color:#777;text-align:center;font-weight:700">— Thierry, philosophe, pronostiqueur, et légèrement imprévisible</div>
-        <div style="display:flex;gap:.8rem;width:100%">
-          <button onclick="document.getElementById('thierryPopup').remove()" style="flex:1;background:rgba(255,255,255,.07);border:1px solid #444;border-radius:12px;padding:.8rem;color:#888;font-family:'Nunito',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer">Pas pour moi</button>
-          <button onclick="document.getElementById('thierryPopup').remove();showPronoMortForm(false);" style="flex:2;background:linear-gradient(135deg,#8b0000,#cc0000);border:none;border-radius:12px;padding:.8rem;color:white;font-family:'Nunito',sans-serif;font-size:.88rem;font-weight:900;cursor:pointer">💀 J'ose ! Je tente le Prono de la Mort !</button>
+        <div style="display:flex;gap:.8rem">
+          <button onclick="document.getElementById('thierryPopup').remove()" style="flex:1;background:rgba(255,255,255,.07);border:1px solid #444;border-radius:12px;padding:.75rem;color:#888;font-family:'Nunito',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer">Pas pour moi</button>
+          <button onclick="document.getElementById('thierryPopup').remove();showPronoMortForm(false);" style="flex:2;background:linear-gradient(135deg,#8b0000,#cc0000);border:none;border-radius:12px;padding:.75rem;color:white;font-family:'Nunito',sans-serif;font-size:.88rem;font-weight:900;cursor:pointer">💀 J'ose !</button>
         </div>
       </div>
     </div>`;
