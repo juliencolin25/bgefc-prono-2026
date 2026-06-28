@@ -1278,8 +1278,7 @@ function renderMatches() {
             <span class="prono-sep">—</span>
             <input type="number" min="0" max="20" class="prono-input" id="pi2_${m.id}" value="${prono ? prono.score2 : ''}" placeholder="?" oninput="checkPenalty(${m.id},'${m.group_name}')">
           </div>
-          ${prono ? `<span class="prono-saved">✅ ${prono.score1}—${prono.score2}${prono.winner ? ' (+tab)' : ''}</span>` : ''}
-          <button class="btn-save" onclick="quickSave(${m.id},'${m.group_name}')">${prono ? '💾' : 'Valider'}</button>
+          ${prono ? `<span class="prono-saved">✅ ${prono.score1}—${prono.score2}${prono.winner ? ' (+tab)' : ''}</span>` : `<button class="btn-save" onclick="quickSave(${m.id},'${m.group_name}')">Valider</button>`}
         </div>
         <div id="pen_${m.id}" style="display:none;padding:.6rem 1rem .4rem;border-top:2px dashed #f0e0cc;text-align:center;font-size:.75rem;color:#e06c00;font-weight:800" onclick="event.stopPropagation()">
           ⚽ QUI GAGNE AUX TIRS AU BUT ?
