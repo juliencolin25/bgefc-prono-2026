@@ -928,38 +928,111 @@ function startCocktailEgg() {
     setTimeout(() => egg?.remove(), 25000); // disparaît après 25s si pas cliqué
   }, 45000);
 }
+const PAULINE_RECETTES = [
+  {
+    nom: 'Moscow Mule',
+    gradient: 'linear-gradient(135deg,#b8860b,#d4a017,#c8960c)',
+    accent: '#b8860b',
+    accentBg: '#fffbeb',
+    accentBorder: '#f0d060',
+    accentText: '#7a5c00',
+    citation: "Le cocktail que tout le monde redemande, et que Pauline refuse de noter pour garder le mystère.",
+    ingredients: [
+      ['🥃','4,5 cl','Vodka (bonne qualité, hein)'],
+      ['🍺','12 cl','Ginger beer (pas ginger ale — la différence est capitale)'],
+      ['🍋','1,5 cl','Jus de citron vert frais pressé'],
+      ['🧊','','Glaçons pilés, beaucoup'],
+      ['🍋','','Tranche de citron vert pour décorer'],
+    ],
+    methode: "Verser sur les glaçons dans un mug en cuivre (obligatoire). Vodka d'abord, citron, puis ginger beer doucement pour garder les bulles. Ne pas mélanger — juste agiter légèrement. Décorer. Savourer.",
+  },
+  {
+    nom: 'Soupe Angevine',
+    gradient: 'linear-gradient(135deg,#7b2d8b,#a855c8,#9333b0)',
+    accent: '#7b2d8b',
+    accentBg: '#fdf4ff',
+    accentBorder: '#d8a0e8',
+    accentText: '#5b1a6b',
+    citation: "La Soupe Angevine. Pauline ne répond plus de rien après la deuxième.",
+    ingredients: [
+      ['🍷','25 cl','Vin rouge (un Anjou, évidemment)'],
+      ['🍊','5 cl','Triple sec ou Cointreau'],
+      ['🍋','3 cl','Jus de citron'],
+      ['🍓','','Fruits rouges de saison'],
+      ['🧊','','Glaçons'],
+      ['🌿','','Menthe fraîche'],
+    ],
+    methode: "Mélanger vin, triple sec et citron dans un pichet avec des glaçons. Ajouter les fruits rouges. Laisser infuser 10 minutes. Servir dans un grand verre avec de la menthe. Ne pas prévoir de réunion sérieuse dans la foulée.",
+  },
+  {
+    nom: 'Sex on the Beach',
+    gradient: 'linear-gradient(135deg,#e8541a,#f97316,#fb923c)',
+    accent: '#e8541a',
+    accentBg: '#fff7ed',
+    accentBorder: '#fed7aa',
+    accentText: '#9a3412',
+    citation: "Pauline assume totalement de commander ça au bar. Vous devriez faire pareil.",
+    ingredients: [
+      ['🥃','4 cl','Vodka'],
+      ['🍑','2 cl','Schnaps pêche'],
+      ['🍊','6 cl','Jus d\'orange'],
+      ['🍹','6 cl','Jus de cranberry'],
+      ['🧊','','Glaçons'],
+      ['🍊','','Tranche d\'orange pour décorer'],
+    ],
+    methode: "Remplir un grand verre de glaçons. Verser vodka et schnaps pêche. Ajouter le jus d'orange, puis le cranberry en filet pour l'effet dégradé. Ne pas mélanger tout de suite — laisser les couleurs se stratifier. Décorer. Photographier avant de boire.",
+  },
+  {
+    nom: 'Spritz Hugo',
+    gradient: 'linear-gradient(135deg,#16a34a,#22c55e,#4ade80)',
+    accent: '#16a34a',
+    accentBg: '#f0fdf4',
+    accentBorder: '#86efac',
+    accentText: '#14532d',
+    citation: "Le Spritz Hugo. Élégant, léger, et Pauline en fait des caisses l'été.",
+    ingredients: [
+      ['🥂','10 cl','Prosecco bien frais'],
+      ['🌸','3 cl','Liqueur de sureau (St-Germain)'],
+      ['💧','3 cl','Eau pétillante'],
+      ['🌿','','Quelques feuilles de menthe fraîche'],
+      ['🍋','','Rondelle de citron vert'],
+      ['🧊','','Glaçons'],
+    ],
+    methode: "Dans un grand verre à vin, mettre les glaçons. Verser la liqueur de sureau, puis le prosecco. Terminer avec l'eau pétillante. Ajouter menthe et citron vert. Remuer délicatement une seule fois. Servir immédiatement — les bulles, c'est sacré.",
+  },
+];
+let _paulineIdx = -1;
 function showMoscowMule() {
+  _paulineIdx = (_paulineIdx + 1) % PAULINE_RECETTES.length;
+  const r = PAULINE_RECETTES[_paulineIdx];
   const pop = document.createElement('div');
   pop.id = 'moscowMulePop';
   pop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem';
   pop.innerHTML = `
-    <div style="background:#fff;border-radius:20px;max-width:380px;width:100%;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.4);font-family:Nunito,sans-serif">
-      <div style="background:linear-gradient(135deg,#b8860b,#d4a017,#c8960c);padding:1.4rem;text-align:center;position:relative">
-        <img src="images/PD.jpg" style="width:72px;height:72px;border-radius:50%;object-fit:cover;border:3px solid #fff;margin-bottom:.5rem;display:block;margin-left:auto;margin-right:auto" onerror="this.style.display='none'">
-        <div style="color:#fff;font-size:1.05rem;font-weight:900;letter-spacing:1px">🍸 La Recette de Pauline</div>
-        <div style="color:rgba(255,255,255,.85);font-size:.78rem;margin-top:.2rem">Moscow Mule</div>
-        <button onclick="document.getElementById('moscowMulePop').remove()" style="position:absolute;top:.7rem;right:.9rem;background:rgba(255,255,255,.25);border:none;border-radius:50%;width:28px;height:28px;color:#fff;font-size:1rem;cursor:pointer;font-weight:900">×</button>
+    <div style="background:#fff;border-radius:20px;max-width:400px;width:100%;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.4);font-family:Nunito,sans-serif">
+      <div style="background:${r.gradient};padding:0;position:relative">
+        <img src="images/PD.jpg" style="width:100%;max-height:180px;object-fit:cover;object-position:center top;display:block" onerror="this.style.display='none'">
+        <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.55) 0%,transparent 60%)"></div>
+        <div style="position:absolute;bottom:.9rem;left:1rem;right:3rem">
+          <div style="color:#fff;font-size:1.05rem;font-weight:900;letter-spacing:1px;text-shadow:0 1px 4px rgba(0,0,0,.5)">🍸 La Recette de Pauline</div>
+          <div style="color:rgba(255,255,255,.9);font-size:.82rem;margin-top:.2rem;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,.5)">${r.nom}</div>
+        </div>
+        <button onclick="document.getElementById('moscowMulePop').remove()" style="position:absolute;top:.7rem;right:.9rem;background:rgba(0,0,0,.3);border:none;border-radius:50%;width:28px;height:28px;color:#fff;font-size:1rem;cursor:pointer;font-weight:900">×</button>
       </div>
-      <div style="padding:1.4rem">
-        <div style="font-size:.82rem;color:#555;margin-bottom:1rem;font-style:italic;text-align:center">"Le cocktail que tout le monde redemande, et que Pauline refuse de noter pour garder le mystère."</div>
-        <div style="display:flex;flex-direction:column;gap:.55rem">
-          ${[
-            ['🥃','4,5 cl','Vodka (bonne qualité, hein)'],
-            ['🍺','12 cl','Ginger beer (pas ginger ale — la différence est capitale)'],
-            ['🍋','1,5 cl','Jus de citron vert frais pressé'],
-            ['🧊','','Glaçons pilés, beaucoup'],
-            ['🍋','','Tranche de citron vert pour décorer'],
-          ].map(([icon,qty,ing]) => `
-            <div style="display:flex;align-items:center;gap:.7rem;padding:.45rem .7rem;background:#fafafa;border-radius:10px;border-left:3px solid #d4a017">
-              <span style="font-size:1.1rem">${icon}</span>
-              <span style="font-weight:900;color:#b8860b;min-width:3rem;font-size:.82rem">${qty}</span>
-              <span style="color:#333;font-size:.82rem">${ing}</span>
+      <div style="padding:1.2rem">
+        <div style="font-size:.8rem;color:#666;margin-bottom:.9rem;font-style:italic;text-align:center">"${r.citation}"</div>
+        <div style="display:flex;flex-direction:column;gap:.45rem">
+          ${r.ingredients.map(([icon,qty,ing]) => `
+            <div style="display:flex;align-items:center;gap:.7rem;padding:.4rem .65rem;background:#fafafa;border-radius:10px;border-left:3px solid ${r.accent}">
+              <span style="font-size:1rem">${icon}</span>
+              <span style="font-weight:900;color:${r.accent};min-width:3.2rem;font-size:.8rem">${qty}</span>
+              <span style="color:#333;font-size:.8rem">${ing}</span>
             </div>`).join('')}
         </div>
-        <div style="margin-top:1.1rem;padding:.8rem;background:#fffbeb;border-radius:10px;border:1px solid #f0d060;font-size:.78rem;color:#7a5c00">
-          <strong>👩‍🍳 La méthode Pauline :</strong> Verser sur les glaçons dans un mug en cuivre (obligatoire). Vodka d'abord, citron, puis ginger beer doucement pour garder les bulles. Ne pas mélanger — juste agiter légèrement. Décorer. Savourer.
+        <div style="margin-top:.9rem;padding:.75rem;background:${r.accentBg};border-radius:10px;border:1px solid ${r.accentBorder};font-size:.77rem;color:${r.accentText}">
+          <strong>👩‍🍳 La méthode Pauline :</strong> ${r.methode}
         </div>
-        <button onclick="document.getElementById('moscowMulePop').remove()" style="margin-top:1rem;width:100%;background:linear-gradient(135deg,#b8860b,#d4a017);border:none;border-radius:12px;padding:.8rem;color:#fff;font-weight:900;font-size:.9rem;cursor:pointer;font-family:Nunito,sans-serif">🥂 Santé !</button>
+        <button onclick="document.getElementById('moscowMulePop').remove()" style="margin-top:.9rem;width:100%;background:${r.gradient};border:none;border-radius:12px;padding:.75rem;color:#fff;font-weight:900;font-size:.9rem;cursor:pointer;font-family:Nunito,sans-serif">🥂 Santé !</button>
       </div>
     </div>`;
   pop.onclick = e => { if (e.target === pop) pop.remove(); };
