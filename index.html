@@ -1499,17 +1499,7 @@ function switchRankMode(mode) {
   renderTeamRanking();
 }
 function showMaledictionFabien() {
-  const MESSAGES = [
-    "Tu as pronostiqué exactement comme Fabien. La baraka, il l'avait à l'Euro. À la Coupe du Monde, elle l'a quitté. Et toi tu choisis ce moment pour te synchroniser avec lui.",
-    "Fabien était inarrêtable à l'Euro. Puis quelque chose s'est passé entre l'Euro et ce Mondial. On sait pas quoi. Lui non plus. Et là tu fais le même prono que lui.",
-    "Même score que Fabien. L'homme qui a perdu la baraka entre deux compétitions sans même comprendre pourquoi. Bonne chance quand même.",
-    "Tu es sur la même longueur d'onde que Fabien JOLY. L'Euro, il était intouchable. Le Mondial, la magie s'est évaporée. Personne ne te l'a demandé.",
-    "Fabien pense pareil que toi sur ce match. À l'Euro il aurait eu raison. Depuis, quelque chose a changé dans l'univers. Probablement toi qui as tort.",
-    "Coïncidence ou malédiction ? Fabien était béni des dieux à l'Euro. Entre-temps, les dieux ont changé d'avis. Dans les deux cas, Fabien est impliqué.",
-    "La baraka de Fabien, c'était quelque chose. À l'Euro. Depuis ce Mondial, elle s'est volatilisée. Et toi tu rentres dans son sillage. Réfléchis bien.",
-    "Même prono que Fabien. L'homme dont la chance s'est arrêtée pile au coup de sifflet final de l'Euro. Depuis : le vide. Et toi tu vas le suivre ?",
-  ];
-  const msg = MESSAGES[Math.floor(Math.random() * MESSAGES.length)];
+  const msg = "Tu es synchronisé.e avec Fabien... mais il est maudit depuis l'Euro. Es-tu sûr.e de ton prono ?";
   const popup = document.createElement('div');
   popup.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem';
   popup.innerHTML = `
