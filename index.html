@@ -347,7 +347,7 @@ main{max-width:1200px;margin:0 auto;padding:2rem 1.5rem;position:relative;z-inde
           <div class="hero-stat"><div class="hero-stat-value" id="statMatchs">—</div><div class="hero-stat-label">Matchs</div></div>
           <div class="hero-stat"><div class="hero-stat-value" id="statPronos">—</div><div class="hero-stat-label">Mes pronos</div></div>
           <div class="hero-stat"><div class="hero-stat-value" id="statPoints">—</div><div class="hero-stat-label">Mes points</div></div>
-          <div class="hero-stat"><div class="hero-stat-value" id="statMort">—</div><div class="hero-stat-label">💀 Prono Mort</div></div>
+          <div class="hero-stat"><div class="hero-stat-value" id="statMort" style="font-size:1rem;line-height:1.2">— joueurs<br>ont osé 💀</div><div class="hero-stat-label">Prono de la Mort</div></div>
         </div>
       </div>
       <div class="filter-bar" id="filterBar"></div>
@@ -1597,7 +1597,7 @@ function updateStats() {
   document.getElementById('statPronos').textContent = count;
   document.getElementById('statPoints').textContent = pts;
   db.from('prono_mort').select('*', { count: 'exact', head: true }).then(({ count: c }) => {
-    document.getElementById('statMort').textContent = c ?? '—';
+    document.getElementById('statMort').innerHTML = `${c ?? '—'} joueur${c > 1 ? 's' : ''}<br>ont osé 💀`;
   });
   document.getElementById('myPts').textContent = pts;
   document.getElementById('myExact').textContent = exact;
