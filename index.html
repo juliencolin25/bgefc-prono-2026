@@ -498,11 +498,11 @@ main{max-width:1200px;margin:0 auto;padding:2rem 1.5rem;position:relative;z-inde
       <input type="number" min="0" max="20" class="modal-prono-input" id="modalScore2" value="1" oninput="checkModalPenalty()">
       <div class="modal-prono-team" id="modalPronoTeam2">Brésil</div>
     </div>
-    <div id="modalPenZone" style="display:none;padding:.8rem 1rem;border-top:2px dashed #f0e0cc;text-align:center;font-size:.8rem;color:#e06c00;font-weight:800">
-      ⚽ QUI GAGNE AUX TIRS AU BUT ?
+    <div id="modalPenZone" style="display:none;margin:.8rem 1rem 0;padding:.8rem 1rem;border:2px dashed #f0e0cc;border-radius:12px;text-align:center;font-size:.8rem;color:#e06c00;font-weight:800;background:#fff8f0">
+      ⚽ EN CAS D'ÉGALITÉ — QUI GAGNE AUX TIRS AU BUT ?
       <div style="display:flex;gap:.6rem;justify-content:center;margin-top:.6rem">
-        <button id="modalPenBtn1" onclick="selectModalPenWinner('team1')" class="pen-btn" id="modalPenBtn1"></button>
-        <button id="modalPenBtn2" onclick="selectModalPenWinner('team2')" class="pen-btn" id="modalPenBtn2"></button>
+        <button id="modalPenBtn1" onclick="selectModalPenWinner('team1')" class="pen-btn">—</button>
+        <button id="modalPenBtn2" onclick="selectModalPenWinner('team2')" class="pen-btn">—</button>
       </div>
     </div>
     <button class="btn-prono-save" onclick="saveModalProno()">💾 Enregistrer mon pronostic</button>
@@ -1377,8 +1377,14 @@ function checkModalPenalty() {
   const s1 = document.getElementById('modalScore1').value;
   const s2 = document.getElementById('modalScore2').value;
   const isDraw = s1 !== '' && s2 !== '' && s1 === s2;
-  document.getElementById('modalPenZone').style.display = isDraw ? 'block' : 'none';
-  if (!isDraw) modalPenWinner = null;
+  const zone = document.getElementById('modalPenZone');
+  zone.style.opacity = isDraw ? '1' : '0.35';
+  zone.style.pointerEvents = isDraw ? 'auto' : 'none';
+  if (!isDraw) {
+    modalPenWinner = null;
+    document.getElementById('modalPenBtn1').className = 'pen-btn';
+    document.getElementById('modalPenBtn2').className = 'pen-btn';
+  }
 }
 
 function selectModalPenWinner(winner) {
@@ -1413,16 +1419,22 @@ function openModal(id) {
   const prono = myPronos[id];
   document.getElementById('modalScore1').value = prono ? prono.score1 : '';
   document.getElementById('modalScore2').value = prono ? prono.score2 : '';
-  // Boutons tirs au but
-  document.getElementById('modalPenBtn1').textContent = m.team1;
-  document.getElementById('modalPenBtn2').textContent = m.team2;
-  document.getElementById('modalPenBtn1').className = 'pen-btn';
-  document.getElementById('modalPenBtn2').className = 'pen-btn';
-  document.getElementById('modalPenZone').style.display = 'none';
-  // Restaurer le winner si prono existant en égalité
-  if (prono && prono.score1 === prono.score2 && prono.winner && KO_GROUPS.includes(m.group_name)) {
-    document.getElementById('modalPenZone').style.display = 'block';
-    selectModalPenWinner(prono.winner);
+  // Zone tirs au but (KO uniquement)
+  const penZone = document.getElementById('modalPenZone');
+  const btn1 = document.getElementById('modalPenBtn1');
+  const btn2 = document.getElementById('modalPenBtn2');
+  if (KO_GROUPS.includes(m.group_name)) {
+    btn1.textContent = m.team1;
+    btn2.textContent = m.team2;
+    btn1.className = 'pen-btn';
+    btn2.className = 'pen-btn';
+    penZone.style.display = 'block';
+    const isDrawProno = prono && prono.score1 === prono.score2;
+    penZone.style.opacity = isDrawProno ? '1' : '0.35';
+    penZone.style.pointerEvents = isDrawProno ? 'auto' : 'none';
+    if (isDrawProno && prono.winner) selectModalPenWinner(prono.winner);
+  } else {
+    penZone.style.display = 'none';
   }
   document.getElementById('matchModal').classList.add('open');
 }
