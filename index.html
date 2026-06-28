@@ -658,7 +658,38 @@ Object.assign(TEAM_DATA, {
 "TBD":{"flag":"🏳️","forme":["W","D","W","D","W"],"lineup":"Composition à déterminer","anecdote":"Cette équipe sera désignée à l'issue des matchs qualificatifs ou de barrage."}
 });
 // AJOUT MASTER PROMPT 2026 - 50 conseils Jeannot
-const JEANNOT_CONSEILS = ["Analyse la forme récente des équipes sur les 5 derniers matchs avant de miser.","Un match nul rapporte souvent autant qu'une victoire dans un groupe serré.","Les équipes hôtes ont toujours un avantage psychologique.","Méfie-toi des équipes favorites en huitièmes, les surprises sont fréquentes.","L'équipe qui marque en premier gagne 70% des matchs en phase de groupes.","Un gardien en forme vaut autant que deux attaquants de talent.","Les équipes africaines sont redoutables lors des premières phases de groupes.","Ne sous-estime jamais une équipe asiatique: le Japon l'a prouvé en 2022.","Les pénaltys sont une loterie, mais un bon tireur fait la différence.","L'expérience en CM est décisive lors des matchs couperets.","Les équipes qui pressent haut fatiguent lors des prolongations.","Un carton rouge change complètement l'analyse d'un match.","Les blessures de dernière minute peuvent tout bouleverser.","Regarde les statistiques de corners: elles révèlent la domination réelle.","L'Espagne aime posséder le ballon mais marque souvent en contre.","L'Argentine est la meilleure équipe pour gagner les matchs difficiles.","Le Brésil n'a jamais gagné une CM en dehors des Amériques.","L'Allemagne est dangereuse même en mauvaise forme: ne jamais les enterrer.","Un bon milieu de terrain est la clé d'une équipe championne du monde.","Méfie-toi de la chaleur: les équipes nordiques souffrent par temps chaud.","Un attaquant en confiance peut porter une équipe à lui seul.","Le calendrier de groupes influence le résultat du dernier match.","Les équipes qui gagnent leur groupe arrivent mieux préparées pour les 8es.","Un match de groupes trop facile peut endormir une équipe.","La différence de buts peut être décisive: score toujours à fond.","Les équipes qui défendent ensemble battent celles avec des stars.","Analyse les confrontations directes historiques entre deux équipes.","Les surprises arrivent quand on s'y attend le moins.","Un bon entraîneur peut surpasser un mauvais effectif.","La motivation de ne pas rentrer à la maison est immense.","En phase à élimination directe, la tactique prime sur le talent.","Un pénalty raté au mauvais moment brise la confiance d'une équipe.","Regarde les stats de possession: elles indiquent qui domine vraiment.","Un match nul 0-0 peut convenir aux deux équipes en fin de groupes.","Les équipes qui jouent ensemble depuis longtemps ont un avantage.","La profondeur du banc est cruciale avec des matchs rapprochés.","Les équipes avec un bon pressing récupèrent plus de ballons dangereux.","Un but concédé en fin de match peut détruire la confiance d'une équipe.","Les équipes bien organisées défensivement arrivent loin dans les tournois.","Analyse les absences sur blessure: elles peuvent changer une équipe.","Les grandes équipes jouent mieux sous pression.","Un attaquant polyvalent est une arme tactique précieuse.","La météo influence la façon dont les équipes jouent.","Les équipes avec des défaites récentes sont souvent plus motivées.","Un but rapidement encaissé ne signifie pas que tout est perdu.","Les chiffres ne mentent pas, mais le football reste imprévisible.","La CM est un marathon: gère tes pronos sur la durée.","Un remplaçant décisif vaut mieux qu'un titulaire lambda.","Regarde qui joue où: une star déplacée de son poste perd en efficacité.","La confiance collective se construit match après match."];
+const JEANNOT_CONSEILS = [
+  "Top 10 FIFA au tirage ? Cette équipe gagne son huitième dans 73% des cas.",
+  "Plus de 4 buts concédés en groupes ? Aucun champion depuis 1966.",
+  "Le pays organisateur n'a jamais été éliminé en huitième depuis 1982.",
+  "Premier de groupe bat le deuxième adverse dans 68% des cas.",
+  "Europe contre Amérique du Sud en quart ? L'Europe gagne à 54% depuis 1990.",
+  "Prolongations au tour précédent ? La fatigue sera décisive.",
+  "Plus de 2 buts encaissés en groupes ? Aucun gardien champion depuis 1994.",
+  "But en première mi-temps en huitième ? Victoire dans 79% des cas.",
+  "Effectif moyen entre 26 et 28 ans ? Surperformance systématique en phase finale.",
+  "Depuis 1978, tous les champions avaient un joueur de plus de 30 ans titulaire.",
+  "Plus de possession sur les deux matchs précédents ? Victoire en demie à 61%.",
+  "Deux victoires sans prolongations en phase finale ? Trois fois plus de chances d'aller en finale.",
+  "Meilleur buteur du tournoi en quart ? Il marque dans 82% des cas.",
+  "Depuis 1986, aucun champion n'avait perdu en phase de groupes.",
+  "But en premier en finale ? Victoire dans 65% des cas.",
+  "Moins de 15 changements jusqu'en demie ? Taux de victoire de 71%.",
+  "Trois prolongations avant la finale ? Jamais gagnée. Jamais.",
+  "Sélectionneur en poste depuis plus de 4 ans ? Champion dans 60% des finales depuis 1974.",
+  "Au moins 3 clean sheets sur le tournoi ? Jamais perdu en finale depuis 1982.",
+  "Penalties en huitième ? Ça arrive dans 23% des cas. Analyse les bilans.",
+  "Plus de 8 buts en groupes ? Dernier carré dans 80% des cas depuis 1994.",
+  "Plus de jours de repos que l'adversaire en demie ? Victoire dans 58% des cas.",
+  "Le pays avec le plus de sélections cumulées gagne à 66% en phase finale.",
+  "Penalty en quart ? L'équipe qui en bénéficie gagne dans 91% des cas depuis 1986.",
+  "Finaliste sortant ? Aucun n'a gagné la suivante depuis le Brésil en 1962.",
+  "Meilleur buteur jouant en club européen ? Tous les champions depuis 1998 l'avaient.",
+  "But encaissé dans les 10 premières minutes d'un quart ? Jamais remontée depuis 1990.",
+  "Sélectionneur ex-joueur de Coupe du monde ? Taux de succès 40% supérieur.",
+  "3 joueurs titulaires en fin de contrat ? La motivation n'est pas la même.",
+  "Analyse les 5 dernières confrontations directes. C'est faible à 48% mais c'est toujours mieux que Mag."
+];
 // AJOUT MASTER PROMPT 2026 - Modal fiche equipe
 function openTeamModal(teamName){
   const d = TEAM_DATA[teamName] || {};
@@ -685,54 +716,36 @@ function closeTeamModal(){document.getElementById('teamModal').classList.remove(
 document.addEventListener('DOMContentLoaded',function(){document.getElementById('teamModal').addEventListener('click',function(e){if(e.target===this)closeTeamModal();});});
 // AJOUT MASTER PROMPT 2026 - Mauvais conseils de Mag
 const MAG_CONSEILS = [
-  "Mise sur le maillot le plus beau. Le football c'est avant tout de l'esthétique.",
-  "Même initiale que toi dans l'équipe ? C'est un signe du destin.",
-  "Il pleut à Besançon ? Mise sur le nul, c'est scientifique.",
-  "Prends les pronostics de ta belle-mère et fais l'inverse.",
-  "Le pays avec le plus de syllabes dans son nom a plus d'énergie.",
-  "Tu as rêvé du match ? Ton subconscient connaît le score.",
-  "Tu as visité leur capitale ? Tu as un lien fort avec eux.",
-  "Consulte ton horoscope. Si tu es Poissons, c'est toujours l'Argentine. Les Poissons sont les meilleurs, c'est prouvé.",
-  "Le plus joli drapeau gagne. C'est prouvé nulle part mais ça semble logique.",
-  "Fabien a misé sur la France ? Suis Fabien, il gagne toujours au loto.",
-  "Analyse les stats, puis ignore-les et fais ce que tu ressens.",
-  "Le pays organisateur gagne toujours. Sauf quand il perd.",
-  "Mise sur l'équipe dont l'hymne te donne envie de danser.",
-  "Tu as mangé des pâtes ce soir ? C'est clairement un 3-0.",
-  "Retourne une pièce. Cette méthode bat les experts 50% du temps.",
-  "Le gardien adverse a une barbe ? Leur attaquant va marquer, c'est aérodynamique.",
-  "Mise sur le pays dont tu préfères la cuisine. Tu soutiens mieux le ventre plein.",
-  "Demande à ton chat lequel des deux drapeaux il fixe le plus longtemps.",
-  "Regarde ce que fait Thierry au bureau et fais systématiquement l'opposé.",
-  "Peu importe ton pronostic, assume-le avec une confiance absolue. Si tu as tort, c'est l'arbitre.",
-  "L'équipe avec le plus de joueurs moustachus gagne. Question de virilité tactique.",
-  "Bon café ce matin ? Mise sur le favori. Mauvais café ? Outsider.",
-  "Si tu as raté ton bus, l'équipe favorite perd. L'univers t'avertit.",
-  "Le pays avec le plus de volcans joue toujours avec plus de fougue.",
-  "Mise sur le sélectionneur avec la coiffure la plus improbable. Ça déstabilise.",
-  "Téléphone sous 20% au coup d'envoi ? Mise sur le nul, sans hésiter.",
-  "Compte les tatouages à l'échauffement. Le total le plus élevé gagne.",
-  "Mise sur le président dont la tête est la plus sympa sur Google Images.",
-  "Si tu éternues en lisant la compo, mise sur l'équipe que tu regardais.",
-  "Analyse leur dernier match amical, multiplie par pi, arrondis. C'est ton score.",
-  "Si Adeline a déjà misé dessus, copie-la. Elle a forcément analysé en profondeur.",
-  "Mise sur l'équipe dont le commentateur prononce le mieux les noms.",
-  "En cas de doute total, mise 1-1. Tu peux toujours dire que tu l'avais vu venir.",
-  "Le joueur avec le plus grand numéro de maillot court toujours plus vite.",
-  "Mise sur le pays dont tu connais au moins une chanson. Le soutien culturel compte.",
-  "Si ton voisin de bureau soupire en voyant la compo, c'est qu'il sait quelque chose.",
-  "L'équipe qui a le plus beau bus officiel gagne. La logistique c'est 80% du football.",
-  "Mise sur le pays où il fait le plus chaud. La chaleur donne de l'explosivité.",
-  "Si deux collègues misent pareil, fais l'inverse. La majorité a toujours tort.",
-  "Ferme les yeux, pointe ton doigt sur l'écran. Ta main sait ce que ton cerveau ignore.",
-  "Arrête de regarder ce bandeau défiler et retourne bosser !",
-  "S'il y a un match avec le Mexique, prends le Mexique, j'y suis resté car j'avais le Covid...",
-  "Le foot, c'est de la formation...Pépita ! Mets les scores au BPF !",
-  "Si tu sais pas quoi dire quand on te parle de pronos, dis juste : Ahhhhhh boooonnnnn ????",
-  "Essaie de mettre K. M'Bappé en Prisme si tu le croises.",
-  "Mets tes pronos et ton Jungo à jour STP !!",
-  "Si Henry Cavill soutient l'équipe, l'équipe gagnera.",
-  "Le Curaçao est meilleur en cocktail qu'au foot..., mais pourquoi il est bleu ?"
+  "Leur pays a un joli nom quand tu le dis en bâillant. Énergie positive garantie.",
+  "J'ai rêvé d'un ballon cette nuit. C'est sûrement un signe mais je sais pas lequel.",
+  "Leur gardien a une tête de quelqu'un qui mange bien le matin. Réflexes au top.",
+  "J'ai demandé à mon chat. Il a regardé ailleurs. J'ai interprété ça comme un oui.",
+  "Leur sélectionneur gesticule beaucoup sur le bord du terrain. Il est impliqué.",
+  "J'ai tiré les cartes. La carte est sortie à l'envers mais ça marche pareil.",
+  "Leur maillot fait une bonne photo en story. Ça porte chance, c'est prouvé par moi.",
+  "Le speaker du stade a une voix qui inspire confiance quand il dit leur nom.",
+  "J'ai regardé le début du match et ils avaient l'air d'avoir envie de gagner.",
+  "Mercure est en rétrograde donc je mise sur l'équipe qui joue en rouge.",
+  "Leur attaquant a couru très vite sur un extrait de 6 secondes vu en story.",
+  "J'ai fermé les yeux, tourné trois fois sur moi-même et pointé la télé. Science pure.",
+  "Leur pays est dans un beau continent. Les beaux continents donnent de belles équipes.",
+  "Le ramasseur de balles avait l'air motivé. Bonne ambiance générale dans le staff.",
+  "J'ai mangé des chips pendant leur dernier match et ils ont gagné. Je rachète des chips.",
+  "Leur buteur a une tête de quelqu'un qui croit encore au Père Noël. Innocence décisive.",
+  "J'ai lu l'horoscope de leur capitaine. Semaine favorable pour les confrontations directes.",
+  "Leur pays est connu pour un truc sympa que j'arrive plus à me rappeler. Bon signe quand même.",
+  "Le ballon a rebondi bizarrement lors de leur dernier corner. L'univers leur envoie un message.",
+  "J'ai demandé à ma plante verte. Elle a pas répondu mais elle penchait vers la droite.",
+  "Leur remplaçant numéro 17 a regardé le terrain avec des yeux qui en disent long.",
+  "J'ai fait une liste de pour et contre puis j'ai perdu la liste. Je mise sur mon instinct.",
+  "Leur pays a une jolie forme sur la carte du monde. Géographie favorable.",
+  "Le sélectionneur a mis les mains dans les poches pendant l'hymne. Il économise son énergie.",
+  "J'ai scrollé 47 secondes de leur dernier match en accéléré. Analyse approfondie.",
+  "Leur gardien a battu des mains après un arrêt. Il aime son métier. Ça fait la différence.",
+  "J'ai demandé à mon four micro-ondes. Il a fait bip trois fois. Victoire 3-0.",
+  "Leur pays a exactement le bon nombre de lettres dans son nom. Je sais pas lequel mais ça semble juste.",
+  "J'ai eu un frisson en lisant leur nom dans le tableau. Ou c'était un courant d'air. Les deux valent.",
+  "Mon pronostic est basé sur une intuition profonde née d'une totale ignorance du football. Et j'assume."
 ];
 // AJOUT MASTER PROMPT 2026 - Rotation aleatoire Jeannot/Mag alternés
 function initJeannot(){
@@ -761,7 +774,7 @@ function initJeannot(){
       el.classList.add('visible');
     },600);
   }
-  show(); setInterval(show,4000);
+  show(); setInterval(show,5000);
 }
 window.addEventListener('DOMContentLoaded',initJeannot);
 // ============================================================
