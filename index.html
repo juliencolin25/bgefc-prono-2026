@@ -744,43 +744,43 @@ function openTeamModal(teamName){
 function closeTeamModal(){document.getElementById('teamModal').classList.remove('active');}
 document.addEventListener('DOMContentLoaded',function(){document.getElementById('teamModal').addEventListener('click',function(e){if(e.target===this)closeTeamModal();});});
 // AJOUT MASTER PROMPT 2026 - Mauvais conseils de Mag
-const MAG_CONSEILS = [
-  "Leur pays a un joli nom quand tu le dis en bâillant. Énergie positive garantie.",
-  "J'ai rêvé d'un ballon cette nuit. C'est sûrement un signe mais je sais pas lequel.",
-  "Leur gardien a une tête de quelqu'un qui mange bien le matin. Réflexes au top.",
-  "J'ai demandé à mon chat. Il a regardé ailleurs. J'ai interprété ça comme un oui.",
-  "Leur sélectionneur gesticule beaucoup sur le bord du terrain. Il est impliqué.",
-  "J'ai tiré les cartes. La carte est sortie à l'envers mais ça marche pareil.",
-  "Leur maillot fait une bonne photo en story. Ça porte chance, c'est prouvé par moi.",
-  "Le speaker du stade a une voix qui inspire confiance quand il dit leur nom.",
-  "J'ai regardé le début du match et ils avaient l'air d'avoir envie de gagner.",
-  "Mercure est en rétrograde donc je mise sur l'équipe qui joue en rouge.",
-  "Leur attaquant a couru très vite sur un extrait de 6 secondes vu en story.",
-  "J'ai fermé les yeux, tourné trois fois sur moi-même et pointé la télé. Science pure.",
-  "Leur pays est dans un beau continent. Les beaux continents donnent de belles équipes.",
-  "Le ramasseur de balles avait l'air motivé. Bonne ambiance générale dans le staff.",
-  "J'ai mangé des chips pendant leur dernier match et ils ont gagné. Je rachète des chips.",
-  "Leur buteur a une tête de quelqu'un qui croit encore au Père Noël. Innocence décisive.",
-  "J'ai lu l'horoscope de leur capitaine. Semaine favorable pour les confrontations directes.",
-  "Leur pays est connu pour un truc sympa que j'arrive plus à me rappeler. Bon signe quand même.",
-  "Le ballon a rebondi bizarrement lors de leur dernier corner. L'univers leur envoie un message.",
-  "J'ai demandé à ma plante verte. Elle a pas répondu mais elle penchait vers la droite.",
-  "Leur remplaçant numéro 17 a regardé le terrain avec des yeux qui en disent long.",
-  "J'ai fait une liste de pour et contre puis j'ai perdu la liste. Je mise sur mon instinct.",
-  "Leur pays a une jolie forme sur la carte du monde. Géographie favorable.",
-  "Le sélectionneur a mis les mains dans les poches pendant l'hymne. Il économise son énergie.",
-  "J'ai scrollé 47 secondes de leur dernier match en accéléré. Analyse approfondie.",
-  "Leur gardien a battu des mains après un arrêt. Il aime son métier. Ça fait la différence.",
-  "J'ai demandé à mon four micro-ondes. Il a fait bip trois fois. Victoire 3-0.",
-  "Leur pays a exactement le bon nombre de lettres dans son nom. Je sais pas lequel mais ça semble juste.",
-  "J'ai eu un frisson en lisant leur nom dans le tableau. Ou c'était un courant d'air. Les deux valent.",
-  "Mon pronostic est basé sur une intuition profonde née d'une totale ignorance du football. Et j'assume."
+const TIPH_CONSEILS = [
+  "Leur maillot utilise le Pantone de l'année. Ils sont dans la tendance, ils gagnent.",
+  "Deux polices maximum dans leur charte. Ces gens savent ce qu'ils font.",
+  "Leur logo n'a pas bougé depuis 1987. Ce niveau de cohérence force le respect.",
+  "Leur maillot extérieur est un dégradé. Qui a validé ça chez eux ?",
+  "Leur sponsor maillot est mal centré de 2mm. Je peux pas les soutenir dans ces conditions.",
+  "Ils ont changé de typo pour la Coupe du monde. Rupture de charte. Je les sanctionne.",
+  "Leur drapeau est lisible en noir et blanc. Identité forte et bien pensée.",
+  "Le backdrop de leur conférence de presse était bien tendu. Pas un faux pli. Professionnels.",
+  "Leur numéro de maillot est en sérif. En 2026. Je dis ça je dis rien.",
+  "Leur vidéo de présentation avait un motion design solide. Ça se voit sur le terrain.",
+  "Ils utilisent encore du Comic Sans en interne. Source confidentielle. Éliminés.",
+  "Leur accroche site officiel est en corps 8. Personne lit. Personne les soutient.",
+  "Trois polices différentes sur leur dernier visuel. Trois. Éliminés direct.",
+  "Trop de couleurs dans leur charte. Aucune retenue. Aucune chance.",
+  "Leur drapeau est trop chargé. Les équipes au logo simple gagnent toujours.",
+  "Pas de logo vectoriel dans leur kit de presse. C'est non.",
+  "Leur community manager poste à 14h37. Ni matin ni soir. Amateurisme total.",
+  "Un dégradé sur leur affiche officielle. On est en 2026 pas en 2004.",
+  "Leur maillot third est sublime et ils ne le porteront jamais. Frustration pure.",
+  "Leur storytelling est fort mais leur logo fait mal aux yeux donc bon.",
+  "Photo d'équipe officielle légèrement surexposée. Manque de rigueur partout.",
+  "Leur communication de crise après la défaite était catastrophique. L'équipe aussi.",
+  "Leur ballon personnalisé est graphiquement parfait. Je mise sur eux rien que pour ça.",
+  "Trop de texte dans leur plaquette institutionnelle. Pas assez d'air. Ça va les étouffer.",
+  "Leur brassard de capitaine n'est pas dans la même typo que le maillot. Inadmissible.",
+  "Leur identité visuelle est cohérente sur tous les supports. Ces gens savent où ils vont.",
+  "Le trophée était mal éclairé à la remise des prix du dernier tournoi. Je leur en veux encore.",
+  "Leur kit médias n'a pas de version sombre du logo. En 2026. Vraiment.",
+  "Leur équipementier a soigné le col du maillot. Ces détails font les champions.",
+  "Peu importe qui gagne, si le générique de la cérémonie est moche, c'est une défaite pour tout le monde."
 ];
 // AJOUT MASTER PROMPT 2026 - Rotation aleatoire Jeannot/Mag alternés
 function initJeannot(){
   let jPool=[], mPool=[];
   function getNextJ(){if(!jPool.length){jPool=[...Array(JEANNOT_CONSEILS.length).keys()];for(let i=jPool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[jPool[i],jPool[j]]=[jPool[j],jPool[i]];}}return jPool.pop();}
-  function getNextM(){if(!mPool.length){mPool=[...Array(MAG_CONSEILS.length).keys()];for(let i=mPool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[mPool[i],mPool[j]]=[mPool[j],mPool[i]];}}return mPool.pop();}
+  function getNextM(){if(!mPool.length){mPool=[...Array(TIPH_CONSEILS.length).keys()];for(let i=mPool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[mPool[i],mPool[j]]=[mPool[j],mPool[i]];}}return mPool.pop();}
   const el=document.getElementById('jeannotTip');
   const labelEl=document.getElementById('jeannotLabel');
   const photoEl=document.querySelector('.jeannot-photo');
@@ -792,9 +792,9 @@ function initJeannot(){
       isMagTurn=!isMagTurn;
       const isMag = isMagTurn;
       if(isMag){
-        el.textContent=MAG_CONSEILS[getNextM()];
-        if(labelEl) labelEl.textContent='😈 Les mauvais conseils de Mag';
-        if(photoEl){ photoEl.src='images/mag.png'; photoEl.alt='Mag'; }
+        el.textContent=TIPH_CONSEILS[getNextM()];
+        if(labelEl) labelEl.textContent='🎨 Les vrais bons conseils de Tiph';
+        if(photoEl){ photoEl.src='images/TG.jpg'; photoEl.alt='Tiph'; }
       } else {
         el.textContent=JEANNOT_CONSEILS[getNextJ()];
         if(labelEl) labelEl.textContent='⭐ Les bons conseils de Jeannot';
