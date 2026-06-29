@@ -1424,20 +1424,6 @@ function parseFrDate(dateStr, timeStr) {
   const [h, m] = (timeStr||'00:00').split(':').map(Number);
   return month * 100000 + day * 1000 + h * 60 + m;
 }
-function getEffectiveStatus(m) {
-  if (m.status === 'done') return 'done';
-  if (m.status === 'live') return 'live';
-  const months = {'janv.':1,'févr.':2,'mars':3,'avr.':4,'mai':5,'juin':6,'juil.':7,'août':8,'sept.':9,'oct.':10,'nov.':11,'déc.':12};
-  const parts = (m.match_date||'').trim().split(' ');
-  const day = parseInt(parts[0]) || 0;
-  const month = months[parts[1]] || 0;
-  const [h, min] = (m.match_time||'00:00').split(':').map(Number);
-  const now = new Date();
-  const kickoff = new Date(now.getFullYear(), month - 1, day, h, min, 0);
-  const elapsed = (now - kickoff) / 60000;
-  if (elapsed >= 0 && elapsed < 120) return 'live';
-  return 'upcoming';
-}
 function renderMatches() {
   const filtered = activeGroup === 'ko' ? allMatches.filter(m => KO_GROUPS.includes(m.group_name))
     : activeGroup === 'groupes' ? allMatches.filter(m => m.group_name.startsWith('Groupe'))
@@ -1452,21 +1438,20 @@ function renderMatches() {
   sorted.forEach(m => {
     if (m.group_name !== cg) { cg = m.group_name; html += `<div class="section-title" style="margin-top:1.5rem">${cg}</div>`; }
     const prono = myPronos[m.id];
-    const effStatus = getEffectiveStatus(m);
-    const statusLabel = effStatus === 'live' ? '🔴 EN DIRECT' : effStatus === 'done' ? '✅ TERMINÉ' : '⏳ À VENIR';
+    const statusLabel = m.status === 'live' ? '🔴 EN DIRECT' : m.status === 'done' ? '✅ TERMINÉ' : '⏳ À VENIR';
     const realScore = m.score1_real !== null ? `<div class="match-score">${m.score1_real}—${m.score2_real}</div>` : `<div class="vs-label">VS</div><div class="match-time">${m.match_time}</div>`;
     html += `
       <div class="match-card" onclick="openModal(${m.id})" style="border-left-color:${prono ? 'var(--vert)' : 'var(--gris-med)'}">
         <div class="match-header">
           <span class="match-meta">${m.group_name} — ${m.match_date}</span>
-          <span class="match-status status-${effStatus}">${statusLabel}</span>
+          <span class="match-status status-${m.status}">${statusLabel}</span>
         </div>
         <div class="match-teams">
           <div class="team"><div class="team-flag team-flag-clickable" onclick="openTeamModal('${m.team1}')">${flagImg(m.team1,56,m.flag1)}</div><div class="team-name">${m.team1}</div></div>
           <div class="match-vs">${realScore}</div>
           <div class="team"><div class="team-flag team-flag-clickable" onclick="openTeamModal('${m.team2}')">${flagImg(m.team2,56,m.flag2)}</div><div class="team-name">${m.team2}</div></div>
         </div>
-        ${effStatus === 'upcoming' ? `
+        ${m.status === 'upcoming' ? `
         <div class="prono-zone" onclick="event.stopPropagation()">
           <span class="prono-label">Mon prono :</span>
           <div class="prono-inputs">
@@ -1538,7 +1523,7 @@ function selectPenWinner(matchId, winner) {
 
 function isMatchLocked(matchId) {
   const m = allMatches.find(x => x.id === matchId);
-  return m && (getEffectiveStatus(m) === 'live' || m.status === 'done');
+  return m && (m.status === 'live' || m.status === 'done');
 }
 
 async function quickSave(matchId, groupName) {
