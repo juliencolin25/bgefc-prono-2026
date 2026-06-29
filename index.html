@@ -1422,7 +1422,7 @@ function parseFrDate(dateStr, timeStr) {
   const day = parseInt(parts[0]) || 0;
   const month = months[parts[1]] || 0;
   const [h, m] = (timeStr||'00:00').split(':').map(Number);
-  return month * 100000 + day * 1000 + h * 60 + m;
+  return month * 50000 + day * 1440 + h * 60 + m;
 }
 function renderMatches() {
   const filtered = activeGroup === 'ko' ? allMatches.filter(m => KO_GROUPS.includes(m.group_name))
