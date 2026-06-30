@@ -1070,13 +1070,23 @@ function playBgefcChant() {
     </style>
     <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(2.5rem,9vw,5rem);letter-spacing:4px;color:#17a2b8;text-shadow:0 0 25px rgba(23,162,184,.7),3px 3px 0 rgba(0,0,0,.25);text-align:center;line-height:1.15">
       <span class="bgefc-chant-word" style="animation-delay:.05s">LA MAG'SEILLAISE</span><br>
-      <span class="bgefc-chant-word" style="animation-delay:.25s;font-size:70%">Allégeance à MAG</span><br>
-      <span class="bgefc-chant-word" style="animation-delay:.45s;font-size:50%">🔮 On ne pouvait pas faire autrement 🔮</span>
+      <span class="bgefc-chant-word" style="animation-delay:.25s;font-size:70%">Allégeance à MAG</span>
     </div>`;
   document.body.appendChild(overlay);
   const audio = new Audio('images/bgefc-chant.mp3');
   audio.play().catch(() => {});
-  setTimeout(() => overlay.remove(), 2400);
+  let count = 0;
+  function showOnce() {
+    overlay.style.opacity = '1';
+    setTimeout(() => {
+      overlay.style.transition = 'opacity .3s';
+      overlay.style.opacity = '0';
+      count++;
+      if (count < 5) setTimeout(() => { overlay.style.transition=''; overlay.style.opacity='1'; showOnce(); }, 400);
+      else setTimeout(() => overlay.remove(), 400);
+    }, 1600);
+  }
+  showOnce();
 }
 
 function showTiphaineSecretMessage() {
