@@ -112,34 +112,24 @@ async function supabaseRequest(path, method, body) {
   return res;
 }
 
-const KO_STAGES = ['ROUND_OF_32','LAST_32','ROUND_OF_16','LAST_16','QUARTER_FINALS','SEMI_FINALS','THIRD_PLACE','FINAL'];
+function matchOutcome(s1, s2, winnerField) {
+  if (s1 > s2) return 'team1';
+  if (s1 < s2) return 'team2';
+  return winnerField || 'draw';
+}
 
-async function calculateAndUpdatePoints(matchId, score1Real, score2Real, matchWinner, isKO) {
+async function calculateAndUpdatePoints(matchId, score1Real, score2Real, winnerField) {
   const res = await supabaseRequest(`/pronos?match_id=eq.${matchId}`, 'GET');
   const pronos = await res.json();
   if (!pronos || !pronos.length) return;
 
-  // Vainqueur réel : 'team1', 'team2', ou 'draw'
-  const realWinner = matchWinner === 'HOME_TEAM' ? 'team1'
-                   : matchWinner === 'AWAY_TEAM' ? 'team2'
-                   : 'draw';
+  const realOutcome = matchOutcome(score1Real, score2Real, winnerField);
 
   for (const p of pronos) {
     let pts = 0;
-    // Vainqueur pronostiqué
-    let pronoWinner;
-    if (isKO && p.score1 === p.score2) {
-      pronoWinner = p.winner || null; // toggle pénaltys
-    } else {
-      pronoWinner = p.score1 > p.score2 ? 'team1' : p.score1 < p.score2 ? 'team2' : 'draw';
-    }
-
-    const scoreExact = p.score1 === score1Real && p.score2 === score2Real;
-    const bonVainqueur = pronoWinner === realWinner;
-
-    if (scoreExact && (!isKO || bonVainqueur)) {
-      pts = 5; // Score exact (+ bon vainqueur si KO avec pénaltys)
-    } else if (bonVainqueur) {
+    if (p.score1 === score1Real && p.score2 === score2Real) {
+      pts = 5; // Score exact
+    } else if (matchOutcome(p.score1, p.score2, p.winner) === realOutcome) {
       pts = 3; // Bon vainqueur
     }
     await supabaseRequest(`/pronos?id=eq.${p.id}`, 'PATCH', { points: pts });
@@ -176,10 +166,18 @@ export default async function handler(req, res) {
       const dateStr = d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', timeZone: 'Europe/Paris' });
       const timeStr = d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' });
 
-      const score1Real = m.score?.fullTime?.home ?? null;
-      const score2Real = m.score?.fullTime?.away ?? null;
-      const matchWinner = m.score?.winner ?? null; // 'HOME_TEAM', 'AWAY_TEAM', 'DRAW'
-      const isKO = KO_STAGES.includes(m.stage);
+      const isPenaltyShootout = m.score?.duration === 'PENALTY_SHOOTOUT';
+      // Pour les TAB, fullTime inclut à tort le score des pénaltys : on prend le score réel (temps réglementaire + prolongation)
+      const score1Real = isPenaltyShootout
+        ? (m.score?.regularTime?.home ?? 0) + (m.score?.extraTime?.home ?? 0)
+        : m.score?.fullTime?.home ?? null;
+      const score2Real = isPenaltyShootout
+        ? (m.score?.regularTime?.away ?? 0) + (m.score?.extraTime?.away ?? 0)
+        : m.score?.fullTime?.away ?? null;
+      // 'winner' ne sert qu'à indiquer le vainqueur aux tirs au but ('team1'/'team2'), null sinon
+      const winnerField = isPenaltyShootout
+        ? (m.score?.winner === 'HOME_TEAM' ? 'team1' : m.score?.winner === 'AWAY_TEAM' ? 'team2' : null)
+        : null;
 
       const updateData = {
         id: m.id,
@@ -193,7 +191,7 @@ export default async function handler(req, res) {
         status,
         score1_real: score1Real,
         score2_real: score2Real,
-        winner: matchWinner,
+        winner: winnerField,
       };
 
       // Upsert dans Supabase (on_conflict sur id)
@@ -202,7 +200,7 @@ export default async function handler(req, res) {
 
       // Recalculer les points si match terminé
       if (status === 'done' && score1Real !== null) {
-        await calculateAndUpdatePoints(m.id, score1Real, score2Real, matchWinner, isKO);
+        await calculateAndUpdatePoints(m.id, score1Real, score2Real, winnerField);
         pointsRecalculated++;
       }
     }
