@@ -802,6 +802,12 @@ function initJeannot(){
         el.textContent='Grégoire Margotton te propose de cliquer ici.';
         if(labelEl) labelEl.textContent='🎙️ Grégoire Margotton';
         if(photoEl){ photoEl.src='images/GM.jfif'; photoEl.alt='Grégoire Margotton'; }
+      } else if(showCount % 25 === 12){
+        // 1 fois sur 25 (décalé) : le cheat code d'Anaïs
+        _isMargotton = false;
+        el.textContent='Hum..... HHBBGGDD.....';
+        if(labelEl) labelEl.textContent='🕵️ Anaïs a un indice...';
+        if(photoEl){ photoEl.src='images/AG.jpg'; photoEl.alt='Anaïs'; }
       } else {
         _isMargotton = false;
         isMagTurn=!isMagTurn;
