@@ -849,86 +849,154 @@ document.addEventListener('keydown', (e) => {
 let _shootoutScore = 0, _shootoutAttempts = 0, _shootoutLocked = false;
 const SHOOTOUT_MAX = 5;
 
+const _shootoutHistory = [];
+
 function openShootoutGame() {
   _shootoutScore = 0;
   _shootoutAttempts = 0;
   _shootoutLocked = false;
+  _shootoutHistory.length = 0;
   const popup = document.createElement('div');
   popup.id = 'shootoutPopup';
   popup.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem';
   popup.innerHTML = `
-    <div style="background:linear-gradient(160deg,#0a1f0f,#06140a);border-radius:24px;max-width:440px;width:100%;overflow:hidden;box-shadow:0 25px 70px rgba(0,0,0,.7);border:2px solid #1a8a3a;font-family:'Nunito',sans-serif;text-align:center">
-      <div style="padding:1.3rem 1.5rem .8rem">
+    <style>
+      @keyframes shootoutConfettiFall{0%{transform:translateY(-10px) rotate(0deg);opacity:1}100%{transform:translateY(140px) rotate(360deg);opacity:0}}
+      @keyframes shootoutShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(4px)}}
+      @keyframes shootoutNetPulse{0%{opacity:1}50%{opacity:.4}100%{opacity:1}}
+      @keyframes shootoutFlash{0%{opacity:.55}100%{opacity:0}}
+      @keyframes shootoutGlow{0%,100%{opacity:.5}50%{opacity:1}}
+      .shootout-card.shake{animation:shootoutShake .45s}
+      .shootout-btn:hover{filter:brightness(1.15);transform:translateY(-2px)}
+      .shootout-btn:active{transform:scale(.94)}
+      .shootout-btn:disabled{opacity:.4;cursor:default;transform:none;filter:none}
+      .shootout-light{animation:shootoutGlow 2.4s ease-in-out infinite}
+      .shootout-dot{transition:all .3s ease}
+    </style>
+    <div class="shootout-card" id="shootoutCard" style="position:relative;background:linear-gradient(160deg,#0a1f0f,#06140a);border-radius:24px;max-width:440px;width:100%;overflow:hidden;box-shadow:0 25px 70px rgba(0,0,0,.7);border:2px solid #1a8a3a;font-family:'Nunito',sans-serif;text-align:center">
+      <div style="position:absolute;top:-30px;left:-20px;width:90px;height:90px;background:radial-gradient(circle,rgba(255,255,200,.35),transparent 70%);border-radius:50%" class="shootout-light"></div>
+      <div style="position:absolute;top:-30px;right:-20px;width:90px;height:90px;background:radial-gradient(circle,rgba(255,255,200,.35),transparent 70%);border-radius:50%" class="shootout-light"></div>
+
+      <div style="position:relative;padding:1.3rem 1.5rem .8rem">
         <div style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:3px;background:linear-gradient(135deg,#fff,#9affb0);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">⚽ Tirs au But Secret</div>
         <div style="font-size:.78rem;color:rgba(255,255,255,.65);font-weight:600;margin-top:.5rem;line-height:1.5">
           🎮 Code Konami débloqué !<br>Choisis ta zone, le gardien plonge au hasard.<br>Vise là où il ne va <strong style="color:#9affb0">pas</strong> pour marquer. 5 tirs au total.
         </div>
       </div>
 
-      <div style="position:relative;background:linear-gradient(180deg,#2d8a3e 0%,#1f6b2d 100%);margin:0 1rem;border-radius:16px;overflow:hidden;box-shadow:inset 0 0 30px rgba(0,0,0,.25)">
-        <svg viewBox="0 0 300 180" style="width:100%;display:block">
+      <div style="position:relative;background:radial-gradient(ellipse at 50% 0%, #379650 0%, #1f6b2d 70%);margin:0 1rem;border-radius:16px;overflow:hidden;box-shadow:inset 0 0 30px rgba(0,0,0,.3)">
+        <!-- foule -->
+        <svg viewBox="0 0 300 14" style="width:100%;display:block">
+          <defs>
+            <pattern id="crowdPattern" width="7" height="7" patternUnits="userSpaceOnUse">
+              <circle cx="3.5" cy="3.5" r="2" fill="rgba(255,255,255,.18)"/>
+            </pattern>
+          </defs>
+          <rect width="300" height="14" fill="#0d2b14"/>
+          <rect width="300" height="14" fill="url(#crowdPattern)"/>
+        </svg>
+        <svg viewBox="0 0 300 180" style="width:100%;display:block;margin-top:-2px">
           <defs>
             <pattern id="netPattern" width="10" height="10" patternUnits="userSpaceOnUse">
               <path d="M0 0 L10 10 M10 0 L0 10" stroke="rgba(255,255,255,.35)" stroke-width="1"/>
             </pattern>
             <linearGradient id="grassStripe" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%" stop-color="rgba(255,255,255,.04)"/>
-              <stop offset="50%" stop-color="rgba(255,255,255,0)"/>
-              <stop offset="100%" stop-color="rgba(255,255,255,.04)"/>
+              <stop offset="0%" stop-color="rgba(255,255,255,.05)"/>
+              <stop offset="25%" stop-color="rgba(255,255,255,0)"/>
+              <stop offset="50%" stop-color="rgba(255,255,255,.05)"/>
+              <stop offset="75%" stop-color="rgba(255,255,255,0)"/>
+              <stop offset="100%" stop-color="rgba(255,255,255,.05)"/>
             </linearGradient>
           </defs>
           <rect x="0" y="0" width="300" height="180" fill="url(#grassStripe)"/>
           <!-- filet -->
-          <rect x="28" y="22" width="244" height="86" fill="url(#netPattern)"/>
+          <rect id="shootoutNet" x="28" y="22" width="244" height="86" fill="url(#netPattern)"/>
           <!-- poteaux -->
           <rect x="24" y="18" width="8" height="94" rx="2" fill="#fff"/>
           <rect x="268" y="18" width="8" height="94" rx="2" fill="#fff"/>
           <rect x="24" y="18" width="252" height="8" rx="2" fill="#fff"/>
-          <!-- ombre filet bas -->
           <rect x="28" y="100" width="244" height="8" fill="rgba(0,0,0,.18)"/>
-          <!-- ligne de surface -->
+          <!-- arc de cercle / surface -->
+          <path d="M 95 180 A 70 70 0 0 1 205 180" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="1.5"/>
           <line x1="0" y1="155" x2="300" y2="155" stroke="rgba(255,255,255,.5)" stroke-width="2"/>
           <!-- gardien -->
           <g id="shootoutKeeper" style="transition: transform .35s cubic-bezier(.34,1.56,.64,1)" transform="translate(150,65)">
-            <ellipse cx="0" cy="14" rx="13" ry="5" fill="rgba(0,0,0,.25)"/>
-            <rect x="-5" y="-18" width="10" height="22" rx="4" fill="#FFD23F"/>
-            <circle cx="0" cy="-24" r="7" fill="#f2c08a"/>
-            <rect x="-15" y="-14" width="11" height="5" rx="2.5" fill="#FFD23F"/>
-            <rect x="4" y="-14" width="11" height="5" rx="2.5" fill="#FFD23F"/>
+            <ellipse cx="0" cy="15" rx="14" ry="5" fill="rgba(0,0,0,.3)"/>
+            <rect x="-6" y="0" width="5" height="16" rx="2" fill="#222"/>
+            <rect x="1" y="0" width="5" height="16" rx="2" fill="#222"/>
+            <rect x="-9" y="-19" width="18" height="22" rx="5" fill="#FFD23F"/>
+            <rect x="-9" y="-19" width="18" height="5" rx="2" fill="#e6b800"/>
+            <circle cx="0" cy="-26" r="7.5" fill="#f2c08a"/>
+            <path d="M-7 -30 a7 5 0 0 1 14 0 z" fill="#5a3a1a"/>
+            <rect x="-17" y="-15" width="12" height="6" rx="3" fill="#fff"/>
+            <rect x="5" y="-15" width="12" height="6" rx="3" fill="#fff"/>
           </g>
           <!-- ballon -->
-          <circle id="shootoutBall" cx="150" cy="160" r="8" fill="white" stroke="#333" stroke-width="1.2" style="transition: cx .4s ease, cy .4s ease"/>
+          <g id="shootoutBallGroup" style="transition: transform .4s cubic-bezier(.2,.8,.3,1)" transform="translate(150,160)">
+            <ellipse cx="0" cy="9" rx="9" ry="3" fill="rgba(0,0,0,.25)"/>
+            <circle r="8" fill="white" stroke="#333" stroke-width="1.2"/>
+            <path d="M0 -8 L2.4 -2.5 L7.6 -2.5 L3.4 1 L5 6.5 L0 3 L-5 6.5 L-3.4 1 L-7.6 -2.5 L-2.4 -2.5 Z" fill="#333" transform="scale(.55)"/>
+          </g>
         </svg>
+        <div id="shootoutFlash" style="position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none"></div>
       </div>
 
-      <div id="shootoutScoreLine" style="font-size:.95rem;color:#9affb0;font-weight:900;letter-spacing:1px;margin:1rem 0 .3rem">⚽ 0 &nbsp;—&nbsp; 0/0 tirs</div>
+      <div id="shootoutDots" style="display:flex;justify-content:center;gap:.45rem;margin-top:1rem">
+        ${Array.from({length: SHOOTOUT_MAX}).map(() => `<span class="shootout-dot" style="width:11px;height:11px;border-radius:50%;background:rgba(255,255,255,.15);display:inline-block"></span>`).join('')}
+      </div>
+      <div id="shootoutScoreLine" style="font-size:.95rem;color:#9affb0;font-weight:900;letter-spacing:1px;margin:.5rem 0 .3rem">⚽ 0 buts marqués</div>
       <div id="shootoutResult" style="font-size:.95rem;font-weight:800;min-height:1.4rem;margin-bottom:.8rem"></div>
 
       <div style="display:flex;gap:.6rem;padding:0 1.5rem 1.5rem">
-        <button id="shootoutBtnLeft" onclick="takeShootoutShot('left')" style="flex:1;background:linear-gradient(135deg,#1a8a3a,#127a2e);border:none;border-radius:12px;padding:.9rem .5rem;color:white;font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:900;cursor:pointer;transition:transform .15s">⬅️ Gauche</button>
-        <button id="shootoutBtnCenter" onclick="takeShootoutShot('center')" style="flex:1;background:linear-gradient(135deg,#1a8a3a,#127a2e);border:none;border-radius:12px;padding:.9rem .5rem;color:white;font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:900;cursor:pointer;transition:transform .15s">🎯 Centre</button>
-        <button id="shootoutBtnRight" onclick="takeShootoutShot('right')" style="flex:1;background:linear-gradient(135deg,#1a8a3a,#127a2e);border:none;border-radius:12px;padding:.9rem .5rem;color:white;font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:900;cursor:pointer;transition:transform .15s">➡️ Droite</button>
+        <button class="shootout-btn" id="shootoutBtnLeft" onclick="takeShootoutShot('left')" style="flex:1;background:linear-gradient(135deg,#1a8a3a,#127a2e);border:none;border-radius:12px;padding:.9rem .5rem;color:white;font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:900;cursor:pointer;transition:transform .15s,filter .15s">⬅️ Gauche</button>
+        <button class="shootout-btn" id="shootoutBtnCenter" onclick="takeShootoutShot('center')" style="flex:1;background:linear-gradient(135deg,#1a8a3a,#127a2e);border:none;border-radius:12px;padding:.9rem .5rem;color:white;font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:900;cursor:pointer;transition:transform .15s,filter .15s">🎯 Centre</button>
+        <button class="shootout-btn" id="shootoutBtnRight" onclick="takeShootoutShot('right')" style="flex:1;background:linear-gradient(135deg,#1a8a3a,#127a2e);border:none;border-radius:12px;padding:.9rem .5rem;color:white;font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:900;cursor:pointer;transition:transform .15s,filter .15s">➡️ Droite</button>
       </div>
       <button onclick="document.getElementById('shootoutPopup').remove()" style="width:calc(100% - 3rem);margin:0 1.5rem 1.5rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:.7rem;color:#aaa;font-family:'Nunito',sans-serif;font-size:.8rem;font-weight:700;cursor:pointer">Fermer</button>
     </div>`;
   document.body.appendChild(popup);
 }
 
+function spawnShootoutConfetti(card) {
+  const colors = ['#9affb0','#FFD23F','#4ade80','#fff','#6ee7ff'];
+  const burst = document.createElement('div');
+  burst.style.cssText = 'position:absolute;top:90px;left:0;right:0;height:0;pointer-events:none;z-index:5';
+  for (let i = 0; i < 16; i++) {
+    const c = document.createElement('div');
+    const left = 20 + Math.random() * 60;
+    c.style.cssText = `position:absolute;left:${left}%;top:0;width:6px;height:10px;background:${colors[i % colors.length]};border-radius:2px;animation:shootoutConfettiFall ${0.7 + Math.random() * 0.5}s ease-in forwards;animation-delay:${Math.random() * 0.15}s`;
+    burst.appendChild(c);
+  }
+  card.appendChild(burst);
+  setTimeout(() => burst.remove(), 1400);
+}
+
 function takeShootoutShot(zone) {
   if (_shootoutLocked || _shootoutAttempts >= SHOOTOUT_MAX) return;
   _shootoutLocked = true;
+  document.querySelectorAll('.shootout-btn').forEach(b => b.disabled = true);
 
   const zonesX = { left: 65, center: 150, right: 235 };
   const keeperZone = ['left','center','right'][Math.floor(Math.random() * 3)];
   const isGoal = zone !== keeperZone;
   _shootoutAttempts++;
   if (isGoal) _shootoutScore++;
+  _shootoutHistory.push(isGoal);
 
-  const ball = document.getElementById('shootoutBall');
+  const ballGroup = document.getElementById('shootoutBallGroup');
   const keeper = document.getElementById('shootoutKeeper');
+  const card = document.getElementById('shootoutCard');
+  const net = document.getElementById('shootoutNet');
+  const flash = document.getElementById('shootoutFlash');
   const keeperTilt = { left: -34, center: 0, right: 34 }[keeperZone];
   if (keeper) keeper.setAttribute('transform', `translate(${zonesX[keeperZone]},65) rotate(${keeperTilt})`);
-  if (ball) { ball.setAttribute('cx', zonesX[zone]); ball.setAttribute('cy', 60); }
+  if (ballGroup) ballGroup.setAttribute('transform', `translate(${zonesX[zone]},58) scale(.85) rotate(180)`);
+
+  // pastille de progression
+  const dot = document.querySelectorAll('#shootoutDots .shootout-dot')[_shootoutAttempts - 1];
+  if (dot) { dot.style.background = isGoal ? '#4ade80' : '#f87171'; dot.style.transform = 'scale(1.3)'; }
+
+  if (flash) { flash.style.animation = 'none'; void flash.offsetWidth; flash.style.animation = 'shootoutFlash .4s ease-out'; }
 
   const resultEl = document.getElementById('shootoutResult');
   const scoreLine = document.getElementById('shootoutScoreLine');
@@ -936,24 +1004,32 @@ function takeShootoutShot(zone) {
     resultEl.style.color = isGoal ? '#4ade80' : '#f87171';
     resultEl.textContent = isGoal ? '⚽ BUUUT !' : '🧤 Arrêté par le gardien !';
   }
-  if (scoreLine) scoreLine.textContent = `⚽ ${_shootoutScore} — ${_shootoutAttempts}/${SHOOTOUT_MAX} tirs`;
+  if (scoreLine) scoreLine.textContent = `⚽ ${_shootoutScore} but${_shootoutScore !== 1 ? 's' : ''} marqué${_shootoutScore !== 1 ? 's' : ''}`;
+
+  if (isGoal && net) { net.style.animation = 'none'; void net.offsetWidth; net.style.animation = 'shootoutNetPulse .5s ease'; }
+  if (isGoal && card) spawnShootoutConfetti(card);
+  if (!isGoal && card) { card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake'); }
 
   setTimeout(() => {
-    const ball2 = document.getElementById('shootoutBall');
-    if (ball2 && _shootoutAttempts < SHOOTOUT_MAX) { ball2.setAttribute('cx', 150); ball2.setAttribute('cy', 160); }
+    const ballGroup2 = document.getElementById('shootoutBallGroup');
+    if (ballGroup2 && _shootoutAttempts < SHOOTOUT_MAX) ballGroup2.setAttribute('transform', 'translate(150,160) scale(1) rotate(0)');
     const keeper2 = document.getElementById('shootoutKeeper');
     if (keeper2) keeper2.setAttribute('transform', 'translate(150,65)');
     _shootoutLocked = false;
 
-    if (_shootoutAttempts >= SHOOTOUT_MAX && resultEl) {
-      const pct = _shootoutScore / SHOOTOUT_MAX;
-      const msg = pct === 1 ? '🏆 Parfait ! Thierry est impressionné.'
-        : pct >= 0.6 ? '👏 Pas mal du tout !'
-        : pct >= 0.3 ? '😅 Bon, on a vu pire...'
-        : '💀 Aïe. Reste sur les pronos plutôt.';
-      resultEl.innerHTML = `${msg}<br><span style="font-size:.8rem;font-weight:700;color:#9affb0">Score final : ${_shootoutScore}/${SHOOTOUT_MAX}</span>`;
+    if (_shootoutAttempts >= SHOOTOUT_MAX) {
+      if (resultEl) {
+        const pct = _shootoutScore / SHOOTOUT_MAX;
+        const msg = pct === 1 ? '🏆 Parfait ! Thierry est impressionné.'
+          : pct >= 0.6 ? '👏 Pas mal du tout !'
+          : pct >= 0.3 ? '😅 Bon, on a vu pire...'
+          : '💀 Aïe. Reste sur les pronos plutôt.';
+        resultEl.innerHTML = `${msg}<br><span style="font-size:.8rem;font-weight:700;color:#9affb0">Score final : ${_shootoutScore}/${SHOOTOUT_MAX}</span>`;
+      }
+    } else {
+      document.querySelectorAll('.shootout-btn').forEach(b => b.disabled = false);
     }
-  }, 700);
+  }, 750);
 }
 
 let _sonometre = 0, _sonometreTimer = null;
