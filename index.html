@@ -801,24 +801,24 @@ function initJeannot(){
         _isMargotton = true;
         el.textContent='Grégoire Margotton te propose de cliquer ici.';
         if(labelEl) labelEl.textContent='🎙️ Grégoire Margotton';
-        if(photoEl){ photoEl.src='images/GM.jfif'; photoEl.alt='Grégoire Margotton'; }
+        if(photoEl){ photoEl.src='images/GM.jfif'; photoEl.alt='Grégoire Margotton'; photoEl.style.objectPosition='center'; }
       } else if(showCount % 25 === 12){
         // 1 fois sur 25 (décalé) : le cheat code d'Anaïs
         _isMargotton = false;
         el.textContent='Hum..... HHBBGGDD.....';
-        if(labelEl) labelEl.textContent='🕵️ Anaïs a un indice...';
-        if(photoEl){ photoEl.src='images/AG.png'; photoEl.alt='Anaïs'; }
+        if(labelEl) labelEl.textContent='🕵️ Le Cheat Code d\'Anaïs';
+        if(photoEl){ photoEl.src='images/AG.png'; photoEl.alt='Anaïs'; photoEl.style.objectPosition='center 20%'; }
       } else {
         _isMargotton = false;
         isMagTurn=!isMagTurn;
         if(isMagTurn){
           el.textContent=TIPH_CONSEILS[getNextM()];
           if(labelEl) labelEl.textContent='🎨 Les vrais bons conseils de Tiph';
-          if(photoEl){ photoEl.src='images/TG.jpg'; photoEl.alt='Tiph'; }
+          if(photoEl){ photoEl.src='images/TG.jpg'; photoEl.alt='Tiph'; photoEl.style.objectPosition='center'; }
         } else {
           el.textContent=JEANNOT_CONSEILS[getNextJ()];
           if(labelEl) labelEl.textContent='⭐ Les bons conseils de Jeannot';
-          if(photoEl){ photoEl.src='images/jeannot.png'; photoEl.alt='Jeannot'; }
+          if(photoEl){ photoEl.src='images/jeannot.png'; photoEl.alt='Jeannot'; photoEl.style.objectPosition='center'; }
         }
       }
       el.classList.add('visible');
