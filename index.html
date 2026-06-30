@@ -782,7 +782,7 @@ const TIPH_CONSEILS = [
   "Peu importe qui gagne, si le générique de la cérémonie est moche, c'est une défaite pour tout le monde."
 ];
 // AJOUT MASTER PROMPT 2026 - Rotation aleatoire Jeannot/Mag alternés
-let _isMargotton = false;
+let _clickVideo = null; // src de la vidéo à lancer au clic sur la bannière, ou null
 function initJeannot(){
   let jPool=[], mPool=[], showCount=0;
   function getNextJ(){if(!jPool.length){jPool=[...Array(JEANNOT_CONSEILS.length).keys()];for(let i=jPool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[jPool[i],jPool[j]]=[jPool[j],jPool[i]];}}return jPool.pop();}
@@ -798,24 +798,30 @@ function initJeannot(){
       showCount++;
       // 1 fois sur 25 : Grégoire Margotton
       if(showCount % 25 === 0){
-        _isMargotton = true;
+        _clickVideo = 'images/margotton.mp4';
         el.textContent='Grégoire Margotton te propose de cliquer ici.';
         if(labelEl) labelEl.textContent='🎙️ Grégoire Margotton';
         if(photoEl){ photoEl.src='images/GM.jfif'; photoEl.alt='Grégoire Margotton'; photoEl.style.objectPosition='center'; }
       } else if(showCount % 25 === 12){
         // 1 fois sur 25 (décalé) : le cheat code d'Anaïs
-        _isMargotton = false;
+        _clickVideo = null;
         el.textContent='Hum..... ⬆️⬆️⬇️⬇️⬅️⬅️➡️➡️.....';
         if(labelEl) labelEl.textContent='🕵️ Le Cheat Code d\'Anaïs';
         if(photoEl){ photoEl.src='images/AG.png'; photoEl.alt='Anaïs'; photoEl.style.objectPosition='center 20%'; }
       } else if(showCount % 25 === 19){
         // 1 fois sur 25 (décalé) : l'intuition de Mag
-        _isMargotton = false;
+        _clickVideo = null;
         el.textContent='Surtout... évitez de trop cliquer sur le logo BGE. J\'ai un mauvais pressentiment.';
         if(labelEl) labelEl.textContent='🔮 L\'intuition de Mag';
         if(photoEl){ photoEl.src='images/mag.png'; photoEl.alt='Mag'; photoEl.style.objectPosition='center'; }
+      } else if(showCount % 25 === 6){
+        // 1 fois sur 25 (décalé) : Thierry Roland
+        _clickVideo = 'images/thierry-roland.mp4';
+        el.textContent='Thierry Roland te propose de cliquer ici.';
+        if(labelEl) labelEl.textContent='🎙️ Thierry Roland';
+        if(photoEl){ photoEl.src='images/TR.jpg'; photoEl.alt='Thierry Roland'; photoEl.style.objectPosition='center'; }
       } else {
-        _isMargotton = false;
+        _clickVideo = null;
         isMagTurn=!isMagTurn;
         if(isMagTurn){
           el.textContent=TIPH_CONSEILS[getNextM()];
@@ -1103,11 +1109,11 @@ const SONOMETRE_MSGS = [
   "Au moins Mag elle se fait pas cliquer dessus comme ça. Enfin je crois.",
 ];
 function sonometre() {
-  if (_isMargotton) {
+  if (_clickVideo) {
     const pop = document.createElement('div');
     pop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem';
     pop.innerHTML = `<div style="position:relative;max-width:500px;width:100%;border-radius:16px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.6)">
-      <video src="images/margotton.mp4" autoplay controls style="width:100%;display:block;border-radius:16px"></video>
+      <video src="${_clickVideo}" autoplay controls style="width:100%;display:block;border-radius:16px"></video>
       <button onclick="this.closest('div').parentElement.remove()" style="position:absolute;top:.6rem;right:.6rem;background:rgba(0,0,0,.5);border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:1.1rem;cursor:pointer;font-weight:900;line-height:1">×</button>
     </div>`;
     pop.onclick = e => { if (e.target === pop) pop.remove(); };
