@@ -1434,7 +1434,8 @@ function renderMatches() {
     if (m.group_name !== cg) { cg = m.group_name; html += `<div class="section-title" style="margin-top:1.5rem">${cg}</div>`; }
     const prono = myPronos[m.id];
     const statusLabel = m.status === 'live' ? '🔴 EN DIRECT' : m.status === 'done' ? '✅ TERMINÉ' : '⏳ À VENIR';
-    const realScore = m.score1_real !== null ? `<div class="match-score">${m.score1_real}—${m.score2_real}</div>` : `<div class="vs-label">VS</div><div class="match-time">${m.match_time}</div>`;
+    const tabNote = m.winner ? `<div style="font-size:.62rem;font-weight:800;color:var(--gris);letter-spacing:.5px;margin-top:.1rem">Victoire aux TAB</div>` : '';
+    const realScore = m.score1_real !== null ? `<div class="match-score">${m.score1_real}—${m.score2_real}</div>${tabNote}` : `<div class="vs-label">VS</div><div class="match-time">${m.match_time}</div>`;
     html += `
       <div class="match-card" onclick="openModal(${m.id})" style="border-left-color:${prono ? 'var(--vert)' : 'var(--gris-med)'}">
         <div class="match-header">
@@ -1617,7 +1618,7 @@ function openModal(id) {
   document.getElementById('modalT2name').textContent = m.team2;
   document.getElementById('modalPronoTeam1').textContent = m.team1;
   document.getElementById('modalPronoTeam2').textContent = m.team2;
-  document.getElementById('modalMeta').textContent = `${m.group_name} — ${m.match_date} ${m.match_time}`;
+  document.getElementById('modalMeta').textContent = `${m.group_name} — ${m.match_date} ${m.match_time}${m.winner ? ' — Victoire aux TAB' : ''}`;
   document.getElementById('modalPalmares1').innerHTML = PALMARES[m.team1] || qualifLabel(m.team1);
   document.getElementById('modalPalmares2').innerHTML = PALMARES[m.team2] || qualifLabel(m.team2);
   const rf = (team, el) => {
