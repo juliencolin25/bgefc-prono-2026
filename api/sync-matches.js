@@ -125,19 +125,27 @@ async function calculateAndUpdatePoints(matchId, score1Real, score2Real, winnerF
 
   const realOutcome = matchOutcome(score1Real, score2Real, winnerField);
 
-  for (const p of pronos) {
+  await Promise.all(pronos.map(p => {
     let pts = 0;
     if (p.score1 === score1Real && p.score2 === score2Real) {
       pts = 5; // Score exact
     } else if (matchOutcome(p.score1, p.score2, p.winner) === realOutcome) {
       pts = 3; // Bon vainqueur
     }
-    await supabaseRequest(`/pronos?id=eq.${p.id}`, 'PATCH', { points: pts });
-  }
+    return supabaseRequest(`/pronos?id=eq.${p.id}`, 'PATCH', { points: pts });
+  }));
 }
 
 export default async function handler(req, res) {
   try {
+    // 0. Récupérer l'état actuel des matchs en base (pour ne traiter que ce qui a changé)
+    const existingRes = await supabaseRequest(
+      '/matches?select=id,score1_real,score2_real,winner,status',
+      'GET'
+    );
+    const existingMatches = await existingRes.json();
+    const existingById = new Map((existingMatches || []).map(m => [m.id, m]));
+
     // 1. Récupérer les matchs depuis football-data.org
     const apiRes = await fetch(FOOTBALL_API_URL, {
       headers: { 'X-Auth-Token': FOOTBALL_API_KEY }
@@ -150,8 +158,8 @@ export default async function handler(req, res) {
     const data = await apiRes.json();
     const matches = data.matches || [];
 
-    let updated = 0;
-    let pointsRecalculated = 0;
+    const updatePayloads = [];
+    const matchesToRecalc = [];
 
     for (const m of matches) {
       const team1 = frName(m.homeTeam?.name || 'À déterminer');
@@ -181,7 +189,7 @@ export default async function handler(req, res) {
       const pen1 = isPenaltyShootout ? (m.score?.penalties?.home ?? null) : null;
       const pen2 = isPenaltyShootout ? (m.score?.penalties?.away ?? null) : null;
 
-      const updateData = {
+      updatePayloads.push({
         id: m.id,
         group_name: groupName,
         match_date: dateStr,
@@ -196,23 +204,34 @@ export default async function handler(req, res) {
         winner: winnerField,
         pen1,
         pen2,
-      };
+      });
 
-      // Upsert dans Supabase (on_conflict sur id)
-      await supabaseRequest('/matches?on_conflict=id', 'POST', updateData);
-      updated++;
-
-      // Recalculer les points si match terminé
+      // Ne recalculer les points que si le match vient de se terminer ou si le résultat a changé
       if (status === 'done' && score1Real !== null) {
-        await calculateAndUpdatePoints(m.id, score1Real, score2Real, winnerField);
-        pointsRecalculated++;
+        const prev = existingById.get(m.id);
+        const changed = !prev
+          || prev.status !== 'done'
+          || prev.score1_real !== score1Real
+          || prev.score2_real !== score2Real
+          || prev.winner !== winnerField;
+        if (changed) matchesToRecalc.push({ id: m.id, score1Real, score2Real, winnerField });
       }
     }
 
+    // 2. Upsert de tous les matchs en un seul appel
+    if (updatePayloads.length) {
+      await supabaseRequest('/matches?on_conflict=id', 'POST', updatePayloads);
+    }
+
+    // 3. Recalcul des points uniquement pour les matchs modifiés, en parallèle
+    await Promise.all(matchesToRecalc.map(mm =>
+      calculateAndUpdatePoints(mm.id, mm.score1Real, mm.score2Real, mm.winnerField)
+    ));
+
     return res.status(200).json({
       success: true,
-      matchesUpdated: updated,
-      matchesWithPoints: pointsRecalculated,
+      matchesUpdated: updatePayloads.length,
+      matchesWithPoints: matchesToRecalc.length,
       timestamp: new Date().toISOString(),
     });
 
