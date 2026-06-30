@@ -1095,7 +1095,6 @@ async function startApp() {
 // POPUP CHAMPIONS PHASES DE POULE
 // ============================================================
 async function showPouleChampionsPopup() {
-  const alreadyDone = !!myPronoMort;
   const popup = document.createElement('div');
   popup.id = 'pouleChampionsPopup';
   popup.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem';
@@ -1122,11 +1121,7 @@ async function showPouleChampionsPopup() {
             <span style="font-size:1.1rem">❌</span><span><strong>Mauvaise équipe :</strong> −20 pts</span>
           </div>
         </div>
-        ${alreadyDone
-          ? `<div style="background:rgba(0,200,0,.1);border:1px solid rgba(0,200,0,.3);border-radius:10px;padding:.7rem 1rem;font-size:.82rem;color:#88ff88;margin-bottom:.8rem;text-align:center;font-weight:700">💀 Tu as déjà osé. Respect.</div>`
-          : `<button onclick="document.getElementById('pouleChampionsPopup').remove();openPronoMort();" style="width:100%;background:linear-gradient(135deg,#8b0000,#cc0000);border:none;border-radius:12px;padding:.9rem;color:white;font-family:'Nunito',sans-serif;font-size:.95rem;font-weight:900;cursor:pointer;margin-bottom:.5rem">💀 J'ose le Prono de la Mort !</button>`
-        }
-        <button onclick="document.getElementById('pouleChampionsPopup').remove()" style="width:100%;background:rgba(255,255,255,.06);border:1px solid #333;border-radius:12px;padding:.7rem;color:#777;font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:700;cursor:pointer">${alreadyDone ? 'Fermer' : 'Pas maintenant… (lâche)'}</button>
+        <button onclick="document.getElementById('pouleChampionsPopup').remove()" style="width:100%;background:linear-gradient(135deg,#8b0000,#cc0000);border:none;border-radius:12px;padding:.9rem;color:white;font-family:'Nunito',sans-serif;font-size:.95rem;font-weight:900;cursor:pointer">🙏 Merci Thierry, pour cette super info</button>
       </div>
     </div>`;
   popup.onclick = e => { if (e.target === popup) popup.remove(); };
