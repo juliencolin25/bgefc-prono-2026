@@ -1308,10 +1308,12 @@ const PAULINE_RECETTES = [
     methode: "Dans un grand verre à vin, mettre les glaçons. Verser la liqueur de sureau, puis le prosecco. Terminer avec l'eau pétillante. Ajouter menthe et citron vert. Remuer délicatement une seule fois. Servir immédiatement — les bulles, c'est sacré.",
   },
 ];
-let _paulineIdx = -1;
+let _paulineLastIdx = -1;
 function showMoscowMule() {
-  _paulineIdx = (_paulineIdx + 1) % PAULINE_RECETTES.length;
-  const r = PAULINE_RECETTES[_paulineIdx];
+  let idx;
+  do { idx = Math.floor(Math.random() * PAULINE_RECETTES.length); } while (idx === _paulineLastIdx && PAULINE_RECETTES.length > 1);
+  _paulineLastIdx = idx;
+  const r = PAULINE_RECETTES[idx];
   const pop = document.createElement('div');
   pop.id = 'moscowMulePop';
   pop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem';
