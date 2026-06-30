@@ -1434,8 +1434,9 @@ function renderMatches() {
     if (m.group_name !== cg) { cg = m.group_name; html += `<div class="section-title" style="margin-top:1.5rem">${cg}</div>`; }
     const prono = myPronos[m.id];
     const statusLabel = m.status === 'live' ? '🔴 EN DIRECT' : m.status === 'done' ? '✅ TERMINÉ' : '⏳ À VENIR';
-    const tabNote = m.winner ? `<div style="font-size:.62rem;font-weight:800;color:var(--gris);letter-spacing:.5px;margin-top:.1rem">Victoire aux TAB</div>` : '';
-    const realScore = m.score1_real !== null ? `<div class="match-score">${m.score1_real}—${m.score2_real}</div>${tabNote}` : `<div class="vs-label">VS</div><div class="match-time">${m.match_time}</div>`;
+    const realScore = m.score1_real !== null ? `<div class="match-score">${m.score1_real}—${m.score2_real}</div>` : `<div class="vs-label">VS</div><div class="match-time">${m.match_time}</div>`;
+    const tabNote1 = m.winner === 'team1' ? `<div style="font-size:.62rem;font-weight:800;color:var(--gris);letter-spacing:.5px;margin-top:.2rem">Victoire aux TAB</div>` : '';
+    const tabNote2 = m.winner === 'team2' ? `<div style="font-size:.62rem;font-weight:800;color:var(--gris);letter-spacing:.5px;margin-top:.2rem">Victoire aux TAB</div>` : '';
     html += `
       <div class="match-card" onclick="openModal(${m.id})" style="border-left-color:${prono ? 'var(--vert)' : 'var(--gris-med)'}">
         <div class="match-header">
@@ -1443,9 +1444,9 @@ function renderMatches() {
           <span class="match-status status-${m.status}">${statusLabel}</span>
         </div>
         <div class="match-teams">
-          <div class="team"><div class="team-flag team-flag-clickable" onclick="openTeamModal('${m.team1}')">${flagImg(m.team1,56,m.flag1)}</div><div class="team-name">${m.team1}</div></div>
+          <div class="team"><div class="team-flag team-flag-clickable" onclick="openTeamModal('${m.team1}')">${flagImg(m.team1,56,m.flag1)}</div><div class="team-name">${m.team1}</div>${tabNote1}</div>
           <div class="match-vs">${realScore}</div>
-          <div class="team"><div class="team-flag team-flag-clickable" onclick="openTeamModal('${m.team2}')">${flagImg(m.team2,56,m.flag2)}</div><div class="team-name">${m.team2}</div></div>
+          <div class="team"><div class="team-flag team-flag-clickable" onclick="openTeamModal('${m.team2}')">${flagImg(m.team2,56,m.flag2)}</div><div class="team-name">${m.team2}</div>${tabNote2}</div>
         </div>
         ${m.status === 'upcoming' ? `
         <div class="prono-zone" onclick="event.stopPropagation()">
