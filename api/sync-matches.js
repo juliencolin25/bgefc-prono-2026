@@ -178,6 +178,8 @@ export default async function handler(req, res) {
       const winnerField = isPenaltyShootout
         ? (m.score?.winner === 'HOME_TEAM' ? 'team1' : m.score?.winner === 'AWAY_TEAM' ? 'team2' : null)
         : null;
+      const pen1 = isPenaltyShootout ? (m.score?.penalties?.home ?? null) : null;
+      const pen2 = isPenaltyShootout ? (m.score?.penalties?.away ?? null) : null;
 
       const updateData = {
         id: m.id,
@@ -192,6 +194,8 @@ export default async function handler(req, res) {
         score1_real: score1Real,
         score2_real: score2Real,
         winner: winnerField,
+        pen1,
+        pen2,
       };
 
       // Upsert dans Supabase (on_conflict sur id)

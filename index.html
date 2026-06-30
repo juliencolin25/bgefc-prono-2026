@@ -1435,8 +1435,9 @@ function renderMatches() {
     const prono = myPronos[m.id];
     const statusLabel = m.status === 'live' ? '🔴 EN DIRECT' : m.status === 'done' ? '✅ TERMINÉ' : '⏳ À VENIR';
     const realScore = m.score1_real !== null ? `<div class="match-score">${m.score1_real}—${m.score2_real}</div>` : `<div class="vs-label">VS</div><div class="match-time">${m.match_time}</div>`;
-    const tabNote1 = m.winner === 'team1' ? `<div style="font-size:.62rem;font-weight:800;color:var(--gris);letter-spacing:.5px;margin-top:.2rem">Victoire aux TAB</div>` : '';
-    const tabNote2 = m.winner === 'team2' ? `<div style="font-size:.62rem;font-weight:800;color:var(--gris);letter-spacing:.5px;margin-top:.2rem">Victoire aux TAB</div>` : '';
+    const penScore = (m.pen1 !== null && m.pen1 !== undefined) ? ` (${m.pen1}—${m.pen2})` : '';
+    const tabNote1 = m.winner === 'team1' ? `<div style="font-size:.62rem;font-weight:800;color:var(--gris);letter-spacing:.5px;margin-top:.2rem">Victoire aux TAB${penScore}</div>` : '';
+    const tabNote2 = m.winner === 'team2' ? `<div style="font-size:.62rem;font-weight:800;color:var(--gris);letter-spacing:.5px;margin-top:.2rem">Victoire aux TAB${penScore}</div>` : '';
     html += `
       <div class="match-card" onclick="openModal(${m.id})" style="border-left-color:${prono ? 'var(--vert)' : 'var(--gris-med)'}">
         <div class="match-header">
@@ -1987,7 +1988,10 @@ async function renderAdminPanel() {
           <option value="">Si nul : vainqueur TAB</option>
           <option value="team1" ${m.winner === 'team1' ? 'selected' : ''}>${m.team1} (TAB)</option>
           <option value="team2" ${m.winner === 'team2' ? 'selected' : ''}>${m.team2} (TAB)</option>
-        </select>` : ''}
+        </select>
+        <input type="number" min="0" max="20" id="apen1_${m.id}" value="${m.pen1 ?? ''}" placeholder="TAB" style="width:50px;border:2px solid var(--gris-med);border-radius:8px;padding:.3rem;text-align:center;font-family:'Bebas Neue';font-size:1rem;outline:none">
+        <span style="font-family:'Bebas Neue';font-size:1rem;color:var(--gris-med)">—</span>
+        <input type="number" min="0" max="20" id="apen2_${m.id}" value="${m.pen2 ?? ''}" placeholder="TAB" style="width:50px;border:2px solid var(--gris-med);border-radius:8px;padding:.3rem;text-align:center;font-family:'Bebas Neue';font-size:1rem;outline:none">` : ''}
         <button class="btn-save" onclick="saveRealScore(${m.id})">✓ Valider</button>
       </div>
     </div>`).join('');
@@ -2009,7 +2013,11 @@ async function saveRealScore(matchId) {
     return;
   }
   const winner = winnerSel ? (winnerSel.value || null) : null;
-  await db.from('matches').update({ score1_real: s1, score2_real: s2, status: 'done', winner }).eq('id', matchId);
+  const pen1El = document.getElementById('apen1_' + matchId);
+  const pen2El = document.getElementById('apen2_' + matchId);
+  const pen1 = winner && pen1El ? (parseInt(pen1El.value) ?? null) : null;
+  const pen2 = winner && pen2El ? (parseInt(pen2El.value) ?? null) : null;
+  await db.from('matches').update({ score1_real: s1, score2_real: s2, status: 'done', winner, pen1: isNaN(pen1) ? null : pen1, pen2: isNaN(pen2) ? null : pen2 }).eq('id', matchId);
   // Recalculer les points pour tous les pronostics de ce match
   const { data: pronos } = await db.from('pronos').select('*').eq('match_id', matchId);
   if (pronos) {
