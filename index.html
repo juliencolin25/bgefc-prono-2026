@@ -796,26 +796,24 @@ function initJeannot(){
     el.classList.remove('visible');
     setTimeout(()=>{
       showCount++;
-      // 1 fois sur 25 : Grégoire Margotton
-      if(showCount % 25 === 0){
+      const rnd = Math.random();
+      // Chaque spécial a 1/25 de chance, tiré aléatoirement à chaque rotation
+      if(rnd < 1/25){
         _clickVideo = 'images/margotton.mp4';
         el.textContent='Grégoire Margotton te propose de cliquer ici.';
         if(labelEl) labelEl.textContent='🎙️ Grégoire Margotton';
         if(photoEl){ photoEl.src='images/GM.jfif'; photoEl.alt='Grégoire Margotton'; photoEl.style.objectPosition='center'; }
-      } else if(showCount % 25 === 12){
-        // 1 fois sur 25 (décalé) : le cheat code d'Anaïs
+      } else if(rnd < 2/25){
         _clickVideo = null;
         el.textContent='Hum..... ⬆️⬆️⬇️⬇️⬅️⬅️➡️➡️.....';
         if(labelEl) labelEl.textContent='🕵️ Le Cheat Code d\'Anaïs';
         if(photoEl){ photoEl.src='images/AG.png'; photoEl.alt='Anaïs'; photoEl.style.objectPosition='center 20%'; }
-      } else if(showCount % 25 === 19){
-        // 1 fois sur 25 (décalé) : l'intuition de Mag
+      } else if(rnd < 3/25){
         _clickVideo = null;
         el.textContent='Surtout... évitez de trop cliquer sur le logo BGE juste au-dessous de moi. J\'ai un mauvais pressentiment.';
         if(labelEl) labelEl.textContent='🔮 L\'intuition de Mag';
         if(photoEl){ photoEl.src='images/mag.png'; photoEl.alt='Mag'; photoEl.style.objectPosition='center'; }
-      } else if(showCount % 25 === 6){
-        // 1 fois sur 25 (décalé) : Thierry Roland
+      } else if(rnd < 4/25){
         _clickVideo = 'images/thierry-roland.mp4';
         el.textContent='Thierry Roland te propose de cliquer ici.';
         if(labelEl) labelEl.textContent='🎙️ Thierry Roland';
