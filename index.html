@@ -822,6 +822,91 @@ function initJeannot(){
 }
 window.addEventListener('DOMContentLoaded',initJeannot);
 
+// ============================================================
+// EASTER EGG KONAMI : haut haut bas bas gauche gauche droite droite -> mini-jeu Tirs au but
+// ============================================================
+const KONAMI_SEQUENCE = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowLeft','ArrowRight','ArrowRight'];
+let _konamiProgress = 0;
+document.addEventListener('keydown', (e) => {
+  if (document.getElementById('shootoutPopup')) return;
+  if (e.key === KONAMI_SEQUENCE[_konamiProgress]) {
+    _konamiProgress++;
+    if (_konamiProgress === KONAMI_SEQUENCE.length) {
+      _konamiProgress = 0;
+      openShootoutGame();
+    }
+  } else {
+    _konamiProgress = (e.key === KONAMI_SEQUENCE[0]) ? 1 : 0;
+  }
+});
+
+let _shootoutScore = 0, _shootoutAttempts = 0;
+const SHOOTOUT_MAX = 5;
+
+function openShootoutGame() {
+  _shootoutScore = 0;
+  _shootoutAttempts = 0;
+  const popup = document.createElement('div');
+  popup.id = 'shootoutPopup';
+  popup.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem';
+  popup.innerHTML = `
+    <div style="background:linear-gradient(160deg,#001a3d,#000a1a);border-radius:20px;max-width:420px;width:100%;overflow:hidden;box-shadow:0 20px 60px rgba(0,30,100,.6);border:2px solid #002395;font-family:'Nunito',sans-serif;text-align:center;padding:1.5rem">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:3px;background:linear-gradient(135deg,#fff,#aaccff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">⚽ Tirs au But Secret</div>
+      <div style="font-size:.8rem;color:rgba(255,255,255,.7);font-weight:600;margin:.4rem 0 1rem">Code Konami activé ! Choisis ta zone de tir.</div>
+      <div id="shootoutScoreLine" style="font-size:.85rem;color:#aaccff;font-weight:800;margin-bottom:1rem">Score : 0 / 0</div>
+      <svg viewBox="0 0 300 160" style="width:100%;max-width:300px;margin:0 auto;display:block">
+        <rect x="20" y="20" width="260" height="100" fill="none" stroke="white" stroke-width="4"/>
+        <line x1="20" y1="20" x2="20" y2="120" stroke="white" stroke-width="4"/>
+        <line x1="280" y1="20" x2="280" y2="120" stroke="white" stroke-width="4"/>
+        <line x1="20" y1="20" x2="280" y2="20" stroke="white" stroke-width="4"/>
+        <circle id="shootoutKeeper" cx="150" cy="55" r="16" fill="#FFD23F"/>
+        <circle id="shootoutBall" cx="150" cy="150" r="9" fill="white" stroke="#333" stroke-width="1.5"/>
+      </svg>
+      <div style="display:flex;gap:.6rem;margin-top:1.2rem">
+        <button onclick="takeShootoutShot('left')" style="flex:1;background:linear-gradient(135deg,#002395,#1a3db5);border:none;border-radius:12px;padding:.8rem;color:white;font-family:'Nunito',sans-serif;font-size:.85rem;font-weight:900;cursor:pointer">⬅️ Gauche</button>
+        <button onclick="takeShootoutShot('center')" style="flex:1;background:linear-gradient(135deg,#002395,#1a3db5);border:none;border-radius:12px;padding:.8rem;color:white;font-family:'Nunito',sans-serif;font-size:.85rem;font-weight:900;cursor:pointer">⬆️ Centre</button>
+        <button onclick="takeShootoutShot('right')" style="flex:1;background:linear-gradient(135deg,#002395,#1a3db5);border:none;border-radius:12px;padding:.8rem;color:white;font-family:'Nunito',sans-serif;font-size:.85rem;font-weight:900;cursor:pointer">➡️ Droite</button>
+      </div>
+      <div id="shootoutResult" style="margin-top:1rem;font-size:.9rem;font-weight:800;min-height:1.3rem"></div>
+      <button onclick="document.getElementById('shootoutPopup').remove()" style="width:100%;margin-top:1rem;background:rgba(255,255,255,.06);border:1px solid #333;border-radius:12px;padding:.7rem;color:#999;font-family:'Nunito',sans-serif;font-size:.8rem;font-weight:700;cursor:pointer">Fermer</button>
+    </div>`;
+  document.body.appendChild(popup);
+}
+
+function takeShootoutShot(zone) {
+  const zones = { left: 70, center: 150, right: 230 };
+  const keeperZone = ['left','center','right'][Math.floor(Math.random() * 3)];
+  const isGoal = zone !== keeperZone;
+  _shootoutAttempts++;
+  if (isGoal) _shootoutScore++;
+
+  const ball = document.getElementById('shootoutBall');
+  const keeper = document.getElementById('shootoutKeeper');
+  if (ball) { ball.setAttribute('cx', zones[zone]); ball.setAttribute('cy', 55); }
+  if (keeper) keeper.setAttribute('cx', zones[keeperZone]);
+
+  const resultEl = document.getElementById('shootoutResult');
+  const scoreLine = document.getElementById('shootoutScoreLine');
+  if (resultEl) {
+    resultEl.style.color = isGoal ? '#4ade80' : '#f87171';
+    resultEl.textContent = isGoal ? '⚽ BUUUT !' : '🧤 Arrêté par le gardien !';
+  }
+  if (scoreLine) scoreLine.textContent = `Score : ${_shootoutScore} / ${_shootoutAttempts}`;
+
+  if (_shootoutAttempts >= SHOOTOUT_MAX) {
+    setTimeout(() => {
+      if (resultEl) {
+        const pct = _shootoutScore / SHOOTOUT_MAX;
+        const msg = pct === 1 ? '🏆 Parfait ! Thierry est impressionné.'
+          : pct >= 0.6 ? '👏 Pas mal du tout !'
+          : pct >= 0.3 ? '😅 Bon, on a vu pire...'
+          : '💀 Aïe. Reste sur les pronos plutôt.';
+        resultEl.innerHTML = `${msg}<br><span style="font-size:.8rem;font-weight:700;color:#aaccff">Score final : ${_shootoutScore}/${SHOOTOUT_MAX}</span>`;
+      }
+    }, 600);
+  }
+}
+
 let _sonometre = 0, _sonometreTimer = null;
 const SONOMETRE_MSGS = [
   "MAIS QU'EST-CE QUE VOUS FOUTEZ ?! Arrêtez de me cliquer dessus, j'essaie de donner des conseils moi !",
