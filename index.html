@@ -1976,30 +1976,46 @@ async function renderAdminPanel() {
     <div style="display:flex;align-items:center;gap:1rem;padding:.8rem 0;border-bottom:1px solid var(--gris-clair);flex-wrap:wrap">
       <span style="font-size:.8rem;color:var(--gris);font-weight:700;min-width:120px">${m.group_name} — ${m.match_date}</span>
       <span style="font-weight:800;font-size:.9rem;flex:1;display:flex;align-items:center;gap:.4rem">${flagImg(m.team1,28)} ${m.team1} vs ${m.team2} ${flagImg(m.team2,28)}</span>
-      <div style="display:flex;align-items:center;gap:.5rem">
+      <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap">
         <input type="number" min="0" max="20" id="ar1_${m.id}" value="${m.score1_real ?? ''}" placeholder="?" style="width:50px;border:2px solid var(--gris-med);border-radius:8px;padding:.3rem;text-align:center;font-family:'Bebas Neue';font-size:1.2rem;outline:none">
         <span style="font-family:'Bebas Neue';font-size:1.2rem;color:var(--gris-med)">—</span>
         <input type="number" min="0" max="20" id="ar2_${m.id}" value="${m.score2_real ?? ''}" placeholder="?" style="width:50px;border:2px solid var(--gris-med);border-radius:8px;padding:.3rem;text-align:center;font-family:'Bebas Neue';font-size:1.2rem;outline:none">
+        ${KO_GROUPS.includes(m.group_name) ? `
+        <select id="arWinner_${m.id}" style="border:2px solid var(--gris-med);border-radius:8px;padding:.35rem;font-size:.8rem;font-weight:700;outline:none">
+          <option value="">Si nul : vainqueur TAB</option>
+          <option value="team1" ${m.winner === 'team1' ? 'selected' : ''}>${m.team1} (TAB)</option>
+          <option value="team2" ${m.winner === 'team2' ? 'selected' : ''}>${m.team2} (TAB)</option>
+        </select>` : ''}
         <button class="btn-save" onclick="saveRealScore(${m.id})">✓ Valider</button>
       </div>
     </div>`).join('');
+}
+
+function matchOutcome(s1, s2, winnerField) {
+  if (s1 > s2) return 'team1';
+  if (s1 < s2) return 'team2';
+  return winnerField || 'draw';
 }
 
 async function saveRealScore(matchId) {
   const s1 = parseInt(document.getElementById('ar1_' + matchId).value);
   const s2 = parseInt(document.getElementById('ar2_' + matchId).value);
   if (isNaN(s1) || isNaN(s2)) return;
-  await db.from('matches').update({ score1_real: s1, score2_real: s2, status: 'done' }).eq('id', matchId);
+  const winnerSel = document.getElementById('arWinner_' + matchId);
+  if (s1 === s2 && winnerSel && !winnerSel.value) {
+    showToast('⚠️ Choisis le vainqueur aux tirs au but !');
+    return;
+  }
+  const winner = winnerSel ? (winnerSel.value || null) : null;
+  await db.from('matches').update({ score1_real: s1, score2_real: s2, status: 'done', winner }).eq('id', matchId);
   // Recalculer les points pour tous les pronostics de ce match
   const { data: pronos } = await db.from('pronos').select('*').eq('match_id', matchId);
   if (pronos) {
+    const realOutcome = matchOutcome(s1, s2, winner);
     for (const p of pronos) {
       let pts = 0;
       if (p.score1 === s1 && p.score2 === s2) pts = 5;
-      else {
-        const res = (n1, n2) => n1 > n2 ? 1 : n1 < n2 ? -1 : 0;
-        if (res(p.score1, p.score2) === res(s1, s2)) pts = 3;
-      }
+      else if (matchOutcome(p.score1, p.score2, p.winner) === realOutcome) pts = 3;
       await db.from('pronos').update({ points: pts }).eq('id', p.id);
     }
   }
