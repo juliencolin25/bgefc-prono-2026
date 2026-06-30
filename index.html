@@ -306,7 +306,7 @@ main{max-width:1200px;margin:0 auto;padding:2rem 1.5rem;position:relative;z-inde
   </div>
   <header>
     <div class="header-inner">
-      <div class="logo-bge">
+      <div class="logo-bge" id="logoBgeChant" onclick="bgefcChantClick()" style="cursor:pointer">
 
         <div style="display:flex;flex-direction:column;align-items:flex-start;gap:2px">
           <img src="images/logo-bge.png" alt="BGE" style="height:44px;width:auto;object-fit:contain;" onerror="this.style.display='none'">
@@ -808,6 +808,12 @@ function initJeannot(){
         el.textContent='Hum..... ⬆️⬆️⬇️⬇️⬅️⬅️➡️➡️.....';
         if(labelEl) labelEl.textContent='🕵️ Le Cheat Code d\'Anaïs';
         if(photoEl){ photoEl.src='images/AG.png'; photoEl.alt='Anaïs'; photoEl.style.objectPosition='center 20%'; }
+      } else if(showCount % 25 === 19){
+        // 1 fois sur 25 (décalé) : l'intuition de Mag
+        _isMargotton = false;
+        el.textContent='Surtout... évitez de trop cliquer sur le logo BGE. J\'ai un mauvais pressentiment.';
+        if(labelEl) labelEl.textContent='🔮 L\'intuition de Mag';
+        if(photoEl){ photoEl.src='images/mag.png'; photoEl.alt='Mag'; photoEl.style.objectPosition='center'; }
       } else {
         _isMargotton = false;
         isMagTurn=!isMagTurn;
@@ -1033,6 +1039,38 @@ function takeShootoutShot(zone) {
       document.querySelectorAll('.shootout-btn').forEach(b => b.disabled = false);
     }
   }, 750);
+}
+
+let _bgefcChantClicks = 0, _bgefcChantTimer = null;
+function bgefcChantClick() {
+  _bgefcChantClicks++;
+  if (_bgefcChantTimer) clearTimeout(_bgefcChantTimer);
+  _bgefcChantTimer = setTimeout(() => { _bgefcChantClicks = 0; }, 2000);
+  if (_bgefcChantClicks < 5) return;
+  _bgefcChantClicks = 0;
+  playBgefcChant();
+}
+
+function playBgefcChant() {
+  if (document.getElementById('bgefcChantOverlay')) return;
+  const overlay = document.createElement('div');
+  overlay.id = 'bgefcChantOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;pointer-events:none';
+  overlay.innerHTML = `
+    <style>
+      @keyframes bgefcChantPop{0%{transform:scale(.3) rotate(-4deg);opacity:0}50%{transform:scale(1.15) rotate(2deg);opacity:1}70%{transform:scale(.95) rotate(-1deg)}100%{transform:scale(1) rotate(0)}}
+      @keyframes bgefcChantPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+      .bgefc-chant-word{display:inline-block;animation:bgefcChantPop .5s cubic-bezier(.34,1.56,.64,1) both, bgefcChantPulse 1.1s ease-in-out infinite .5s}
+    </style>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(2.5rem,9vw,5rem);letter-spacing:4px;color:#17a2b8;text-shadow:0 0 25px rgba(23,162,184,.7),3px 3px 0 rgba(0,0,0,.25);text-align:center;line-height:1.15">
+      <span class="bgefc-chant-word" style="animation-delay:.05s">BGEFC !</span><br>
+      <span class="bgefc-chant-word" style="animation-delay:.25s">BGEFC !</span><br>
+      <span class="bgefc-chant-word" style="animation-delay:.45s">BGEFC !</span>
+    </div>`;
+  document.body.appendChild(overlay);
+  const audio = new Audio('images/bgefc-chant.mp3');
+  audio.play().catch(() => {});
+  setTimeout(() => overlay.remove(), 2400);
 }
 
 function showTiphaineSecretMessage() {
