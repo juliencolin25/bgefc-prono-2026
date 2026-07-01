@@ -1429,6 +1429,7 @@ async function startApp() {
   document.getElementById('loginPage').style.display = 'none';
   document.getElementById('appPage').style.display = 'block';
   startCocktailEgg();
+  initChat();
 
   const initials = currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   document.getElementById('headerName').textContent = currentUser.name;
@@ -2461,6 +2462,156 @@ function showToast(msg) {
   document.getElementById('toastMsg').textContent = msg;
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
+
+<!-- ============================================================ -->
+<!-- MINI CHAT GLOBAL                                             -->
+<!-- ============================================================ -->
+<style>
+#chatBtn{position:fixed;bottom:1.4rem;left:1.2rem;z-index:600;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--navy),#0a5068);border:none;cursor:pointer;box-shadow:0 4px 18px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;font-size:1.4rem;transition:transform .2s}
+#chatBtn:hover{transform:scale(1.1)}
+#chatBadge{position:absolute;top:-3px;right:-3px;background:#e63946;color:#fff;border-radius:50%;width:18px;height:18px;font-size:.6rem;font-weight:900;display:none;align-items:center;justify-content:center}
+#chatPanel{position:fixed;bottom:5rem;left:1.2rem;z-index:600;width:310px;max-width:calc(100vw - 2.4rem);background:linear-gradient(160deg,#0f1923,#162635);border:1.5px solid rgba(255,255,255,.12);border-radius:20px;box-shadow:0 12px 40px rgba(0,0,0,.5);display:none;flex-direction:column;overflow:hidden;font-family:'Nunito',sans-serif}
+#chatHeader{padding:.75rem 1rem;background:rgba(255,255,255,.05);display:flex;align-items:center;gap:.5rem;font-size:.82rem;font-weight:800;color:#fff;border-bottom:1px solid rgba(255,255,255,.08)}
+#chatMessages{height:240px;overflow-y:auto;padding:.7rem .85rem;display:flex;flex-direction:column;gap:.45rem;scroll-behavior:smooth}
+#chatMessages::-webkit-scrollbar{width:4px}
+#chatMessages::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:4px}
+.chat-msg{max-width:85%;padding:.45rem .7rem;border-radius:14px;font-size:.78rem;line-height:1.4;word-break:break-word}
+.chat-msg-me{align-self:flex-end;background:linear-gradient(135deg,var(--rouge),var(--orange));color:#fff;border-bottom-right-radius:4px}
+.chat-msg-other{align-self:flex-start;background:rgba(255,255,255,.1);color:#e8e8e8;border-bottom-left-radius:4px}
+.chat-msg-name{font-size:.62rem;font-weight:800;opacity:.7;margin-bottom:.15rem}
+.chat-msg-time{font-size:.58rem;opacity:.5;margin-top:.15rem;text-align:right}
+#chatInputRow{display:flex;gap:.5rem;padding:.65rem .75rem;border-top:1px solid rgba(255,255,255,.08)}
+#chatInput{flex:1;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:.45rem .7rem;color:#fff;font-family:'Nunito',sans-serif;font-size:.8rem;outline:none}
+#chatInput::placeholder{color:rgba(255,255,255,.35)}
+#chatInput:focus{border-color:rgba(255,255,255,.3)}
+#chatSend{background:linear-gradient(135deg,var(--rouge),var(--orange));border:none;border-radius:10px;padding:.45rem .75rem;color:#fff;font-size:.9rem;cursor:pointer;transition:transform .15s}
+#chatSend:hover{transform:scale(1.08)}
+</style>
+
+<button id="chatBtn" onclick="toggleChat()" title="Chat BGEFC" style="display:none">
+  💬
+  <span id="chatBadge"></span>
+</button>
+<div id="chatPanel">
+  <div id="chatHeader">💬 Chat BGEFC 2026 <span id="chatOnline" style="margin-left:auto;font-size:.65rem;color:rgba(255,255,255,.4)"></span></div>
+  <div id="chatMessages"><div style="text-align:center;color:rgba(255,255,255,.25);font-size:.75rem;margin:auto">Chargement...</div></div>
+  <div id="chatInputRow">
+    <input id="chatInput" type="text" placeholder="Ton message..." maxlength="200" onkeydown="if(event.key==='Enter')sendChatMsg()">
+    <button id="chatSend" onclick="sendChatMsg()">➤</button>
+  </div>
+</div>
+
+<script>
+let _chatOpen = false;
+let _chatUnread = 0;
+let _chatLastId = 0;
+let _chatSub = null;
+
+function toggleChat() {
+  _chatOpen = !_chatOpen;
+  document.getElementById('chatPanel').style.display = _chatOpen ? 'flex' : 'none';
+  if (_chatOpen) {
+    _chatUnread = 0;
+    updateChatBadge();
+    document.getElementById('chatInput').focus();
+    scrollChatToBottom();
+  }
+}
+
+function updateChatBadge() {
+  const badge = document.getElementById('chatBadge');
+  if (_chatUnread > 0) {
+    badge.textContent = _chatUnread > 9 ? '9+' : _chatUnread;
+    badge.style.display = 'flex';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+function scrollChatToBottom() {
+  const el = document.getElementById('chatMessages');
+  if (el) el.scrollTop = el.scrollHeight;
+}
+
+function formatChatTime(ts) {
+  const d = new Date(ts);
+  return d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+}
+
+function renderChatMsg(msg, prepend = false) {
+  const isMe = currentUser && msg.user_name === currentUser.name;
+  const el = document.createElement('div');
+  el.className = 'chat-msg ' + (isMe ? 'chat-msg-me' : 'chat-msg-other');
+  el.dataset.id = msg.id;
+  el.innerHTML = `${!isMe ? `<div class="chat-msg-name">${msg.user_name}</div>` : ''}
+    <div>${msg.content}</div>
+    <div class="chat-msg-time">${formatChatTime(msg.created_at)}</div>`;
+  const container = document.getElementById('chatMessages');
+  if (prepend) container.prepend(el);
+  else container.appendChild(el);
+}
+
+async function loadChatHistory() {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/messages?select=*&order=created_at.asc&limit=50`, {
+      headers: { 'apikey': SUPABASE_ANON, 'Authorization': 'Bearer ' + SUPABASE_ANON }
+    });
+    const msgs = await res.json();
+    const container = document.getElementById('chatMessages');
+    container.innerHTML = '';
+    if (!msgs.length) {
+      container.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,.25);font-size:.75rem;margin:auto">Soyez les premiers à écrire ! ⚽</div>';
+      return;
+    }
+    msgs.forEach(m => { renderChatMsg(m); if (m.id > _chatLastId) _chatLastId = m.id; });
+    scrollChatToBottom();
+  } catch(e) {}
+}
+
+async function sendChatMsg() {
+  if (!currentUser) { showToast('⚠️ Connecte-toi pour chatter !'); return; }
+  const input = document.getElementById('chatInput');
+  const content = input.value.trim();
+  if (!content) return;
+  input.value = '';
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/messages`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_ANON,
+        'Authorization': 'Bearer ' + SUPABASE_ANON,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({ user_name: currentUser.name, content })
+    });
+  } catch(e) { showToast('❌ Erreur envoi message'); }
+}
+
+function initChat() {
+  if (!currentUser) return;
+  document.getElementById('chatBtn').style.display = 'flex';
+  loadChatHistory();
+  // Realtime via Supabase JS client
+  _chatSub = db.channel('public:messages')
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
+      const msg = payload.new;
+      if (msg.id <= _chatLastId) return;
+      _chatLastId = msg.id;
+      // Retirer le placeholder si présent
+      const container = document.getElementById('chatMessages');
+      const placeholder = container.querySelector('[style*="Soyez"]');
+      if (placeholder) placeholder.remove();
+      renderChatMsg(msg);
+      scrollChatToBottom();
+      if (!_chatOpen) {
+        _chatUnread++;
+        updateChatBadge();
+      }
+    })
+    .subscribe();
 }
 </script>
 </body>
