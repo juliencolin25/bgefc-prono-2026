@@ -798,22 +798,28 @@ function initJeannot(){
       showCount++;
       const rnd = Math.random();
       // Chaque spécial a 1/25 de chance, tiré aléatoirement à chaque rotation
-      if(rnd < 1/10){
+      if(rnd < 1/20){
         _clickVideo = 'images/margotton.mp4';
         el.textContent='Grégoire Margotton te propose de cliquer ici.';
         if(labelEl) labelEl.textContent='🎙️ Grégoire Margotton';
         if(photoEl){ photoEl.src='images/GM.jfif'; photoEl.alt='Grégoire Margotton'; photoEl.style.objectPosition='center'; }
-      } else if(rnd < 2/10){
+      } else if(rnd < 2/20){
         _clickVideo = null;
-        el.textContent='Hum..... ⬆️⬆️⬇️⬇️⬅️⬅️➡️➡️.....';
+        const _anaisExpired = new Date() >= new Date('2026-07-04T15:00:00Z');
+        el.textContent = _anaisExpired ? 'Plus de code pour l\'instant. 🤫' : 'Hum..... ⬆️⬆️⬇️⬇️⬅️⬅️➡️➡️.....';
         if(labelEl) labelEl.textContent='🕵️ Le Cheat Code d\'Anaïs';
         if(photoEl){ photoEl.src='images/AG.png'; photoEl.alt='Anaïs'; photoEl.style.objectPosition='center 20%'; }
-      } else if(rnd < 3/10){
+      } else if(rnd < 3/20 && new Date() < new Date('2026-07-04T15:00:00Z')){
+        _clickVideo = null;
+        el.textContent='Psst... jouez avant vendredi soir ! 😉';
+        if(labelEl) labelEl.textContent='🕵️ Le Cheat Code d\'Anaïs';
+        if(photoEl){ photoEl.src='images/AG.png'; photoEl.alt='Anaïs'; photoEl.style.objectPosition='center 20%'; }
+      } else if(rnd < 4/20){
         _clickVideo = null;
         el.textContent='Surtout... évitez de trop cliquer sur le logo BGE juste au-dessous de moi. J\'ai un mauvais pressentiment.';
         if(labelEl) labelEl.textContent='🔮 L\'intuition de Mag';
         if(photoEl){ photoEl.src='images/mag.png'; photoEl.alt='Mag'; photoEl.style.objectPosition='center'; }
-      } else if(rnd < 4/10){
+      } else if(rnd < 5/20){
         _clickVideo = 'images/thierry-roland.mp4';
         el.textContent='Thierry Roland te propose de cliquer ici.';
         if(labelEl) labelEl.textContent='🎙️ Thierry Roland';
@@ -843,6 +849,7 @@ window.addEventListener('DOMContentLoaded',initJeannot);
 // ============================================================
 const KONAMI_SEQUENCE = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowLeft','ArrowRight','ArrowRight'];
 let _konamiProgress = 0;
+
 document.addEventListener('keydown', (e) => {
   if (document.getElementById('shootoutPopup')) return;
   if (e.key === KONAMI_SEQUENCE[_konamiProgress]) {
@@ -1088,6 +1095,9 @@ function playBgefcChant() {
 }
 
 function showTiphaineSecretMessage() {
+  // Après vendredi 4 juillet 2026 à 17h, Tiphaine ne demande plus de poster dans Teams
+  if (new Date() >= new Date('2026-07-04T15:00:00Z')) return;
+
   const pop = document.createElement('div');
   pop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:10000;display:flex;align-items:center;justify-content:center;padding:1rem';
   pop.innerHTML = `
@@ -2039,12 +2049,8 @@ function switchRankMode(mode) {
   document.getElementById('btnModeKO').classList.toggle('active', mode === 'ko');
   const lbl = document.getElementById('rankModeLabel');
   if (lbl) lbl.textContent = mode === 'ko' ? '⭐ Points des phases à élimination directe uniquement (16es → Finale)' : '🏆 Total cumulé phases de poule + phases finales';
-  const tropheeTs = localStorage.getItem('trophee_jeannot_ts');
-  if (mode === 'ko' && (!tropheeTs || Date.now() - parseInt(tropheeTs) < 72*3600*1000)) {
-    if (!tropheeTs) localStorage.setItem('trophee_jeannot_ts', Date.now().toString());
-    showTropheeJeannotPopup();
-    return;
-  }
+  // Popup Trophée Jean Tarbouriech désactivé
+
   renderRanking();
   renderTeamRanking();
 }
