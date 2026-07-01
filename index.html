@@ -1798,7 +1798,8 @@ function renderMatches() {
   sorted.forEach(m => {
     if (m.group_name !== cg) { cg = m.group_name; html += `<div class="section-title" style="margin-top:1.5rem">${cg}</div>`; }
     const prono = myPronos[m.id];
-    const statusLabel = m.status === 'live' ? '🔴 EN DIRECT' : m.status === 'done' ? '✅ TERMINÉ' : '⏳ À VENIR';
+    const _eff = getEffectiveStatus(m);
+    const statusLabel = _eff === 'live' ? '🔴 EN DIRECT' : _eff === 'done' ? '✅ TERMINÉ' : '⏳ À VENIR';
     const realScore = m.score1_real !== null ? `<div class="match-score">${m.score1_real}—${m.score2_real}</div>` : `<div class="vs-label">VS</div><div class="match-time">${m.match_time}</div>`;
     const penScore = (m.pen1 !== null && m.pen1 !== undefined) ? ` (${m.pen1}—${m.pen2})` : '';
     const tabNote1 = m.winner === 'team1' ? `<div style="font-size:.62rem;font-weight:800;color:var(--gris);letter-spacing:.5px;margin-top:.2rem">Victoire aux TAB${penScore}</div>` : '';
@@ -1884,10 +1885,28 @@ function selectPenWinner(matchId, winner) {
   document.getElementById('penBtn2_' + matchId)?.classList.toggle('pen-btn', winner !== 'team2');
 }
 
+const _MONTHS_FR = {'janv.':1,'févr.':2,'mars':3,'avr.':4,'mai':5,'juin':6,'juil.':7,'août':8,'sept.':9,'oct.':10,'nov.':11,'déc.':12};
+function getEffectiveStatus(m) {
+  if (m.status === 'done') return 'done';
+  if (m.status === 'live') return 'live';
+  const parts = (m.match_date || '').trim().split(' ');
+  const day = parseInt(parts[0]) || 0;
+  const month = _MONTHS_FR[parts[1]] || 0;
+  if (!day || !month) return 'upcoming';
+  const [h, min] = (m.match_time || '00:00').split(':').map(Number);
+  const now = new Date();
+  const kickoff = new Date(now.getFullYear(), month - 1, day, h, min, 0);
+  const elapsed = (now - kickoff) / 60000;
+  if (elapsed >= 0 && elapsed < 130) return 'live';
+  if (elapsed >= 130) return 'done';
+  return 'upcoming';
+}
+
 function isMatchLocked(matchId) {
   const m = allMatches.find(x => x.id === matchId);
   if (!m) return false;
-  return getEffectiveStatus(m) === 'live' || getEffectiveStatus(m) === 'done';
+  const s = getEffectiveStatus(m);
+  return s === 'live' || s === 'done';
 }
 
 async function quickSave(matchId, groupName) {
