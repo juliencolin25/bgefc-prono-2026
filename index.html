@@ -1502,8 +1502,6 @@ let myPronoMort = null;
 async function initPronoMort() {
   const { data } = await db.from('prono_mort').select('*').eq('user_id', currentUser.id).single();
   myPronoMort = data || null;
-  const seiziemes = allMatches.filter(m => m.group_name === '16es de finale');
-  const allDone = seiziemes.length > 0 && seiziemes.every(m => m.status === 'done');
   const btn = document.createElement('div');
   btn.id = 'pronoMortFloating';
   btn.style.cssText = 'position:fixed;bottom:6rem;right:1.2rem;z-index:500;cursor:pointer;text-align:center;user-select:none';
@@ -1519,11 +1517,17 @@ async function initPronoMort() {
   document.body.appendChild(btn);
 }
 
-function openPronoMort() {
+function isPronoMortLocked() {
+  // Verrouillé dès le 4 juillet à 03h30 Paris (01h30 UTC) — dernier 16e de finale
+  if (new Date() >= new Date('2026-07-04T01:30:00Z')) return true;
   const seiziemes = allMatches.filter(m => m.group_name === '16es de finale');
-  const allDone = seiziemes.length > 0 && seiziemes.every(m => m.status === 'done');
-  if (myPronoMort) { showThierryDiablePopup(allDone); return; }
-  if (allDone) { showToast('⏰ Les 16es sont terminés — le Prono de la Mort est fermé !'); return; }
+  return seiziemes.length > 0 && seiziemes.every(m => m.status === 'done');
+}
+
+function openPronoMort() {
+  const locked = isPronoMortLocked();
+  if (myPronoMort) { showThierryDiablePopup(locked); return; }
+  if (locked) { showToast('⏰ Le Prono de la Mort est fermé depuis le 4 juillet !'); return; }
   showThierryMonologue();
 }
 
