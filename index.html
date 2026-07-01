@@ -1108,8 +1108,7 @@ function showTiphaineSecretMessage() {
         Poste dans Teams :<br>
         <strong id="tiphaineQuote" style="color:#fff;font-style:italic">"Derechef, je m'exécute et plussoie de dire que d'Anaïs et de flèches, j'ai fait 5"</strong>
       </div>
-      <button onclick="navigator.clipboard.writeText(document.getElementById('tiphaineQuote').textContent).then(()=>{this.textContent='✅ Copié !';setTimeout(()=>{this.textContent='📋 Copier la phrase'},1500)})" style="width:100%;margin-top:.8rem;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:12px;padding:.65rem;color:#d9b8ff;font-family:'Nunito',sans-serif;font-size:.78rem;font-weight:800;cursor:pointer">📋 Copier la phrase</button>
-      <button onclick="this.closest('div').parentElement.remove()" style="width:100%;margin-top:.6rem;background:linear-gradient(135deg,#7c2fd6,#9B5DE5);border:none;border-radius:12px;padding:.8rem;color:white;font-family:'Nunito',sans-serif;font-size:.85rem;font-weight:900;cursor:pointer">J'ai compris, Tiphaine</button>
+      <button onclick="navigator.clipboard.writeText(document.getElementById('tiphaineQuote').textContent).then(()=>{this.textContent='✅ Copié — à toi de jouer !';setTimeout(()=>this.closest('div').parentElement.remove(),900)})" style="width:100%;margin-top:.8rem;background:linear-gradient(135deg,#7c2fd6,#9B5DE5);border:none;border-radius:12px;padding:.85rem;color:white;font-family:'Nunito',sans-serif;font-size:.88rem;font-weight:900;cursor:pointer">📋 Copier et fermer</button>
     </div>`;
   pop.onclick = e => { if (e.target === pop) pop.remove(); };
   document.body.appendChild(pop);
