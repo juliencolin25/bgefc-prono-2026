@@ -2210,6 +2210,8 @@ function showTropheeJeannotPopup() {
     </div>`;
   document.body.appendChild(popup);
 }
+const SHOOTOUT_CHAMPIONS = new Set(['Mehdi','Magali','Jeannot','Pauline']);
+
 async function renderRanking() {
   const allPronos = await loadAllPronos();
   const medals = ['🥇','🥈','🥉'];
@@ -2235,7 +2237,7 @@ async function renderRanking() {
     return `<tr style="${isMe ? 'background:#fff8e1;' : ''}">
       <td class="rank-num ${i < 3 ? 'rank-' + (i + 1) : ''}">${medals[i] || (i + 1)}</td>
       <td><div class="rank-player"><div class="rank-avatar" style="background:${color}">${initials}</div>
-        <div class="rank-name">${p.name}${isMe ? ' <span style="color:var(--rouge);font-size:.7rem">(moi)</span>' : ''}</div></div></td>
+        <div class="rank-name">${p.name}${SHOOTOUT_CHAMPIONS.has(p.name.split(' ')[0]) ? ' <span title="5/5 aux Tirs au But Secret !" style="font-size:.85rem">👕</span>' : ''}${isMe ? ' <span style="color:var(--rouge);font-size:.7rem">(moi)</span>' : ''}</div></div></td>
       <td><span style="font-size:.8rem;font-weight:800;color:${color}">${p.team}</span></td>
       <td class="rank-points">${p.pts}</td>
       <td class="rank-exact">⭐ ${p.exact}</td>
