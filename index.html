@@ -1886,7 +1886,8 @@ function selectPenWinner(matchId, winner) {
 
 function isMatchLocked(matchId) {
   const m = allMatches.find(x => x.id === matchId);
-  return m && (m.status === 'live' || m.status === 'done');
+  if (!m) return false;
+  return getEffectiveStatus(m) === 'live' || getEffectiveStatus(m) === 'done';
 }
 
 async function quickSave(matchId, groupName) {
