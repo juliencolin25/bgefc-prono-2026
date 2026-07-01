@@ -2495,7 +2495,7 @@ function showToast(msg) {
   <span id="chatBadge"></span>
 </button>
 <div id="chatPanel">
-  <div id="chatHeader">💬 Chat BGEFC 2026 <span id="chatOnline" style="margin-left:auto;font-size:.65rem;color:rgba(255,255,255,.4)"></span></div>
+  <div id="chatHeader">💬 Chat BGEFC 2026 <button onclick="toggleChat()" style="margin-left:auto;background:none;border:none;color:rgba(255,255,255,.5);font-size:1.1rem;cursor:pointer;line-height:1;padding:0">✕</button></div>
   <div id="chatMessages"><div style="text-align:center;color:rgba(255,255,255,.25);font-size:.75rem;margin:auto">Chargement...</div></div>
   <div id="chatInputRow">
     <input id="chatInput" type="text" placeholder="Ton message..." maxlength="200" onkeydown="if(event.key==='Enter')sendChatMsg()">
