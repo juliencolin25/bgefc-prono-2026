@@ -2260,7 +2260,7 @@ async function renderRanking() {
     return `<tr style="${isMe ? 'background:#fff8e1;' : ''}">
       <td class="rank-num ${i < 3 ? 'rank-' + (i + 1) : ''}">${medals[i] || (i + 1)}</td>
       <td><div class="rank-player"><div class="rank-avatar" style="background:${color}">${initials}</div>
-        <div class="rank-name">${p.name}${isShootoutChampion(p.name) ? ' <span title="5/5 aux Tirs au But Secret !" style="display:inline-block;background:#16a34a;color:#fff;border-radius:999px;padding:1px 6px;font-size:.62rem;font-weight:900;vertical-align:middle;letter-spacing:.02em">⚽ 5/5</span>' : ''}${isMe ? ' <span style="color:var(--rouge);font-size:.7rem">(moi)</span>' : ''}</div></div></td>
+        <div class="rank-name">${p.name}${isShootoutChampion(p.name) ? ' <span title="5/5 aux Tirs au But Secret !" style="display:inline-block;background:#16a34a;color:#fff;border-radius:999px;padding:1px 5px;font-size:.75rem;vertical-align:middle">⚽</span>' : ''}${isMe ? ' <span style="color:var(--rouge);font-size:.7rem">(moi)</span>' : ''}</div></div></td>
       <td><span style="font-size:.8rem;font-weight:800;color:${color}">${p.team}</span></td>
       <td class="rank-points">${p.pts}</td>
       <td class="rank-exact">⭐ ${p.exact}</td>
