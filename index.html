@@ -2239,10 +2239,17 @@ function isShootoutChampion(name) {
   return SHOOTOUT_CHAMPIONS.has(name.split(' ')[0]) || name.toLowerCase().includes('tarbouriech');
 }
 
+let _goldenBallIds = new Set();
+
 async function renderRanking() {
   const allPronos = await loadAllPronos();
   const medals = ['🥇','🥈','🥉'];
   const koMatchIds = new Set(allMatches.filter(m => KO_GROUPS.includes(m.group_name)).map(m => m.id));
+
+  // Calcul dynamique des ballons d'or (10+ pronos exacts sur toute la compétition)
+  const exactCountAll = {};
+  allPronos.forEach(p => { if (p.points === 5) exactCountAll[p.user_id] = (exactCountAll[p.user_id] || 0) + 1; });
+  _goldenBallIds = new Set(Object.entries(exactCountAll).filter(([,v]) => v >= 10).map(([k]) => k));
 
   const players = allUsers.map(u => {
     const userPronos = allPronos.filter(p => p.user_id === u.id && (rankMode === 'ko' ? koMatchIds.has(p.match_id) : true));
@@ -2264,7 +2271,7 @@ async function renderRanking() {
     return `<tr style="${isMe ? 'background:#fff8e1;' : ''}">
       <td class="rank-num ${i < 3 ? 'rank-' + (i + 1) : ''}">${medals[i] || (i + 1)}</td>
       <td><div class="rank-player"><div class="rank-avatar" style="background:${color}">${initials}</div>
-        <div class="rank-name">${p.name}${isShootoutChampion(p.name) ? ' <span title="5/5 aux Tirs au But Secret !" style="display:inline-block;background:#16a34a;color:#fff;border-radius:999px;padding:1px 5px;font-size:.75rem;vertical-align:middle">⚽</span>' : ''}${isMe ? ' <span style="color:var(--rouge);font-size:.7rem">(moi)</span>' : ''}</div></div></td>
+        <div class="rank-name">${p.name}${_goldenBallIds.has(p.id) ? ' <span title="10 pronos exacts ou plus !" style="display:inline-block;background:#b45309;color:#fef08a;border-radius:999px;padding:1px 5px;font-size:.75rem;vertical-align:middle">⚽</span>' : ''}${isShootoutChampion(p.name) ? ' <span title="5/5 aux Tirs au But Secret !" style="display:inline-block;background:#16a34a;color:#fff;border-radius:999px;padding:1px 5px;font-size:.75rem;vertical-align:middle">⚽</span>' : ''}${isMe ? ' <span style="color:var(--rouge);font-size:.7rem">(moi)</span>' : ''}</div></div></td>
       <td><span style="font-size:.8rem;font-weight:800;color:${color}">${p.team}</span></td>
       <td class="rank-points">${p.pts}</td>
       <td class="rank-exact">⭐ ${p.exact}</td>
@@ -2336,7 +2343,7 @@ async function renderTeamCards() {
           <div style="font-size:.75rem;color:var(--gris);font-weight:600">${members.length} participant${members.length > 1 ? 's' : ''}</div>
         </div>
       </div>
-      ${members.map(m => `<div style="display:flex;justify-content:space-between;align-items:center;font-size:.83rem;padding:.35rem 0;border-bottom:1px solid var(--gris-clair)"><span style="font-weight:700;color:var(--navy)">${m.name}${isShootoutChampion(m.name) ? ' <span title="5/5 aux Tirs au But Secret !" style="display:inline-block;background:#16a34a;color:#fff;border-radius:999px;padding:1px 5px;font-size:.75rem;vertical-align:middle">⚽</span>' : ''}</span><span style="color:${color};font-weight:900">${m.pts} pts</span></div>`).join('')}
+      ${members.map(m => `<div style="display:flex;justify-content:space-between;align-items:center;font-size:.83rem;padding:.35rem 0;border-bottom:1px solid var(--gris-clair)"><span style="font-weight:700;color:var(--navy)">${m.name}${_goldenBallIds.has(m.id) ? ' <span title="10 pronos exacts ou plus !" style="display:inline-block;background:#b45309;color:#fef08a;border-radius:999px;padding:1px 5px;font-size:.75rem;vertical-align:middle">⚽</span>' : ''}${isShootoutChampion(m.name) ? ' <span title="5/5 aux Tirs au But Secret !" style="display:inline-block;background:#16a34a;color:#fff;border-radius:999px;padding:1px 5px;font-size:.75rem;vertical-align:middle">⚽</span>' : ''}</span><span style="color:${color};font-weight:900">${m.pts} pts</span></div>`).join('')}
       ${members.length === 0 ? `<div style="text-align:center;padding:1rem;color:var(--gris);font-size:.82rem;font-weight:600">Aucun participant encore</div>` : ''}
     </div>`;
   }).join('');
