@@ -1106,7 +1106,7 @@ function showTiphaineSecretMessage() {
       <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:2px;color:#d9b8ff">🏆 5/5 !</div>
       <div style="background:rgba(155,93,229,.12);border:1px solid rgba(155,93,229,.35);border-radius:12px;padding:.8rem 1rem;font-size:.82rem;color:#d9b8ff;line-height:1.6;margin-top:.9rem">
         Poste dans Teams :<br>
-        <strong id="tiphaineQuote" style="color:#fff;font-style:italic">"Derechef, je m'exécute et plussoie de dire que d'Anaïs et de flèches, j'ai fait 5"</strong>
+        <strong id="tiphaineQuote" style="color:#fff;font-style:italic">${new Date() >= new Date('2026-07-01T16:00:00Z') ? 'Fini les flèches, promis, j\'apporte les croissants avant les vacances' : 'Derechef, je m\'exécute et plussoie de dire que d\'Anaïs et de flèches, j\'ai fait 5'}"</strong>
       </div>
       <button onclick="navigator.clipboard.writeText(document.getElementById('tiphaineQuote').textContent).then(()=>{this.textContent='✅ Copié — à toi de jouer !';setTimeout(()=>this.closest('div').parentElement.remove(),900)})" style="width:100%;margin-top:.8rem;background:linear-gradient(135deg,#7c2fd6,#9B5DE5);border:none;border-radius:12px;padding:.85rem;color:white;font-family:'Nunito',sans-serif;font-size:.88rem;font-weight:900;cursor:pointer">📋 Copier et fermer</button>
     </div>`;
