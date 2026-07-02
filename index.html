@@ -805,11 +805,11 @@ function initJeannot(){
         if(photoEl){ photoEl.src='images/GM.jfif'; photoEl.alt='Grégoire Margotton'; photoEl.style.objectPosition='center'; }
       } else if(rnd < 2/20){
         _clickVideo = null;
-        const _anaisExpired = new Date() >= new Date('2026-07-04T15:00:00Z');
+        const _anaisExpired = new Date() >= new Date('2026-07-03T15:00:00Z');
         el.textContent = _anaisExpired ? 'Plus de code pour l\'instant. 🤫' : 'Hum..... ⬆️⬆️⬇️⬇️⬅️⬅️➡️➡️.....';
         if(labelEl) labelEl.textContent='🕵️ Le Cheat Code d\'Anaïs';
         if(photoEl){ photoEl.src='images/AG.png'; photoEl.alt='Anaïs'; photoEl.style.objectPosition='center 20%'; }
-      } else if(rnd < 3/20 && new Date() < new Date('2026-07-04T15:00:00Z')){
+      } else if(rnd < 3/20 && new Date() < new Date('2026-07-03T15:00:00Z')){
         _clickVideo = null;
         el.textContent='Psst... jouez avant vendredi soir ! 😉';
         if(labelEl) labelEl.textContent='🕵️ Le Cheat Code d\'Anaïs';
@@ -1095,8 +1095,8 @@ function playBgefcChant() {
 }
 
 function showTiphaineSecretMessage() {
-  // Après vendredi 4 juillet 2026 à 17h, Tiphaine ne demande plus de poster dans Teams
-  if (new Date() >= new Date('2026-07-04T15:00:00Z')) return;
+  // Après vendredi 3 juillet 2026 à 17h, Tiphaine ne demande plus de poster dans Teams
+  if (new Date() >= new Date('2026-07-03T15:00:00Z')) return;
 
   const pop = document.createElement('div');
   pop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:10000;display:flex;align-items:center;justify-content:center;padding:1rem';
