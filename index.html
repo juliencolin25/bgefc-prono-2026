@@ -1219,7 +1219,10 @@ async function doLogout() {
   currentUser = null;
   localStorage.removeItem('bgefc_user_id_v2');
   document.getElementById('pronoMortFloating')?.remove();
+  document.getElementById('dailyPollFloating')?.remove();
   document.getElementById('cocktailEgg')?.remove();
+  const chatBtn = document.getElementById('chatBtn');
+  if (chatBtn) chatBtn.style.display = 'none';
   stopCocktailEgg();
   document.getElementById('loginPage').style.display = 'flex';
   document.getElementById('appPage').style.display = 'none';
