@@ -1553,11 +1553,11 @@ async function initPronoMort() {
 // Ballon bleu clair vendredi 10 à 17h Paris (15:00 UTC) pour ceux qui ont voté aux 5 sondages.
 // ============================================================
 const DAILY_POLLS = [
-  { date:'2026-07-06', start:'2026-07-05T00:00:00Z', q:'Le plus grand de tous ?', a:'Team Ronaldo', ea:'🇵🇹', b:'Team Messi', eb:'🇦🇷' },
-  { date:'2026-07-07', start:'2026-07-07T07:00:00Z', q:'La nouvelle génération ?', a:'Team Mbappé', ea:'🇫🇷', b:'Team Haaland', eb:'🇳🇴' },
-  { date:'2026-07-08', start:'2026-07-08T07:00:00Z', q:'Légende bleue préférée ?', a:'Team Zidane', ea:'🐐', b:'Team Platini', eb:'✨' },
-  { date:'2026-07-09', start:'2026-07-09T07:00:00Z', q:'Magie brésilienne ?', a:'Team Ronaldinho', ea:'🇧🇷', b:'Team Neymar', eb:'🇧🇷' },
-  { date:'2026-07-10', start:'2026-07-10T07:00:00Z', q:'Le GOAT ultime ?', a:'Team Pelé', ea:'🇧🇷', b:'Team Maradona', eb:'🇦🇷' },
+  { date:'2026-07-06', start:'2026-07-05T00:00:00Z', q:'Le plus grand de tous ?', a:'Team Ronaldo', ea:'🇵🇹', ia:'https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Cristiano_Ronaldo_2275_%28cropped%29.jpg/330px-Cristiano_Ronaldo_2275_%28cropped%29.jpg', b:'Team Messi', eb:'🇦🇷', ib:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Lionel_Messi_NE_Revolution_Inter_Miami_7.9.25-055.jpg/330px-Lionel_Messi_NE_Revolution_Inter_Miami_7.9.25-055.jpg' },
+  { date:'2026-07-07', start:'2026-07-07T07:00:00Z', q:'La nouvelle génération ?', a:'Team Mbappé', ea:'🇫🇷', ia:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Kylian_Mbappe_France_v_Senegal_16_June_2026-391_%28cropped%29.jpg/330px-Kylian_Mbappe_France_v_Senegal_16_June_2026-391_%28cropped%29.jpg', b:'Team Haaland', eb:'🇳🇴', ib:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Erling_Haaland_Morocco_v_Norway_7_June_2026-51.jpg/330px-Erling_Haaland_Morocco_v_Norway_7_June_2026-51.jpg' },
+  { date:'2026-07-08', start:'2026-07-08T07:00:00Z', q:'Légende bleue préférée ?', a:'Team Zidane', ea:'🐐', ia:'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Zinedine_Zidane_by_Tasnim_03.jpg/330px-Zinedine_Zidane_by_Tasnim_03.jpg', b:'Team Platini', eb:'✨', ib:'https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Michel_Platini_2010_%28cropped%29.jpg/330px-Michel_Platini_2010_%28cropped%29.jpg' },
+  { date:'2026-07-09', start:'2026-07-09T07:00:00Z', q:'Magie brésilienne ?', a:'Team Ronaldinho', ea:'🇧🇷', ia:'https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/2019_-_Press_conferences_-_Day_1_ENX_6950_%2849019873887%29_%28cropped%29.jpg/330px-2019_-_Press_conferences_-_Day_1_ENX_6950_%2849019873887%29_%28cropped%29.jpg', b:'Team Neymar', eb:'🇧🇷', ib:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Neymar_Junior_Brazil_V_Morocco_13_June_2026-40.jpg/330px-Neymar_Junior_Brazil_V_Morocco_13_June_2026-40.jpg' },
+  { date:'2026-07-10', start:'2026-07-10T07:00:00Z', q:'Le GOAT ultime ?', a:'Team Pelé', ea:'🇧🇷', ia:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Pele_con_brasil_%28cropped%29.jpg/330px-Pele_con_brasil_%28cropped%29.jpg', b:'Team Maradona', eb:'🇦🇷', ib:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Argentina_celebrando_copa_%28cropped%29.jpg/330px-Argentina_celebrando_copa_%28cropped%29.jpg' },
 ];
 
 function isPollWindow() {
@@ -1609,16 +1609,16 @@ async function openDailyPoll() {
 
   const resultsBlock = `
     <div style="margin-top:1rem;text-align:left">
-      <div style="display:flex;justify-content:space-between;font-size:.82rem;font-weight:800;color:#fff;margin-bottom:.2rem"><span>${poll.ea} ${poll.a}</span><span>${aPct}%</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;font-size:.82rem;font-weight:800;color:#fff;margin-bottom:.2rem"><span style="display:flex;align-items:center;gap:.4rem"><img src="${poll.ia}" style="width:26px;height:26px;border-radius:50%;object-fit:cover;object-position:center top" onerror="this.style.display='none'">${poll.ea} ${poll.a}</span><span>${aPct}%</span></div>
       <div style="background:rgba(255,255,255,.15);border-radius:999px;height:14px;overflow:hidden;margin-bottom:.7rem"><div style="width:${aPct}%;height:100%;background:#2b9fe0"></div></div>
-      <div style="display:flex;justify-content:space-between;font-size:.82rem;font-weight:800;color:#fff;margin-bottom:.2rem"><span>${poll.eb} ${poll.b}</span><span>${bPct}%</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;font-size:.82rem;font-weight:800;color:#fff;margin-bottom:.2rem"><span style="display:flex;align-items:center;gap:.4rem"><img src="${poll.ib}" style="width:26px;height:26px;border-radius:50%;object-fit:cover;object-position:center top" onerror="this.style.display='none'">${poll.eb} ${poll.b}</span><span>${bPct}%</span></div>
       <div style="background:rgba(255,255,255,.15);border-radius:999px;height:14px;overflow:hidden"><div style="width:${bPct}%;height:100%;background:#ffd23f"></div></div>
       <div style="text-align:center;font-size:.72rem;color:#8fd3ff;margin-top:.7rem">${total} vote${total>1?'s':''}${myChoice ? ' • Ton choix : '+(myChoice==='A'?poll.a:poll.b) : ''}</div>
     </div>`;
   const voteBlock = `
     <div style="display:flex;gap:.7rem;margin-top:1rem">
-      <button onclick="castPollVote('A')" style="flex:1;background:linear-gradient(135deg,#0a4a7c,#2b9fe0);border:none;border-radius:14px;padding:1rem .5rem;color:white;font-family:'Nunito',sans-serif;font-weight:900;font-size:.85rem;cursor:pointer"><div style="font-size:1.6rem">${poll.ea}</div>${poll.a}</button>
-      <button onclick="castPollVote('B')" style="flex:1;background:linear-gradient(135deg,#7c2fd6,#9B5DE5);border:none;border-radius:14px;padding:1rem .5rem;color:white;font-family:'Nunito',sans-serif;font-weight:900;font-size:.85rem;cursor:pointer"><div style="font-size:1.6rem">${poll.eb}</div>${poll.b}</button>
+      <button onclick="castPollVote('A')" style="flex:1;background:linear-gradient(135deg,#0a4a7c,#2b9fe0);border:none;border-radius:14px;padding:1rem .5rem;color:white;font-family:'Nunito',sans-serif;font-weight:900;font-size:.85rem;cursor:pointer"><img src="${poll.ia}" alt="${poll.a}" style="width:64px;height:64px;border-radius:50%;object-fit:cover;object-position:center top;border:2px solid #fff;display:block;margin:0 auto .5rem" onerror="this.style.display='none'"><div style="font-size:1.2rem">${poll.ea}</div>${poll.a}</button>
+      <button onclick="castPollVote('B')" style="flex:1;background:linear-gradient(135deg,#7c2fd6,#9B5DE5);border:none;border-radius:14px;padding:1rem .5rem;color:white;font-family:'Nunito',sans-serif;font-weight:900;font-size:.85rem;cursor:pointer"><img src="${poll.ib}" alt="${poll.b}" style="width:64px;height:64px;border-radius:50%;object-fit:cover;object-position:center top;border:2px solid #fff;display:block;margin:0 auto .5rem" onerror="this.style.display='none'"><div style="font-size:1.2rem">${poll.eb}</div>${poll.b}</button>
     </div>`;
 
   const pop = document.createElement('div');
@@ -1646,8 +1646,21 @@ async function castPollVote(choice) {
   const dot = document.getElementById('pollVotedDot');
   if (dot) dot.style.display = 'block';
   document.getElementById('dailyPollPopup')?.remove();
-  showToast('🗳️ Vote enregistré !');
-  openDailyPoll(); // Rouvre sur les résultats
+  showThierryPollBravo();
+}
+
+function showThierryPollBravo() {
+  const pop = document.createElement('div');
+  pop.id = 'thierryPollBravo';
+  pop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:10000;display:flex;align-items:center;justify-content:center;padding:1rem';
+  pop.innerHTML = `
+    <div style="background:linear-gradient(160deg,#08243e,#0a3a5e);border-radius:20px;max-width:360px;width:100%;padding:1.6rem;text-align:center;border:2px solid #2b9fe0;box-shadow:0 20px 60px rgba(43,159,224,.5);font-family:'Nunito',sans-serif">
+      <img src="images/TB.png" alt="Thierry" style="width:110px;height:110px;border-radius:50%;object-fit:cover;object-position:center top;border:3px solid #2b9fe0;box-shadow:0 0 25px rgba(43,159,224,.5);display:block;margin:0 auto .9rem" onerror="this.style.display='none'">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:1px;color:#ffd23f">Bravo pour ta prise de position !</div>
+      <button onclick="document.getElementById('thierryPollBravo').remove();openDailyPoll();" style="width:100%;margin-top:1.2rem;background:linear-gradient(135deg,#0a4a7c,#2b9fe0);border:none;border-radius:12px;padding:.85rem;color:white;font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:900;cursor:pointer">Voir la tendance 📊</button>
+    </div>`;
+  pop.onclick = e => { if (e.target === pop) { pop.remove(); openDailyPoll(); } };
+  document.body.appendChild(pop);
 }
 
 function isPronoMortLocked() {
