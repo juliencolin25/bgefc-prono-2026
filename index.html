@@ -1457,6 +1457,7 @@ async function startApp() {
   if (!pouleTs) { localStorage.setItem('poule_champs_ts', Date.now().toString()); showPouleChampionsPopup(); }
   else if (Date.now() - parseInt(pouleTs) < 72*3600*1000) showPouleChampionsPopup();
   initPronoMort();
+  initDailyPoll();
   showMagQuartPopup();
 }
 
@@ -1530,6 +1531,7 @@ let myPronoMort = null;
 async function initPronoMort() {
   const { data } = await db.from('prono_mort').select('*').eq('user_id', currentUser.id).single();
   myPronoMort = data || null;
+  if (isPollWindow()) return; // Remplacé par le Sondage du jour cette semaine
   const btn = document.createElement('div');
   btn.id = 'pronoMortFloating';
   btn.style.cssText = 'position:fixed;bottom:6rem;right:1.2rem;z-index:500;cursor:pointer;text-align:center;user-select:none';
@@ -1543,6 +1545,109 @@ async function initPronoMort() {
     </div>
     <div style="font-size:.52rem;font-family:'Bebas Neue',sans-serif;letter-spacing:1.5px;color:#ff4444;margin-top:3px;line-height:1.2">PRONO<br>DE LA MORT</div>`;
   document.body.appendChild(btn);
+}
+
+// ============================================================
+// SONDAGE DU JOUR (lun 6 → ven 10 juillet 2026)
+// Remplace le Prono de la Mort. 1 vote/jour/personne. Bascule à 9h Paris (07:00 UTC).
+// Ballon bleu clair vendredi 10 à 17h Paris (15:00 UTC) pour ceux qui ont voté aux 5 sondages.
+// ============================================================
+const DAILY_POLLS = [
+  { date:'2026-07-06', start:'2026-07-06T07:00:00Z', q:'Le plus grand de tous ?', a:'Team Ronaldo', ea:'🇵🇹', b:'Team Messi', eb:'🇦🇷' },
+  { date:'2026-07-07', start:'2026-07-07T07:00:00Z', q:'La nouvelle génération ?', a:'Team Mbappé', ea:'🇫🇷', b:'Team Haaland', eb:'🇳🇴' },
+  { date:'2026-07-08', start:'2026-07-08T07:00:00Z', q:'Légende bleue préférée ?', a:'Team Zidane', ea:'🐐', b:'Team Platini', eb:'✨' },
+  { date:'2026-07-09', start:'2026-07-09T07:00:00Z', q:'Magie brésilienne ?', a:'Team Ronaldinho', ea:'🇧🇷', b:'Team Neymar', eb:'🇧🇷' },
+  { date:'2026-07-10', start:'2026-07-10T07:00:00Z', q:'Le GOAT ultime ?', a:'Team Pelé', ea:'🇧🇷', b:'Team Maradona', eb:'🇦🇷' },
+];
+
+function isPollWindow() {
+  const now = new Date();
+  return now >= new Date('2026-07-06T07:00:00Z') && now < new Date('2026-07-11T07:00:00Z');
+}
+
+function getActivePoll() {
+  const now = new Date();
+  let active = null;
+  for (const p of DAILY_POLLS) { if (now >= new Date(p.start)) active = p; }
+  return active;
+}
+
+let myPollVotes = {}; // { poll_date: 'A'|'B' }
+
+async function initDailyPoll() {
+  if (!isPollWindow()) return;
+  const poll = getActivePoll();
+  if (!poll) return;
+  const { data } = await db.from('poll_votes').select('poll_date,choice').eq('user_id', currentUser.id);
+  myPollVotes = {};
+  (data || []).forEach(v => { myPollVotes[v.poll_date] = v.choice; });
+  const btn = document.createElement('div');
+  btn.id = 'dailyPollFloating';
+  btn.style.cssText = 'position:fixed;bottom:6rem;right:1.2rem;z-index:500;cursor:pointer;text-align:center;user-select:none';
+  btn.onclick = openDailyPoll;
+  const voted = myPollVotes[poll.date] != null;
+  btn.innerHTML = `
+    <div style="position:relative;display:inline-block">
+      <div style="background:linear-gradient(135deg,#0a4a7c,#2b9fe0);border-radius:50%;width:58px;height:58px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(43,159,224,.6);border:2px solid #8fd3ff">
+        <span style="font-size:1.6rem">🗳️</span>
+      </div>
+      <div id="pollVotedDot" style="display:${voted?'block':'none'};position:absolute;top:-4px;right:-4px;font-size:1.1rem">✅</div>
+    </div>
+    <div style="font-size:.52rem;font-family:'Bebas Neue',sans-serif;letter-spacing:1.5px;color:#2b9fe0;margin-top:3px;line-height:1.2">SONDAGE<br>DU JOUR</div>`;
+  document.body.appendChild(btn);
+}
+
+async function openDailyPoll() {
+  const poll = getActivePoll();
+  if (!poll) return;
+  const myChoice = myPollVotes[poll.date] || null;
+  const { data: votes } = await db.from('poll_votes').select('choice').eq('poll_date', poll.date);
+  const total = (votes || []).length;
+  const aCount = (votes || []).filter(v => v.choice === 'A').length;
+  const aPct = total ? Math.round(aCount / total * 100) : 0;
+  const bPct = total ? 100 - aPct : 0;
+
+  const resultsBlock = `
+    <div style="margin-top:1rem;text-align:left">
+      <div style="display:flex;justify-content:space-between;font-size:.82rem;font-weight:800;color:#fff;margin-bottom:.2rem"><span>${poll.ea} ${poll.a}</span><span>${aPct}%</span></div>
+      <div style="background:rgba(255,255,255,.15);border-radius:999px;height:14px;overflow:hidden;margin-bottom:.7rem"><div style="width:${aPct}%;height:100%;background:#2b9fe0"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:.82rem;font-weight:800;color:#fff;margin-bottom:.2rem"><span>${poll.eb} ${poll.b}</span><span>${bPct}%</span></div>
+      <div style="background:rgba(255,255,255,.15);border-radius:999px;height:14px;overflow:hidden"><div style="width:${bPct}%;height:100%;background:#ffd23f"></div></div>
+      <div style="text-align:center;font-size:.72rem;color:#8fd3ff;margin-top:.7rem">${total} vote${total>1?'s':''}${myChoice ? ' • Ton choix : '+(myChoice==='A'?poll.a:poll.b) : ''}</div>
+    </div>`;
+  const voteBlock = `
+    <div style="display:flex;gap:.7rem;margin-top:1rem">
+      <button onclick="castPollVote('A')" style="flex:1;background:linear-gradient(135deg,#0a4a7c,#2b9fe0);border:none;border-radius:14px;padding:1rem .5rem;color:white;font-family:'Nunito',sans-serif;font-weight:900;font-size:.85rem;cursor:pointer"><div style="font-size:1.6rem">${poll.ea}</div>${poll.a}</button>
+      <button onclick="castPollVote('B')" style="flex:1;background:linear-gradient(135deg,#7c2fd6,#9B5DE5);border:none;border-radius:14px;padding:1rem .5rem;color:white;font-family:'Nunito',sans-serif;font-weight:900;font-size:.85rem;cursor:pointer"><div style="font-size:1.6rem">${poll.eb}</div>${poll.b}</button>
+    </div>`;
+
+  const pop = document.createElement('div');
+  pop.id = 'dailyPollPopup';
+  pop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem';
+  pop.innerHTML = `
+    <div style="background:linear-gradient(160deg,#08243e,#0a3a5e);border-radius:20px;max-width:400px;width:100%;padding:1.6rem;text-align:center;border:2px solid #2b9fe0;box-shadow:0 20px 60px rgba(43,159,224,.5);font-family:'Nunito',sans-serif">
+      <div style="font-size:.72rem;color:#8fd3ff;font-weight:800;letter-spacing:1px">🗳️ SONDAGE DU JOUR</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:1px;color:#fff;margin:.2rem 0 .1rem">${poll.q}</div>
+      <div style="font-size:.72rem;color:#8fd3ff">${myChoice ? 'Merci, tu as voté ! Voici la tendance :' : 'Un seul vote aujourd\'hui — choisis ton camp !'}</div>
+      ${myChoice ? resultsBlock : voteBlock}
+      <button onclick="document.getElementById('dailyPollPopup').remove()" style="width:100%;margin-top:1rem;background:rgba(255,255,255,.08);border:1px solid #2b9fe0;border-radius:12px;padding:.7rem;color:#8fd3ff;font-family:'Nunito',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer">Fermer</button>
+    </div>`;
+  pop.onclick = e => { if (e.target === pop) pop.remove(); };
+  document.body.appendChild(pop);
+}
+
+async function castPollVote(choice) {
+  const poll = getActivePoll();
+  if (!poll) return;
+  if (myPollVotes[poll.date]) return; // Déjà voté aujourd'hui
+  const { error } = await db.from('poll_votes').insert({ user_id: currentUser.id, poll_date: poll.date, choice });
+  if (error) { showToast('⚠️ Vote impossible (déjà voté aujourd\'hui ?)'); return; }
+  myPollVotes[poll.date] = choice;
+  const dot = document.getElementById('pollVotedDot');
+  if (dot) dot.style.display = 'block';
+  document.getElementById('dailyPollPopup')?.remove();
+  showToast('🗳️ Vote enregistré !');
+  openDailyPoll(); // Rouvre sur les résultats
 }
 
 function isPronoMortLocked() {
@@ -2269,6 +2374,7 @@ function isShootoutChampion(name) {
 }
 
 let _goldenBallIds = new Set();
+let _bluePollIds = new Set();
 
 async function renderRanking() {
   const allPronos = await loadAllPronos();
@@ -2279,6 +2385,15 @@ async function renderRanking() {
   const exactCountAll = {};
   allPronos.forEach(p => { if (p.points === 5) exactCountAll[p.user_id] = (exactCountAll[p.user_id] || 0) + 1; });
   _goldenBallIds = new Set(Object.entries(exactCountAll).filter(([,v]) => v >= 10).map(([k]) => k));
+
+  // Ballon bleu clair : voté à TOUS les sondages de la semaine, décerné vendredi 10 juillet 17h Paris (15:00 UTC)
+  _bluePollIds = new Set();
+  if (new Date() >= new Date('2026-07-10T15:00:00Z')) {
+    const { data: pv } = await db.from('poll_votes').select('user_id,poll_date');
+    const byUser = {};
+    (pv || []).forEach(v => { (byUser[v.user_id] = byUser[v.user_id] || new Set()).add(v.poll_date); });
+    _bluePollIds = new Set(Object.entries(byUser).filter(([, dates]) => DAILY_POLLS.every(p => dates.has(p.date))).map(([k]) => k));
+  }
 
   const players = allUsers.map(u => {
     const userPronos = allPronos.filter(p => p.user_id === u.id && (rankMode === 'ko' ? koMatchIds.has(p.match_id) : true));
@@ -2300,7 +2415,7 @@ async function renderRanking() {
     return `<tr style="${isMe ? 'background:#fff8e1;' : ''}">
       <td class="rank-num ${i < 3 ? 'rank-' + (i + 1) : ''}">${medals[i] || (i + 1)}</td>
       <td><div class="rank-player"><div class="rank-avatar" style="background:${color}">${initials}</div>
-        <div class="rank-name">${p.name}${_goldenBallIds.has(p.id) ? ' <span title="10 pronos exacts ou plus !" style="display:inline-block;background:#FFD700;color:#7c3a00;border-radius:999px;padding:1px 5px;font-size:.75rem;vertical-align:middle">⚽</span>' : ''}${isShootoutChampion(p.name) ? ' <span title="5/5 aux Tirs au But Secret !" style="display:inline-block;background:#16a34a;color:#fff;border-radius:999px;padding:1px 5px;font-size:.75rem;vertical-align:middle">⚽</span>' : ''}${isMe ? ' <span style="color:var(--rouge);font-size:.7rem">(moi)</span>' : ''}</div></div></td>
+        <div class="rank-name">${p.name}${_goldenBallIds.has(p.id) ? ' <span title="10 pronos exacts ou plus !" style="display:inline-block;background:#FFD700;color:#7c3a00;border-radius:999px;padding:1px 5px;font-size:.75rem;vertical-align:middle">⚽</span>' : ''}${isShootoutChampion(p.name) ? ' <span title="5/5 aux Tirs au But Secret !" style="display:inline-block;background:#16a34a;color:#fff;border-radius:999px;padding:1px 5px;font-size:.75rem;vertical-align:middle">⚽</span>' : ''}${_bluePollIds.has(p.id) ? ' <span title="A voté à tous les sondages de la semaine !" style="display:inline-block;background:#8fd3ff;color:#084c7c;border-radius:999px;padding:1px 5px;font-size:.75rem;vertical-align:middle">⚽</span>' : ''}${isMe ? ' <span style="color:var(--rouge);font-size:.7rem">(moi)</span>' : ''}</div></div></td>
       <td><span style="font-size:.8rem;font-weight:800;color:${color}">${p.team}</span></td>
       <td class="rank-points">${p.pts}</td>
       <td class="rank-exact">⭐ ${p.exact}</td>
