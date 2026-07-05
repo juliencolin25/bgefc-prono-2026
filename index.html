@@ -1553,7 +1553,7 @@ async function initPronoMort() {
 // Ballon bleu clair vendredi 10 à 17h Paris (15:00 UTC) pour ceux qui ont voté aux 5 sondages.
 // ============================================================
 const DAILY_POLLS = [
-  { date:'2026-07-06', start:'2026-07-06T07:00:00Z', q:'Le plus grand de tous ?', a:'Team Ronaldo', ea:'🇵🇹', b:'Team Messi', eb:'🇦🇷' },
+  { date:'2026-07-06', start:'2026-07-05T00:00:00Z', q:'Le plus grand de tous ?', a:'Team Ronaldo', ea:'🇵🇹', b:'Team Messi', eb:'🇦🇷' },
   { date:'2026-07-07', start:'2026-07-07T07:00:00Z', q:'La nouvelle génération ?', a:'Team Mbappé', ea:'🇫🇷', b:'Team Haaland', eb:'🇳🇴' },
   { date:'2026-07-08', start:'2026-07-08T07:00:00Z', q:'Légende bleue préférée ?', a:'Team Zidane', ea:'🐐', b:'Team Platini', eb:'✨' },
   { date:'2026-07-09', start:'2026-07-09T07:00:00Z', q:'Magie brésilienne ?', a:'Team Ronaldinho', ea:'🇧🇷', b:'Team Neymar', eb:'🇧🇷' },
@@ -1562,7 +1562,7 @@ const DAILY_POLLS = [
 
 function isPollWindow() {
   const now = new Date();
-  return now >= new Date('2026-07-06T07:00:00Z') && now < new Date('2026-07-11T07:00:00Z');
+  return now >= new Date('2026-07-05T00:00:00Z') && now < new Date('2026-07-11T07:00:00Z');
 }
 
 function getActivePoll() {
