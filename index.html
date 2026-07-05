@@ -1840,9 +1840,29 @@ async function cancelPronoMort() {
 }
 
 // ============================================================
+// CONTRÔLE DE VERSION — recharge auto quand un nouveau déploiement est détecté
+// (À CHAQUE déploiement : monter APP_VERSION ici ET dans version.json à l'identique)
+// ============================================================
+const APP_VERSION = '2026-07-05-1';
+async function checkAppVersion() {
+  try {
+    const res = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' });
+    if (!res.ok) return;
+    const { version } = await res.json();
+    if (version && version !== APP_VERSION && !sessionStorage.getItem('bgefc_reloaded_' + version)) {
+      sessionStorage.setItem('bgefc_reloaded_' + version, '1');
+      location.reload();
+    }
+  } catch (e) { /* hors ligne : on réessaiera plus tard */ }
+}
+
+// ============================================================
 // AUTO LOGIN
 // ============================================================
 window.addEventListener('load', async () => {
+  checkAppVersion();
+  setInterval(checkAppVersion, 2 * 60 * 1000); // toutes les 2 min
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) checkAppVersion(); });
   const savedId = localStorage.getItem('bgefc_user_id_v2');
   if (savedId) {
     const { data } = await db.from('users').select('*').eq('id', savedId).single();
