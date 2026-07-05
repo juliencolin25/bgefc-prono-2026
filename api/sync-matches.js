@@ -118,19 +118,29 @@ function matchOutcome(s1, s2, winnerField) {
   return winnerField || 'draw';
 }
 
-async function calculateAndUpdatePoints(matchId, score1Real, score2Real, winnerField) {
+// Match spécial France-Maroc (quart de finale) : barème renforcé 8 pts score exact / 5 pts bon vainqueur
+function isFranceMarocQuart(team1, team2, groupName) {
+  if (groupName !== 'Quart de finale') return false;
+  const teams = [team1, team2];
+  return teams.includes('France') && teams.includes('Maroc');
+}
+
+async function calculateAndUpdatePoints(matchId, score1Real, score2Real, winnerField, team1, team2, groupName) {
   const res = await supabaseRequest(`/pronos?match_id=eq.${matchId}`, 'GET');
   const pronos = await res.json();
   if (!pronos || !pronos.length) return;
 
   const realOutcome = matchOutcome(score1Real, score2Real, winnerField);
+  const special = isFranceMarocQuart(team1, team2, groupName);
+  const exactPts = special ? 8 : 5;
+  const outcomePts = special ? 5 : 3;
 
   await Promise.all(pronos.map(p => {
     let pts = 0;
     if (p.score1 === score1Real && p.score2 === score2Real) {
-      pts = 5; // Score exact
+      pts = exactPts; // Score exact
     } else if (matchOutcome(p.score1, p.score2, p.winner) === realOutcome) {
-      pts = 3; // Bon vainqueur
+      pts = outcomePts; // Bon vainqueur
     }
     return supabaseRequest(`/pronos?id=eq.${p.id}`, 'PATCH', { points: pts });
   }));
@@ -214,7 +224,7 @@ export default async function handler(req, res) {
           || prev.score1_real !== score1Real
           || prev.score2_real !== score2Real
           || prev.winner !== winnerField;
-        if (changed) matchesToRecalc.push({ id: m.id, score1Real, score2Real, winnerField });
+        if (changed) matchesToRecalc.push({ id: m.id, score1Real, score2Real, winnerField, team1, team2, groupName });
       }
     }
 
@@ -225,7 +235,7 @@ export default async function handler(req, res) {
 
     // 3. Recalcul des points uniquement pour les matchs modifiés, en parallèle
     await Promise.all(matchesToRecalc.map(mm =>
-      calculateAndUpdatePoints(mm.id, mm.score1Real, mm.score2Real, mm.winnerField)
+      calculateAndUpdatePoints(mm.id, mm.score1Real, mm.score2Real, mm.winnerField, mm.team1, mm.team2, mm.groupName)
     ));
 
     return res.status(200).json({
