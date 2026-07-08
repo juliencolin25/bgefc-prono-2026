@@ -185,19 +185,27 @@ export default async function handler(req, res) {
       const timeStr = d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' });
 
       const isPenaltyShootout = m.score?.duration === 'PENALTY_SHOOTOUT';
+      const _regH = m.score?.regularTime?.home ?? 0;
+      const _regA = m.score?.regularTime?.away ?? 0;
+      const _etH = m.score?.extraTime?.home ?? 0;
+      const _etA = m.score?.extraTime?.away ?? 0;
+      const _ftH = m.score?.fullTime?.home;
+      const _ftA = m.score?.fullTime?.away;
       // Pour les TAB, fullTime inclut à tort le score des pénaltys : on prend le score réel (temps réglementaire + prolongation)
-      const score1Real = isPenaltyShootout
-        ? (m.score?.regularTime?.home ?? 0) + (m.score?.extraTime?.home ?? 0)
-        : m.score?.fullTime?.home ?? null;
-      const score2Real = isPenaltyShootout
-        ? (m.score?.regularTime?.away ?? 0) + (m.score?.extraTime?.away ?? 0)
-        : m.score?.fullTime?.away ?? null;
-      // 'winner' ne sert qu'à indiquer le vainqueur aux tirs au but ('team1'/'team2'), null sinon
-      const winnerField = isPenaltyShootout
-        ? (m.score?.winner === 'HOME_TEAM' ? 'team1' : m.score?.winner === 'AWAY_TEAM' ? 'team2' : null)
-        : null;
-      const pen1 = isPenaltyShootout ? (m.score?.penalties?.home ?? null) : null;
-      const pen2 = isPenaltyShootout ? (m.score?.penalties?.away ?? null) : null;
+      const score1Real = isPenaltyShootout ? _regH + _etH : (_ftH ?? null);
+      const score2Real = isPenaltyShootout ? _regA + _etA : (_ftA ?? null);
+      // Vainqueur aux TAB ('team1'/'team2'). On prend score.winner s'il est fourni, sinon on le déduit
+      // du fullTime : football-data laisse parfois score.winner à null sur un PENALTY_SHOOTOUT pourtant terminé.
+      let winnerField = null;
+      if (isPenaltyShootout) {
+        if (m.score?.winner === 'HOME_TEAM') winnerField = 'team1';
+        else if (m.score?.winner === 'AWAY_TEAM') winnerField = 'team2';
+        else if (_ftH != null && _ftA != null) winnerField = _ftH > _ftA ? 'team1' : (_ftA > _ftH ? 'team2' : null);
+      }
+      // Score des tirs au but : déduit du fullTime (fullTime − temps réglementaire − prolongation),
+      // le champ penalties étant parfois incohérent (ex: 3-3 alors que le TAB a désigné un vainqueur).
+      const pen1 = (isPenaltyShootout && _ftH != null && _ftA != null) ? _ftH - _regH - _etH : null;
+      const pen2 = (isPenaltyShootout && _ftH != null && _ftA != null) ? _ftA - _regA - _etA : null;
 
       updatePayloads.push({
         id: m.id,
