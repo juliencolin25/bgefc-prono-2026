@@ -1460,6 +1460,7 @@ async function startApp() {
   initPronoMort();
   initDailyPoll();
   showMagQuartPopup();
+  showMagFranceResultPopup();
 }
 
 // ============================================================
@@ -1482,6 +1483,84 @@ function showMagQuartPopup() {
         <span style="display:inline-block;font-size:1rem;color:#fff;font-weight:900">✓ 5 pts</span> pour le bon vainqueur
       </div>
       <button onclick="document.getElementById('magQuartPopup').remove()" style="width:100%;margin-top:1rem;background:linear-gradient(135deg,#7c2fd6,#9B5DE5);border:none;border-radius:12px;padding:.85rem;color:white;font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:900;cursor:pointer">Merci patronne ! 💜</button>
+    </div>`;
+  pop.onclick = e => { if (e.target === pop) pop.remove(); };
+  document.body.appendChild(pop);
+}
+
+// ============================================================
+// POPUP RÉSULTAT FRANCE — quart France-Maroc (jeudi 9 juillet 22h)
+// Victoire : Magali qui célèbre, affiché jusqu'à la demi-finale de la France.
+// Défaite : vidéo Lose.mp4 (son au clic) + Magali + Thierry diablotin, pendant 48h.
+// S'affiche après connexion, une fois le score du match synchronisé.
+// ============================================================
+function getFranceQuartResult() {
+  const m = allMatches.find(x => x.id === 537383)
+    || allMatches.find(x => x.group_name === 'Quart de finale' && [x.team1, x.team2].includes('France') && [x.team1, x.team2].includes('Maroc'));
+  if (!m) return null;
+  if (getEffectiveStatus(m) !== 'done' || m.score1_real === null || m.score1_real === undefined) return null;
+  const franceIsTeam1 = m.team1 === 'France';
+  const fScore = franceIsTeam1 ? m.score1_real : m.score2_real;
+  const oScore = franceIsTeam1 ? m.score2_real : m.score1_real;
+  let franceWon;
+  if (fScore > oScore) franceWon = true;
+  else if (fScore < oScore) franceWon = false;
+  else franceWon = m.winner === (franceIsTeam1 ? 'team1' : 'team2'); // égalité → vainqueur aux TAB
+  return { m, franceWon };
+}
+
+function showMagFranceResultPopup() {
+  const r = getFranceQuartResult();
+  if (!r) return;
+  if (r.franceWon) {
+    // Affiché jusqu'au coup d'envoi de la demi-finale de la France
+    const demi = allMatches.find(x => x.group_name === 'Demi-finale' && [x.team1, x.team2].includes('France'));
+    if (demi && ['live', 'done'].includes(getEffectiveStatus(demi))) return;
+    showFranceWinPopup();
+  } else {
+    // Affiché pendant 48h après la fin du match (~00h15 Paris le 10 → cutoff le 12 juillet 00h15 Paris = 22h15 UTC le 11)
+    if (new Date() >= new Date('2026-07-11T22:15:00Z')) return;
+    showFranceLosePopup();
+  }
+}
+
+function showFranceWinPopup() {
+  const pop = document.createElement('div');
+  pop.id = 'franceWinPopup';
+  pop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem';
+  pop.innerHTML = `
+    <div style="background:linear-gradient(160deg,#001a4d,#002395);border-radius:20px;max-width:400px;width:100%;padding:1.6rem;text-align:center;border:2px solid #ffd23f;box-shadow:0 20px 60px rgba(0,35,149,.6);font-family:'Nunito',sans-serif">
+      <img src="images/Magvic.png" alt="Magali" style="width:120px;height:120px;border-radius:50%;object-fit:cover;object-position:center top;border:3px solid #ffd23f;box-shadow:0 0 25px rgba(255,210,63,.5);display:block;margin:0 auto .8rem" onerror="this.style.display='none'">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:1.7rem;letter-spacing:2px;color:#ffd23f;display:flex;align-items:center;justify-content:center;gap:.5rem"><img src="https://flagcdn.com/h40/fr.png" style="height:22px;width:auto;border-radius:2px" onerror="this.style.display='none'"> ALLEZ LES BLEUS ! <img src="https://flagcdn.com/h40/fr.png" style="height:22px;width:auto;border-radius:2px" onerror="this.style.display='none'"></div>
+      <div style="background:rgba(255,255,255,.1);border:1px solid rgba(255,210,63,.4);border-radius:12px;padding:1rem;font-size:.88rem;color:#fff;line-height:1.7;margin-top:.8rem">
+        Bravo à la France, et bravo à tous ceux qui ont parié juste — je vous donne vos <strong style="color:#ffd23f">8 points</strong> ! Et pour le prochain match, je remets non pas 8 mais <strong style="color:#ffd23f">10 points</strong> en jeu en cas de victoire de la France… parce que je suis vraiment généreuse. 💙
+      </div>
+      <button onclick="document.getElementById('franceWinPopup').remove()" style="width:100%;margin-top:1rem;background:linear-gradient(135deg,#ffd23f,#ffb700);border:none;border-radius:12px;padding:.85rem;color:#002395;font-family:'Nunito',sans-serif;font-size:.92rem;font-weight:900;cursor:pointer">Merci patronne ! 💙</button>
+    </div>`;
+  pop.onclick = e => { if (e.target === pop) pop.remove(); };
+  document.body.appendChild(pop);
+}
+
+function showFranceLosePopup() {
+  const pop = document.createElement('div');
+  pop.id = 'franceLosePopup';
+  pop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem';
+  pop.innerHTML = `
+    <div style="background:linear-gradient(160deg,#0a0000,#1a0505);border-radius:20px;max-width:420px;width:100%;padding:1.4rem;text-align:center;border:2px solid #cc0000;box-shadow:0 20px 60px rgba(139,0,0,.6);font-family:'Nunito',sans-serif">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:2px;color:#ff6666;margin-bottom:.8rem">💔 FIN DU RÊVE BLEU</div>
+      <div style="position:relative;border-radius:12px;overflow:hidden;background:#000">
+        <video id="loseVid" src="images/Lose.mp4" playsinline loop controls style="width:100%;max-height:42vh;object-fit:contain;background:#000;display:block"></video>
+        <button id="losePlayBtn" onclick="const v=document.getElementById('loseVid');v.play();this.style.display='none';" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.45);border:none;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:2px;cursor:pointer">▶️ Voir la sentence</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:.7rem;background:rgba(155,93,229,.12);border:1px solid rgba(155,93,229,.35);border-radius:12px;padding:.7rem .9rem;margin-top:1rem;text-align:left">
+        <img src="images/mag.png" alt="Magali" style="width:44px;height:44px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid #9B5DE5" onerror="this.style.display='none'">
+        <div style="font-size:.82rem;color:#f0e6ff;line-height:1.5"><strong>Magali :</strong> Bon… j'en connais quand même quelques-uns qui vont perdre leur Prono de la Mort. 😬</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:.7rem;background:rgba(204,0,0,.12);border:1px solid rgba(204,0,0,.4);border-radius:12px;padding:.7rem .9rem;margin-top:.6rem;text-align:left">
+        <img src="images/DTB.png" alt="Thierry" style="width:44px;height:44px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid #cc0000" onerror="this.style.display='none'">
+        <div style="font-size:.82rem;color:#ffdada;line-height:1.5"><strong>Thierry 😈 :</strong> Et je serai là, en costume de diable, pour recueillir leurs larmes une par une.</div>
+      </div>
+      <button onclick="document.getElementById('franceLosePopup').remove()" style="width:100%;margin-top:1rem;background:linear-gradient(135deg,#8b0000,#cc0000);border:none;border-radius:12px;padding:.8rem;color:white;font-family:'Nunito',sans-serif;font-size:.88rem;font-weight:900;cursor:pointer">Fermer (et pleurer)</button>
     </div>`;
   pop.onclick = e => { if (e.target === pop) pop.remove(); };
   document.body.appendChild(pop);
@@ -1840,7 +1919,7 @@ async function cancelPronoMort() {
 // CONTRÔLE DE VERSION — recharge auto quand un nouveau déploiement est détecté
 // (À CHAQUE déploiement : monter APP_VERSION ici ET dans version.json à l'identique)
 // ============================================================
-const APP_VERSION = '2026-07-05-3';
+const APP_VERSION = '2026-07-09-1';
 async function checkAppVersion() {
   try {
     const res = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' });
