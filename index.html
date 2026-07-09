@@ -260,7 +260,7 @@ main{max-width:1200px;margin:0 auto;padding:2rem 1.5rem;position:relative;z-inde
 <div id="loginPage" class="login-wrap">
   <div class="login-card">
     <div class="login-hero">
-      <img src="images/KMBpeno.jpg" alt="Mbappé" class="login-emoji" style="width:100%;max-width:320px;height:auto;display:block;margin:0 auto;border-radius:12px;" onerror="this.style.display='none'">
+      <img id="loginHero" src="images/KMBpeno.jpg" alt="Mbappé" class="login-emoji" style="width:100%;max-width:320px;height:auto;display:block;margin:0 auto;border-radius:12px;" onerror="this.style.display='none'">
       <div class="login-title">PRONOS 2026</div>
       <div class="login-sub">🏆 Coupe du Monde FIFA 2026 — BGE Franche-Comté</div>
       <div class="login-sub" style="font-style:italic;margin-top:.4rem;color:#002395;font-weight:800">Allez les Bleus !</div>
@@ -1919,7 +1919,7 @@ async function cancelPronoMort() {
 // CONTRÔLE DE VERSION — recharge auto quand un nouveau déploiement est détecté
 // (À CHAQUE déploiement : monter APP_VERSION ici ET dans version.json à l'identique)
 // ============================================================
-const APP_VERSION = '2026-07-09-1';
+const APP_VERSION = '2026-07-09-2';
 async function checkAppVersion() {
   try {
     const res = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' });
@@ -1935,10 +1935,31 @@ async function checkAppVersion() {
 // ============================================================
 // AUTO LOGIN
 // ============================================================
+// Sur la page de connexion : si la France a perdu le quart, on remplace l'image héro par images/fifa.png
+async function updateLoginHero() {
+  try {
+    const { data: m } = await db.from('matches').select('*').eq('id', 537383).single();
+    if (!m) return;
+    if (getEffectiveStatus(m) !== 'done' || m.score1_real === null || m.score1_real === undefined) return;
+    const franceIsTeam1 = m.team1 === 'France';
+    const fScore = franceIsTeam1 ? m.score1_real : m.score2_real;
+    const oScore = franceIsTeam1 ? m.score2_real : m.score1_real;
+    let franceWon;
+    if (fScore > oScore) franceWon = true;
+    else if (fScore < oScore) franceWon = false;
+    else franceWon = m.winner === (franceIsTeam1 ? 'team1' : 'team2');
+    if (!franceWon) {
+      const hero = document.getElementById('loginHero');
+      if (hero) { hero.src = 'images/fifa.png'; hero.alt = 'FIFA'; }
+    }
+  } catch (e) { /* silencieux */ }
+}
+
 window.addEventListener('load', async () => {
   checkAppVersion();
   setInterval(checkAppVersion, 2 * 60 * 1000); // toutes les 2 min
   document.addEventListener('visibilitychange', () => { if (!document.hidden) checkAppVersion(); });
+  updateLoginHero();
   const savedId = localStorage.getItem('bgefc_user_id_v2');
   if (savedId) {
     const { data } = await db.from('users').select('*').eq('id', savedId).single();
