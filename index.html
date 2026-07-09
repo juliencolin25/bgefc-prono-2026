@@ -263,7 +263,7 @@ main{max-width:1200px;margin:0 auto;padding:2rem 1.5rem;position:relative;z-inde
       <img id="loginHero" src="images/KMBpeno.jpg" alt="Mbappé" class="login-emoji" style="width:100%;max-width:320px;height:auto;display:block;margin:0 auto;border-radius:12px;" onerror="this.style.display='none'">
       <div class="login-title">PRONOS 2026</div>
       <div class="login-sub">🏆 Coupe du Monde FIFA 2026 — BGE Franche-Comté</div>
-      <div class="login-sub" style="font-style:italic;margin-top:.4rem;color:#002395;font-weight:800">Allez les Bleus !</div>
+      <div id="loginAllezBleus" class="login-sub" style="font-style:italic;margin-top:.4rem;color:#002395;font-weight:800">Allez les Bleus !</div>
     </div>
     <div id="loginError" class="login-error"></div>
 
@@ -1919,7 +1919,7 @@ async function cancelPronoMort() {
 // CONTRÔLE DE VERSION — recharge auto quand un nouveau déploiement est détecté
 // (À CHAQUE déploiement : monter APP_VERSION ici ET dans version.json à l'identique)
 // ============================================================
-const APP_VERSION = '2026-07-09-2';
+const APP_VERSION = '2026-07-09-3';
 async function checkAppVersion() {
   try {
     const res = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' });
@@ -1951,6 +1951,8 @@ async function updateLoginHero() {
     if (!franceWon) {
       const hero = document.getElementById('loginHero');
       if (hero) { hero.src = 'images/fifa.png'; hero.alt = 'FIFA'; }
+      const allez = document.getElementById('loginAllezBleus');
+      if (allez) allez.style.display = 'none';
     }
   } catch (e) { /* silencieux */ }
 }
