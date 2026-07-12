@@ -414,8 +414,13 @@ main{max-width:1200px;margin:0 auto;padding:2rem 1.5rem;position:relative;z-inde
             <div class="points-item"><div class="points-value" style="color:#2e7d32">3</div><div class="points-label">Bon vainqueur ✓</div></div>
             <div class="points-item"><div class="points-value" style="color:var(--rouge)">0</div><div class="points-label">Mauvais résultat ✗</div></div>
           </div>
-          <div id="magQuartRule" style="margin-top:1rem;background:rgba(155,93,229,.1);border:1px solid rgba(155,93,229,.35);border-left:4px solid #9B5DE5;border-radius:0 8px 8px 0;padding:.7rem .9rem;font-size:.82rem;line-height:1.6;color:var(--navy);font-weight:600">
-            📣 <strong>Annonce de la com' — Points doublés en demi-finales !</strong> Sur les deux demies : <strong style="color:#7c2fd6">10 pts</strong> pour le score exact, <strong style="color:#7c2fd6">5 pts</strong> pour le bon résultat.
+          <div id="magQuartRule" style="margin-top:1rem;background:rgba(155,93,229,.08);border:1px solid rgba(155,93,229,.35);border-radius:12px;padding:.9rem 1rem">
+            <div style="font-size:.82rem;font-weight:800;color:#7c2fd6;margin-bottom:.6rem;text-align:center">📣 Annonce de la com' — Points DOUBLÉS en demi-finales !</div>
+            <div class="points-grid" style="grid-template-columns:repeat(2,1fr)">
+              <div class="points-item" style="background:rgba(255,210,63,.18)"><div class="points-value" style="color:#b8860b">10</div><div class="points-label">Score exact 🎯</div></div>
+              <div class="points-item" style="background:rgba(155,93,229,.14)"><div class="points-value" style="color:#7c2fd6">5</div><div class="points-label">Bon résultat ✓</div></div>
+            </div>
+            <div style="font-size:.72rem;color:var(--gris);font-weight:600;text-align:center;margin-top:.5rem">Valable sur les deux demies : France-Espagne et Angleterre-Argentine</div>
           </div>
         </div>
         <div class="card">
@@ -787,6 +792,7 @@ const TIPH_CONSEILS = [
 ];
 // AJOUT MASTER PROMPT 2026 - Rotation aleatoire Jeannot/Mag alternés
 let _clickVideo = null; // src de la vidéo à lancer au clic sur la bannière, ou null
+let _clickLink = null;  // URL à ouvrir au clic sur la bannière, ou null
 function initJeannot(){
   let jPool=[], mPool=[], showCount=0;
   function getNextJ(){if(!jPool.length){jPool=[...Array(JEANNOT_CONSEILS.length).keys()];for(let i=jPool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[jPool[i],jPool[j]]=[jPool[j],jPool[i]];}}return jPool.pop();}
@@ -800,11 +806,18 @@ function initJeannot(){
     el.classList.remove('visible');
     setTimeout(()=>{
       showCount++;
-      // Bannière en pause pour les demi-finales : on ne garde que les conseils de Jeannot
+      // Bannière en pause pour les demi-finales : Jeannot uniquement (+ promo de son site)
       _clickVideo = null;
-      el.textContent=JEANNOT_CONSEILS[getNextJ()];
-      if(labelEl) labelEl.textContent='⭐ Les bons conseils de Jeannot';
+      _clickLink = null;
       if(photoEl){ photoEl.src='images/jeannot.png'; photoEl.alt='Jeannot'; photoEl.style.objectPosition='center'; }
+      if(Math.random() < 1/6){
+        _clickLink = 'http://jeannotforever.fr/';
+        el.innerHTML='🌐 Et tant que vous y êtes, filez sur <u>mon site jeannotforever.fr</u> — cliquez ici !';
+        if(labelEl) labelEl.textContent='⭐ Le site de Jeannot';
+      } else {
+        el.textContent=JEANNOT_CONSEILS[getNextJ()];
+        if(labelEl) labelEl.textContent='⭐ Les bons conseils de Jeannot';
+      }
       el.classList.add('visible');
     },600);
   }
@@ -1094,6 +1107,10 @@ const SONOMETRE_MSGS = [
   "Au moins Mag elle se fait pas cliquer dessus comme ça. Enfin je crois.",
 ];
 function sonometre() {
+  if (_clickLink) {
+    window.open(_clickLink, '_blank', 'noopener');
+    return;
+  }
   if (_clickVideo) {
     const pop = document.createElement('div');
     pop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem';
@@ -1424,6 +1441,7 @@ async function startApp() {
   initPronoMort();
   initDailyPoll();
   showTiphaineDemiPopup();
+  showBastilleFireworks();
 }
 
 // ============================================================
@@ -1567,6 +1585,64 @@ function showTiphaineDemiPopup() {
     </div>`;
   pop.onclick = e => { if (e.target === pop) pop.remove(); };
   document.body.appendChild(pop);
+}
+
+// ============================================================
+// FEUX D'ARTIFICE — Fête nationale du 14 juillet 2026 (8h → 20h Paris = 06h → 18h UTC)
+// ============================================================
+function showBastilleFireworks() {
+  const now = new Date();
+  if (now < new Date('2026-07-14T06:00:00Z') || now >= new Date('2026-07-14T18:00:00Z')) return;
+  const pop = document.createElement('div');
+  pop.id = 'bastillePopup';
+  pop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,12,.9);z-index:10000;display:flex;align-items:center;justify-content:center;padding:1rem;overflow:hidden';
+  pop.innerHTML = `
+    <canvas id="fwCanvas" style="position:absolute;inset:0;width:100%;height:100%"></canvas>
+    <div style="position:relative;text-align:center;font-family:'Nunito',sans-serif;max-width:420px">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:2.4rem;letter-spacing:2px;color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.7);line-height:1.1">🎆 BONNE FÊTE<br>NATIONALE ! 🇫🇷</div>
+      <div style="font-size:.95rem;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.8);margin-top:.6rem;font-weight:700">Vive le 14 juillet… et bon match ce soir ! 🔵⚪🔴</div>
+      <button onclick="if(window._fwStop)window._fwStop();document.getElementById('bastillePopup').remove()" style="margin-top:1.2rem;background:linear-gradient(135deg,#0055A4 0%,#0055A4 33%,#fff 33%,#fff 66%,#EF4135 66%,#EF4135 100%);border:none;border-radius:12px;padding:.85rem 1.6rem;color:#fff;font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:900;cursor:pointer;text-shadow:0 1px 3px rgba(0,0,0,.8)">Vive la France ! 🇫🇷</button>
+    </div>`;
+  document.body.appendChild(pop);
+  startFireworks();
+}
+
+function startFireworks() {
+  const canvas = document.getElementById('fwCanvas');
+  if (!canvas || !canvas.getContext) return;
+  const ctx = canvas.getContext('2d');
+  function resize() { canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight; }
+  resize(); window.addEventListener('resize', resize);
+  const colors = ['#0055A4', '#ffffff', '#EF4135'];
+  let particles = [];
+  function burst() {
+    const x = Math.random() * canvas.width;
+    const y = Math.random() * canvas.height * 0.5 + canvas.height * 0.08;
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    const n = 64;
+    for (let i = 0; i < n; i++) {
+      const a = (Math.PI * 2 * i) / n;
+      const sp = Math.random() * 3 + 2;
+      particles.push({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, life: 1, color });
+    }
+  }
+  let raf, burstTimer;
+  function loop() {
+    ctx.fillStyle = 'rgba(0,0,12,0.18)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => {
+      p.x += p.vx; p.y += p.vy; p.vy += 0.04; p.life -= 0.012;
+      ctx.globalAlpha = Math.max(p.life, 0);
+      ctx.fillStyle = p.color;
+      ctx.beginPath(); ctx.arc(p.x, p.y, 2.2, 0, Math.PI * 2); ctx.fill();
+    });
+    ctx.globalAlpha = 1;
+    particles = particles.filter(p => p.life > 0);
+    raf = requestAnimationFrame(loop);
+  }
+  loop(); burst();
+  burstTimer = setInterval(burst, 650);
+  window._fwStop = function () { cancelAnimationFrame(raf); clearInterval(burstTimer); window.removeEventListener('resize', resize); };
 }
 
 // ============================================================
@@ -1922,7 +1998,7 @@ async function cancelPronoMort() {
 // CONTRÔLE DE VERSION — recharge auto quand un nouveau déploiement est détecté
 // (À CHAQUE déploiement : monter APP_VERSION ici ET dans version.json à l'identique)
 // ============================================================
-const APP_VERSION = '2026-07-09-4';
+const APP_VERSION = '2026-07-12-1';
 async function checkAppVersion() {
   try {
     const res = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' });
