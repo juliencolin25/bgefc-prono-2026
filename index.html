@@ -718,6 +718,10 @@ const JEANNOT_CONSEILS = [
   "Deschamps si tu m'entends 📣🇫🇷 prends un Vert en sélection 💚 UN SEUL 😤🔥",
   "Mon cardiologue m'a dit d'éviter les émotions fortes 😅 alors forcément, cette Coupe du Monde... 🥵🇫🇷💚",
   "On est d'accord que la vraie finale ce serait France 🇫🇷 vs Saint-Étienne 💚 ?? 🤩🔥 ... quoi ? 😳",
+  "J'ÉTAIS à la finale 98 🇫🇷🏆😭 j'ai vu Zizou de mes yeux 👀📸 j'ai 400 photos toutes floues mais chaque pixel est un TRÉSOR 💎🔥",
+  "Visage peint en bleu-blanc-rouge depuis ce matin 🔵⚪🔴😤 ma femme veut plus sortir avec moi mais BON 🇫🇷 les priorités 🤷💚",
+  "Dominique Rocheteau... L'ANGE VERT 😇💚🟢 le plus beau joueur de TOUTE l'histoire 😭 quelqu'un m'écoute au moins ?? 😳🔥",
+  "Euro 84, Platini, NEUF buts 🤯🇫🇷 j'y étais, j'avais 12 ans, j'ai pleuré 💧😭 ... et je repleure là en vous parlant 😭💚",
   "Évite de cliquer plusieurs fois sur cette bannière.... STP.... 😵‍💫💚"
 ];
 // AJOUT MASTER PROMPT 2026 - Modal fiche equipe
@@ -1568,7 +1572,7 @@ function showTiphaineDemiPopup() {
         <img src="images/TG.jpg" alt="Tiphaine" style="width:100px;height:100px;border-radius:50%;object-fit:cover;border:3px solid #9B5DE5;box-shadow:0 0 25px rgba(155,93,229,.5);display:block;margin:0 auto .7rem" onerror="this.style.display='none'">
         <div style="font-size:.72rem;color:#d9b8ff;font-weight:800;letter-spacing:1px">Tiphaine, responsable communication</div>
         <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:2px;color:#ffd23f;line-height:1.1;margin:.4rem 0 .2rem">POINTS DOUBLÉS !</div>
-        <div style="font-size:.85rem;color:#f0e6ff;line-height:1.6;margin-bottom:.9rem">Bon… Magali (la patronne) a <strong>ENCORE</strong> fait une annonce toute seule dans son coin 🙄 du coup c'est la com' qui court derrière pour officialiser. Alors voilà, sur les <strong>deux demi-finales</strong> :</div>
+        <div style="font-size:.85rem;color:#f0e6ff;line-height:1.6;margin-bottom:.9rem">Bon… Magali a <strong>ENCORE</strong> fait une annonce toute seule dans son coin 🙄 du coup c'est la com' qui court derrière pour officialiser. Alors voilà, sur les <strong>deux demi-finales</strong> :</div>
         <div style="display:flex;gap:.6rem;justify-content:center;margin-bottom:.9rem">
           <div style="flex:1;background:rgba(255,255,255,.08);border:1px solid rgba(155,93,229,.4);border-radius:12px;padding:.8rem .5rem">
             <div style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:#fff">5 pts</div>
@@ -2001,7 +2005,7 @@ async function cancelPronoMort() {
 // CONTRÔLE DE VERSION — recharge auto quand un nouveau déploiement est détecté
 // (À CHAQUE déploiement : monter APP_VERSION ici ET dans version.json à l'identique)
 // ============================================================
-const APP_VERSION = '2026-07-12-4';
+const APP_VERSION = '2026-07-12-6';
 async function checkAppVersion() {
   try {
     const res = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' });
