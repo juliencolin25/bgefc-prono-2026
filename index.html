@@ -300,7 +300,7 @@ main{max-width:1200px;margin:0 auto;padding:2rem 1.5rem;position:relative;z-inde
   <div class="jeannot-banner" id="jeannotBanner" onclick="sonometre()" style="cursor:pointer">
     <img src="images/jeannot.png" alt="Jeannot" class="jeannot-photo" onerror="this.style.display='none'">
     <div class="jeannot-content">
-      <div class="jeannot-label" id="jeannotLabel">⭐ Les bons conseils de Jeannot</div>
+      <div class="jeannot-label" id="jeannotLabel">🤪 Jeannot part en vrille</div>
       <div class="jeannot-tip" id="jeannotTip"></div>
     </div>
     <img src="images/logo-bge.png" alt="BGE Franche-Comté" class="logo-bge-banner" onerror="this.style.display='none'">
@@ -829,7 +829,7 @@ function initJeannot(){
         if(photoEl){ photoEl.src='images/TBMAMD.png'; photoEl.alt='Thierry'; photoEl.style.objectPosition='center top'; }
       } else {
         el.innerHTML=JEANNOT_CONSEILS[getNextJ()].replace(/🇫🇷/g, FR_FLAG);
-        if(labelEl) labelEl.textContent='⭐ Les bons conseils de Jeannot';
+        if(labelEl) labelEl.textContent='🤪 Jeannot part en vrille';
         if(photoEl){ photoEl.src='images/jeannot.png'; photoEl.alt='Jeannot'; photoEl.style.objectPosition='center'; }
       }
       el.classList.add('visible');
@@ -2012,7 +2012,7 @@ async function cancelPronoMort() {
 // CONTRÔLE DE VERSION — recharge auto quand un nouveau déploiement est détecté
 // (À CHAQUE déploiement : monter APP_VERSION ici ET dans version.json à l'identique)
 // ============================================================
-const APP_VERSION = '2026-07-12-10';
+const APP_VERSION = '2026-07-12-11';
 async function checkAppVersion() {
   try {
     const res = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' });
