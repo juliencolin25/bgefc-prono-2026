@@ -260,7 +260,7 @@ main{max-width:1200px;margin:0 auto;padding:2rem 1.5rem;position:relative;z-inde
 <div id="loginPage" class="login-wrap">
   <div class="login-card">
     <div class="login-hero">
-      <img id="loginHero" src="images/KMBpeno.jpg" alt="Mbappé" class="login-emoji" style="width:100%;max-width:320px;height:auto;display:block;margin:0 auto;border-radius:12px;" onerror="this.style.display='none'">
+      <img id="loginHero" src="images/Dem.jpg" alt="Demi-finales" class="login-emoji" style="width:100%;max-width:320px;height:auto;display:block;margin:0 auto;border-radius:12px;" onerror="this.style.display='none'">
       <div class="login-title">PRONOS 2026</div>
       <div class="login-sub">🏆 Coupe du Monde FIFA 2026 — BGE Franche-Comté</div>
       <div id="loginAllezBleus" class="login-sub" style="font-style:italic;margin-top:.4rem;color:#002395;font-weight:800">Allez les Bleus !</div>
@@ -1581,7 +1581,7 @@ function showTiphaineDemiPopup() {
           <span><img src="https://flagcdn.com/h20/fr.png" style="height:12px;vertical-align:middle;border-radius:2px" onerror="this.style.display='none'"> France — Espagne <img src="https://flagcdn.com/h20/es.png" style="height:12px;vertical-align:middle;border-radius:2px" onerror="this.style.display='none'"></span>
           <span><img src="https://flagcdn.com/h20/gb-eng.png" style="height:12px;vertical-align:middle;border-radius:2px" onerror="this.style.display='none'"> Angleterre — Argentine <img src="https://flagcdn.com/h20/ar.png" style="height:12px;vertical-align:middle;border-radius:2px" onerror="this.style.display='none'"></span>
         </div>
-        <button onclick="document.getElementById('tiphaineDemiPopup').remove()" style="width:100%;background:linear-gradient(135deg,#7c2fd6,#9B5DE5);border:none;border-radius:12px;padding:.85rem;color:white;font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:900;cursor:pointer">OK, je gère la com' derrière… 🙄📣</button>
+        <button onclick="document.getElementById('tiphaineDemiPopup').remove()" style="width:100%;background:linear-gradient(135deg,#7c2fd6,#9B5DE5);border:none;border-radius:12px;padding:.85rem;color:white;font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:900;cursor:pointer">Merci Tiph' ! 💜</button>
       </div>
     </div>`;
   pop.onclick = e => { if (e.target === pop) pop.remove(); };
@@ -1999,7 +1999,7 @@ async function cancelPronoMort() {
 // CONTRÔLE DE VERSION — recharge auto quand un nouveau déploiement est détecté
 // (À CHAQUE déploiement : monter APP_VERSION ici ET dans version.json à l'identique)
 // ============================================================
-const APP_VERSION = '2026-07-12-2';
+const APP_VERSION = '2026-07-12-3';
 async function checkAppVersion() {
   try {
     const res = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' });
