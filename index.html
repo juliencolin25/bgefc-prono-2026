@@ -787,6 +787,8 @@ const THIERRY_DEMON = [
   "Bientôt la révélation… et certains vont pleurer. 😈🔥"
 ];
 let _thierryIdx = 0;
+// Drapeau France en image (les emojis drapeaux s'affichent "FR" sous Windows)
+const FR_FLAG = '<img src="https://flagcdn.com/h20/fr.png" style="height:12px;vertical-align:middle;border-radius:2px" onerror="this.style.display=\'none\'">';
 function initJeannot(){
   let jPool=[], mPool=[], showCount=0;
   function getNextJ(){if(!jPool.length){jPool=[...Array(JEANNOT_CONSEILS.length).keys()];for(let i=jPool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[jPool[i],jPool[j]]=[jPool[j],jPool[i]];}}return jPool.pop();}
@@ -815,7 +817,7 @@ function initJeannot(){
         if(labelEl) labelEl.textContent='😇😈 Thierry, mi-ange mi-démon';
         if(photoEl){ photoEl.src='images/TBMAMD.png'; photoEl.alt='Thierry'; photoEl.style.objectPosition='center top'; }
       } else {
-        el.textContent=JEANNOT_CONSEILS[getNextJ()];
+        el.innerHTML=JEANNOT_CONSEILS[getNextJ()].replace(/🇫🇷/g, FR_FLAG);
         if(labelEl) labelEl.textContent='⭐ Les bons conseils de Jeannot';
         if(photoEl){ photoEl.src='images/jeannot.png'; photoEl.alt='Jeannot'; photoEl.style.objectPosition='center'; }
       }
@@ -1999,7 +2001,7 @@ async function cancelPronoMort() {
 // CONTRÔLE DE VERSION — recharge auto quand un nouveau déploiement est détecté
 // (À CHAQUE déploiement : monter APP_VERSION ici ET dans version.json à l'identique)
 // ============================================================
-const APP_VERSION = '2026-07-12-3';
+const APP_VERSION = '2026-07-12-4';
 async function checkAppVersion() {
   try {
     const res = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' });
