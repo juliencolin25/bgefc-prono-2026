@@ -699,39 +699,26 @@ Object.assign(TEAM_DATA, {
 "À déterminer":{"flag":"🏳️","forme":["W","D","W","D","W"],"lineup":"Composition à déterminer","anecdote":"Cette équipe sera désignée à l'issue des matchs qualificatifs ou de barrage."},
 "TBD":{"flag":"🏳️","forme":["W","D","W","D","W"],"lineup":"Composition à déterminer","anecdote":"Cette équipe sera désignée à l'issue des matchs qualificatifs ou de barrage."}
 });
-// AJOUT MASTER PROMPT 2026 - 50 conseils Jeannot
+// Conseils de Jeannot — version "il pète les plombs" : la Coupe du Monde + la demie de la France
+// lui font perdre la tête, il ne parle plus que de Saint-Étienne et des Bleus, avec plein de smileys.
 const JEANNOT_CONSEILS = [
-  "Top 10 FIFA au tirage ? Cette équipe gagne son huitième dans 73% des cas.",
-  "Plus de 4 buts concédés en groupes ? Aucun champion depuis 1966.",
-  "Le pays organisateur n'a jamais été éliminé en huitième depuis 1982.",
-  "Premier de groupe bat le deuxième adverse dans 68% des cas.",
-  "Europe contre Amérique du Sud en quart ? L'Europe gagne à 54% depuis 1990.",
-  "Prolongations au tour précédent ? La fatigue sera décisive.",
-  "Plus de 2 buts encaissés en groupes ? Aucun gardien champion depuis 1994.",
-  "But en première mi-temps en huitième ? Victoire dans 79% des cas.",
-  "Effectif moyen entre 26 et 28 ans ? Surperformance systématique en phase finale.",
-  "Depuis 1978, tous les champions avaient un joueur de plus de 30 ans titulaire.",
-  "Plus de possession sur les deux matchs précédents ? Victoire en demie à 61%.",
-  "Deux victoires sans prolongations en phase finale ? Trois fois plus de chances d'aller en finale.",
-  "Meilleur buteur du tournoi en quart ? Il marque dans 82% des cas.",
-  "Depuis 1986, aucun champion n'avait perdu en phase de groupes.",
-  "But en premier en finale ? Victoire dans 65% des cas.",
-  "Moins de 15 changements jusqu'en demie ? Taux de victoire de 71%.",
-  "Trois prolongations avant la finale ? Jamais gagnée. Jamais.",
-  "Sélectionneur en poste depuis plus de 4 ans ? Champion dans 60% des finales depuis 1974.",
-  "Au moins 3 clean sheets sur le tournoi ? Jamais perdu en finale depuis 1982.",
-  "Penalties en huitième ? Ça arrive dans 23% des cas. Analyse les bilans.",
-  "Plus de 8 buts en groupes ? Dernier carré dans 80% des cas depuis 1994.",
-  "Plus de jours de repos que l'adversaire en demie ? Victoire dans 58% des cas.",
-  "Le pays avec le plus de sélections cumulées gagne à 66% en phase finale.",
-  "Penalty en quart ? L'équipe qui en bénéficie gagne dans 91% des cas depuis 1986.",
-  "Finaliste sortant ? Aucun n'a gagné la suivante depuis le Brésil en 1962.",
-  "Meilleur buteur jouant en club européen ? Tous les champions depuis 1998 l'avaient.",
-  "But encaissé dans les 10 premières minutes d'un quart ? Jamais remontée depuis 1990.",
-  "Sélectionneur ex-joueur de Coupe du monde ? Taux de succès 40% supérieur.",
-  "3 joueurs titulaires en fin de contrat ? La motivation n'est pas la même.",
-  "Analyse les 5 dernières confrontations directes. C'est faible à 48% mais c'est toujours mieux que Mag.",
-  "Évite de cliquer plusieurs fois sur cette bannière.... STP...."
+  "ALLEZ LES VERTS 💚💚💚 ... pardon pardon, je reprends vos pronos 😅⚽",
+  "Saint-Étienne 10 fois champion de France 🟢💚🔥 DIX 🔥 LE PLUS GRAND CLUB DU PAYS 💚😤",
+  "La France en demie ET Sainté dans mon cœur 😭🇫🇷💚 je vais pas tenir les gars 🥵",
+  "Geoffroy-Guichard c'est pas un stade... c'est une CATHÉDRALE ⛪💚🟢🔥",
+  "Le CHAUDRON 🔥🔥🔥 vous l'entendez ?? MOI JE L'ENTENDS 💚😳🟢",
+  "Mbappé il est fort 🇫🇷⚽ mais il aurait dû signer à Sainté 💚😤 j'dis ça j'dis rien 🤫",
+  "Allez les Bleus 🇫🇷 allez les Verts 💚 allez... euh... j'ai perdu le fil 😵‍💫💚🔥",
+  "La France championne du monde 🇫🇷🏆 ET Sainté qui remonte 💚 ce serait le plus beau jour de MA VIE 😭🔥",
+  "J'ai mis un maillot vert sous ma chemise BGE 💚🤫 chut 😅 ALLEZ LES VERTS ⚽",
+  "Vous avez vu ?? VOUS AVEZ VU ?? 😱⚽🇫🇷 ... non rien, je m'emballe 😅💚",
+  "Je dors plus 🥵 je mange vert 💚 je rêve en bleu-blanc-rouge 🇫🇷 tout va bien 😵‍💫🔥",
+  "Peu importe vos pronos tant que Sainté est dans vos cœurs 💚🟢🔥 (et la France dans vos paris 🇫🇷😉)",
+  "SAINTÉÉÉÉ 💚💚💚🔥🟢 ... bon, sinon, misez raisonnable hein 😅⚽",
+  "Deschamps si tu m'entends 📣🇫🇷 prends un Vert en sélection 💚 UN SEUL 😤🔥",
+  "Mon cardiologue m'a dit d'éviter les émotions fortes 😅 alors forcément, cette Coupe du Monde... 🥵🇫🇷💚",
+  "On est d'accord que la vraie finale ce serait France 🇫🇷 vs Saint-Étienne 💚 ?? 🤩🔥 ... quoi ? 😳",
+  "Évite de cliquer plusieurs fois sur cette bannière.... STP.... 😵‍💫💚"
 ];
 // AJOUT MASTER PROMPT 2026 - Modal fiche equipe
 function openTeamModal(teamName){
@@ -793,6 +780,13 @@ const TIPH_CONSEILS = [
 // AJOUT MASTER PROMPT 2026 - Rotation aleatoire Jeannot/Mag alternés
 let _clickVideo = null; // src de la vidéo à lancer au clic sur la bannière, ou null
 let _clickLink = null;  // URL à ouvrir au clic sur la bannière, ou null
+// Thierry mi-ange mi-démon : petites piques sur le Prono de la Mort
+const THIERRY_DEMON = [
+  "Alors… on commence à avoir un peu peur ? 😈",
+  "Le Prono de la Mort vous terrifie ? Vous avez bien raison… 😇😈",
+  "Bientôt la révélation… et certains vont pleurer. 😈🔥"
+];
+let _thierryIdx = 0;
 function initJeannot(){
   let jPool=[], mPool=[], showCount=0;
   function getNextJ(){if(!jPool.length){jPool=[...Array(JEANNOT_CONSEILS.length).keys()];for(let i=jPool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[jPool[i],jPool[j]]=[jPool[j],jPool[i]];}}return jPool.pop();}
@@ -806,17 +800,24 @@ function initJeannot(){
     el.classList.remove('visible');
     setTimeout(()=>{
       showCount++;
-      // Bannière en pause pour les demi-finales : Jeannot uniquement (+ promo de son site)
       _clickVideo = null;
       _clickLink = null;
-      if(photoEl){ photoEl.src='images/jeannot.png'; photoEl.alt='Jeannot'; photoEl.style.objectPosition='center'; }
-      if(Math.random() < 1/6){
+      const rnd = Math.random();
+      if(rnd < 1/6){
+        // Jeannot fait la promo de son site
         _clickLink = 'http://jeannotforever.fr/';
         el.innerHTML='🌐 Et tant que vous y êtes, filez sur <u>mon site jeannotforever.fr</u> — cliquez ici !';
         if(labelEl) labelEl.textContent='⭐ Le site de Jeannot';
+        if(photoEl){ photoEl.src='images/jeannot.png'; photoEl.alt='Jeannot'; photoEl.style.objectPosition='center'; }
+      } else if(rnd < 2/6){
+        // Thierry mi-ange mi-démon taquine sur le Prono de la Mort
+        el.textContent=THIERRY_DEMON[_thierryIdx % THIERRY_DEMON.length]; _thierryIdx++;
+        if(labelEl) labelEl.textContent='😇😈 Thierry, mi-ange mi-démon';
+        if(photoEl){ photoEl.src='images/TBMAMD.png'; photoEl.alt='Thierry'; photoEl.style.objectPosition='center top'; }
       } else {
         el.textContent=JEANNOT_CONSEILS[getNextJ()];
         if(labelEl) labelEl.textContent='⭐ Les bons conseils de Jeannot';
+        if(photoEl){ photoEl.src='images/jeannot.png'; photoEl.alt='Jeannot'; photoEl.style.objectPosition='center'; }
       }
       el.classList.add('visible');
     },600);
@@ -1565,7 +1566,7 @@ function showTiphaineDemiPopup() {
         <img src="images/TG.jpg" alt="Tiphaine" style="width:100px;height:100px;border-radius:50%;object-fit:cover;border:3px solid #9B5DE5;box-shadow:0 0 25px rgba(155,93,229,.5);display:block;margin:0 auto .7rem" onerror="this.style.display='none'">
         <div style="font-size:.72rem;color:#d9b8ff;font-weight:800;letter-spacing:1px">Tiphaine, responsable communication</div>
         <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:2px;color:#ffd23f;line-height:1.1;margin:.4rem 0 .2rem">POINTS DOUBLÉS !</div>
-        <div style="font-size:.85rem;color:#f0e6ff;line-height:1.6;margin-bottom:.9rem">Pour les <strong>deux demi-finales</strong>, la direction de la com' frappe fort :</div>
+        <div style="font-size:.85rem;color:#f0e6ff;line-height:1.6;margin-bottom:.9rem">Bon… Magali (la patronne) a <strong>ENCORE</strong> fait une annonce toute seule dans son coin 🙄 du coup c'est la com' qui court derrière pour officialiser. Alors voilà, sur les <strong>deux demi-finales</strong> :</div>
         <div style="display:flex;gap:.6rem;justify-content:center;margin-bottom:.9rem">
           <div style="flex:1;background:rgba(255,255,255,.08);border:1px solid rgba(155,93,229,.4);border-radius:12px;padding:.8rem .5rem">
             <div style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:#fff">5 pts</div>
@@ -1580,7 +1581,7 @@ function showTiphaineDemiPopup() {
           <span><img src="https://flagcdn.com/h20/fr.png" style="height:12px;vertical-align:middle;border-radius:2px" onerror="this.style.display='none'"> France — Espagne <img src="https://flagcdn.com/h20/es.png" style="height:12px;vertical-align:middle;border-radius:2px" onerror="this.style.display='none'"></span>
           <span><img src="https://flagcdn.com/h20/gb-eng.png" style="height:12px;vertical-align:middle;border-radius:2px" onerror="this.style.display='none'"> Angleterre — Argentine <img src="https://flagcdn.com/h20/ar.png" style="height:12px;vertical-align:middle;border-radius:2px" onerror="this.style.display='none'"></span>
         </div>
-        <button onclick="document.getElementById('tiphaineDemiPopup').remove()" style="width:100%;background:linear-gradient(135deg,#7c2fd6,#9B5DE5);border:none;border-radius:12px;padding:.85rem;color:white;font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:900;cursor:pointer">Bien reçu, chef com' ! 📣</button>
+        <button onclick="document.getElementById('tiphaineDemiPopup').remove()" style="width:100%;background:linear-gradient(135deg,#7c2fd6,#9B5DE5);border:none;border-radius:12px;padding:.85rem;color:white;font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:900;cursor:pointer">OK, je gère la com' derrière… 🙄📣</button>
       </div>
     </div>`;
   pop.onclick = e => { if (e.target === pop) pop.remove(); };
@@ -1998,7 +1999,7 @@ async function cancelPronoMort() {
 // CONTRÔLE DE VERSION — recharge auto quand un nouveau déploiement est détecté
 // (À CHAQUE déploiement : monter APP_VERSION ici ET dans version.json à l'identique)
 // ============================================================
-const APP_VERSION = '2026-07-12-1';
+const APP_VERSION = '2026-07-12-2';
 async function checkAppVersion() {
   try {
     const res = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' });
@@ -2304,9 +2305,10 @@ async function saveProno(matchId, s1, s2, winner = null) {
   }
 }
 
-function updateStats() {
+async function updateStats() {
   const count = Object.keys(myPronos).length;
-  const pts = Object.values(myPronos).reduce((s, p) => s + (p.points || 0), 0);
+  const _pmDeltas = await getPronoMortDeltas();
+  const pts = Object.values(myPronos).reduce((s, p) => s + (p.points || 0), 0) + (_pmDeltas[currentUser.id] || 0);
   const exact = Object.values(myPronos).filter(p => p.points === 5).length;
   document.getElementById('statMatchs').textContent = allMatches.length;
   document.getElementById('statPronos').textContent = count;
@@ -2597,6 +2599,30 @@ function isShootoutChampion(name) {
 let _goldenBallIds = new Set();
 let _bluePollIds = new Set();
 
+// Prono de la Mort : bonus/malus appliqués AUTOMATIQUEMENT une fois la finale terminée.
+//  +30 : bonne équipe championne + score exact de la finale
+//  +15 : bonne équipe championne
+//  -20 : mauvaise équipe
+// Rien n'est appliqué tant que la finale n'est pas jouée.
+async function getPronoMortDeltas() {
+  const deltas = {};
+  const finale = allMatches.find(m => m.group_name === 'Finale');
+  if (!finale || getEffectiveStatus(finale) !== 'done' || finale.score1_real === null || finale.score1_real === undefined) return deltas;
+  const t1Win = finale.score1_real > finale.score2_real || (finale.score1_real === finale.score2_real && finale.winner === 'team1');
+  const champion = t1Win ? finale.team1 : finale.team2;
+  const winGoals = t1Win ? finale.score1_real : finale.score2_real;
+  const loseGoals = t1Win ? finale.score2_real : finale.score1_real;
+  const { data: pms } = await db.from('prono_mort').select('user_id,team,score_win,score_lose');
+  (pms || []).forEach(pm => {
+    if (pm.team === champion) {
+      deltas[pm.user_id] = (pm.score_win === winGoals && pm.score_lose === loseGoals) ? 30 : 15;
+    } else {
+      deltas[pm.user_id] = -20;
+    }
+  });
+  return deltas;
+}
+
 async function renderRanking() {
   const allPronos = await loadAllPronos();
   const medals = ['🥇','🥈','🥉'];
@@ -2616,9 +2642,11 @@ async function renderRanking() {
     _bluePollIds = new Set(Object.entries(byUser).filter(([, dates]) => DAILY_POLLS.every(p => dates.has(p.date))).map(([k]) => k));
   }
 
+  const pronoMortDeltas = await getPronoMortDeltas();
+
   const players = allUsers.map(u => {
     const userPronos = allPronos.filter(p => p.user_id === u.id && (rankMode === 'ko' ? koMatchIds.has(p.match_id) : true));
-    const pts = userPronos.reduce((s, p) => s + (p.points || 0), 0);
+    const pts = userPronos.reduce((s, p) => s + (p.points || 0), 0) + (pronoMortDeltas[u.id] || 0);
     const exact = userPronos.filter(p => p.points === 5).length;
     const correct = userPronos.filter(p => p.points === 3).length;
     return { ...u, pts, exact, correct };
