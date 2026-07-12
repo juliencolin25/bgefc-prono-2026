@@ -422,6 +422,13 @@ main{max-width:1200px;margin:0 auto;padding:2rem 1.5rem;position:relative;z-inde
             </div>
             <div style="font-size:.72rem;color:var(--gris);font-weight:600;text-align:center;margin-top:.5rem">Valable sur les deux demies : France-Espagne et Angleterre-Argentine</div>
           </div>
+          <div style="margin-top:.8rem;background:rgba(0,35,149,.06);border:1px solid rgba(0,35,149,.25);border-radius:12px;padding:.9rem 1rem">
+            <div style="font-size:.82rem;font-weight:800;color:#002395;margin-bottom:.6rem;text-align:center">🇫🇷 Rappel — Bonus du quart France-Maroc</div>
+            <div class="points-grid" style="grid-template-columns:repeat(2,1fr)">
+              <div class="points-item" style="background:rgba(0,35,149,.1)"><div class="points-value" style="color:#002395">8</div><div class="points-label">Score exact 🎯</div></div>
+              <div class="points-item" style="background:rgba(0,35,149,.07)"><div class="points-value" style="color:#002395">5</div><div class="points-label">Bon résultat ✓</div></div>
+            </div>
+          </div>
         </div>
         <div class="card">
           <div style="font-family:'Bebas Neue';font-size:1.3rem;letter-spacing:2px;color:var(--navy);margin-bottom:1rem">👥 Classement équipes</div>
@@ -2005,7 +2012,7 @@ async function cancelPronoMort() {
 // CONTRÔLE DE VERSION — recharge auto quand un nouveau déploiement est détecté
 // (À CHAQUE déploiement : monter APP_VERSION ici ET dans version.json à l'identique)
 // ============================================================
-const APP_VERSION = '2026-07-12-6';
+const APP_VERSION = '2026-07-12-7';
 async function checkAppVersion() {
   try {
     const res = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' });
