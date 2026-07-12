@@ -118,11 +118,16 @@ function matchOutcome(s1, s2, winnerField) {
   return winnerField || 'draw';
 }
 
-// Match spécial France-Maroc (quart de finale) : barème renforcé 8 pts score exact / 5 pts bon vainqueur
-function isFranceMarocQuart(team1, team2, groupName) {
-  if (groupName !== 'Quart de finale') return false;
-  const teams = [team1, team2];
-  return teams.includes('France') && teams.includes('Maroc');
+// Barème de points selon le match :
+//  - Demi-finales : 10 pts score exact / 5 pts bon vainqueur (annonce Tiphaine, points doublés)
+//  - Quart France-Maroc : 8 pts score exact / 5 pts bon vainqueur (bonus Mag)
+//  - Défaut : 5 pts score exact / 3 pts bon vainqueur
+function matchPointsScale(team1, team2, groupName) {
+  if (groupName === 'Demi-finale') return { exact: 10, outcome: 5 };
+  if (groupName === 'Quart de finale' && [team1, team2].includes('France') && [team1, team2].includes('Maroc')) {
+    return { exact: 8, outcome: 5 };
+  }
+  return { exact: 5, outcome: 3 };
 }
 
 async function calculateAndUpdatePoints(matchId, score1Real, score2Real, winnerField, team1, team2, groupName) {
@@ -131,9 +136,9 @@ async function calculateAndUpdatePoints(matchId, score1Real, score2Real, winnerF
   if (!pronos || !pronos.length) return;
 
   const realOutcome = matchOutcome(score1Real, score2Real, winnerField);
-  const special = isFranceMarocQuart(team1, team2, groupName);
-  const exactPts = special ? 8 : 5;
-  const outcomePts = special ? 5 : 3;
+  const scale = matchPointsScale(team1, team2, groupName);
+  const exactPts = scale.exact;
+  const outcomePts = scale.outcome;
 
   await Promise.all(pronos.map(p => {
     let pts = 0;
