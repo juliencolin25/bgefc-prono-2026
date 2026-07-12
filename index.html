@@ -76,7 +76,7 @@ main{max-width:1200px;margin:0 auto;padding:2rem 1.5rem;position:relative;z-inde
 
 /* HERO */
 .hero{background:linear-gradient(135deg,var(--navy) 0%,#0a5068 100%);border-radius:24px;padding:2.5rem;margin-bottom:2rem;position:relative;overflow:hidden;color:white;}
-.hero-trophy{position:absolute;right:2rem;top:50%;transform:translateY(-50%);width:140px;opacity:.18;pointer-events:none;}
+.hero-trophy{position:absolute;right:2rem;top:50%;transform:translateY(-50%);width:150px;opacity:.55;pointer-events:none;}
 .hero-flags{font-size:1.5rem;letter-spacing:.3rem;margin-bottom:.8rem;}
 .hero h1{font-family:'Bebas Neue',sans-serif;font-size:2.8rem;letter-spacing:4px;line-height:1;margin-bottom:.5rem;}
 .hero h1 span{color:var(--jaune);}
@@ -341,7 +341,7 @@ main{max-width:1200px;margin:0 auto;padding:2rem 1.5rem;position:relative;z-inde
     <div id="pageMatchs" class="page active">
       <div class="hero">
         <img src="images/fifa.png" alt="FIFA 2026" class="hero-trophy">
-        <div class="hero-flags">🇺🇸 🇨🇦 🇲🇽</div>
+        <div class="hero-flags"><img src="https://flagcdn.com/h40/us.png" style="height:24px;border-radius:3px;vertical-align:middle;margin-right:.4rem" onerror="this.style.display='none'"><img src="https://flagcdn.com/h40/ca.png" style="height:24px;border-radius:3px;vertical-align:middle;margin-right:.4rem" onerror="this.style.display='none'"><img src="https://flagcdn.com/h40/mx.png" style="height:24px;border-radius:3px;vertical-align:middle" onerror="this.style.display='none'"></div>
         <h1>COUPE DU MONDE <span>FIFA 2026</span></h1>
         <p>11 juin — 19 juillet 2026 • États-Unis, Canada, Mexique</p>
         <div class="hero-stats">
@@ -2012,7 +2012,7 @@ async function cancelPronoMort() {
 // CONTRÔLE DE VERSION — recharge auto quand un nouveau déploiement est détecté
 // (À CHAQUE déploiement : monter APP_VERSION ici ET dans version.json à l'identique)
 // ============================================================
-const APP_VERSION = '2026-07-12-9';
+const APP_VERSION = '2026-07-12-10';
 async function checkAppVersion() {
   try {
     const res = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' });
