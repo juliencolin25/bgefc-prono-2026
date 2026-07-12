@@ -808,30 +808,35 @@ function initJeannot(){
   const labelEl=document.getElementById('jeannotLabel');
   const photoEl=document.querySelector('.jeannot-photo');
   if(!el)return;
-  let isMagTurn=false;
+  let _lastBannerHTML='';
   function show(){
     el.classList.remove('visible');
     setTimeout(()=>{
       showCount++;
-      _clickVideo = null;
-      _clickLink = null;
-      const rnd = Math.random();
-      if(rnd < 1/6){
-        // Jeannot fait la promo de son site
-        _clickLink = 'http://jeannotforever.fr/';
-        el.innerHTML='🌐 Et tant que vous y êtes, filez sur <u>mon site jeannotforever.fr</u> — cliquez ici !';
-        if(labelEl) labelEl.textContent='⭐ Le site de Jeannot';
-        if(photoEl){ photoEl.src='images/jeannot.png'; photoEl.alt='Jeannot'; photoEl.style.objectPosition='center'; }
-      } else if(rnd < 2/6){
-        // Thierry mi-ange mi-démon taquine sur le Prono de la Mort
-        el.textContent=THIERRY_DEMON[_thierryIdx % THIERRY_DEMON.length]; _thierryIdx++;
-        if(labelEl) labelEl.textContent='😇😈 Thierry, mi-ange mi-démon';
-        if(photoEl){ photoEl.src='images/TBMAMD.png'; photoEl.alt='Thierry'; photoEl.style.objectPosition='center top'; }
-      } else {
-        el.innerHTML=JEANNOT_CONSEILS[getNextJ()].replace(/🇫🇷/g, FR_FLAG);
-        if(labelEl) labelEl.textContent='🤪 Jeannot part en vrille';
-        if(photoEl){ photoEl.src='images/jeannot.png'; photoEl.alt='Jeannot'; photoEl.style.objectPosition='center'; }
-      }
+      let html, label, photoSrc, objPos, video, link, tries=0;
+      do {
+        video=null; link=null;
+        const rnd = Math.random();
+        if(rnd < 1/6){
+          // Jeannot fait la promo de son site
+          link='http://jeannotforever.fr/';
+          html='🌐 Et tant que vous y êtes, filez sur <u>mon site jeannotforever.fr</u> — cliquez ici !';
+          label='⭐ Le site de Jeannot'; photoSrc='images/jeannot.png'; objPos='center';
+        } else if(rnd < 2/6){
+          // Thierry mi-ange mi-démon taquine sur le Prono de la Mort
+          html=THIERRY_DEMON[_thierryIdx % THIERRY_DEMON.length]; _thierryIdx++;
+          label='😇😈 Thierry, mi-ange mi-démon'; photoSrc='images/TBMAMD.png'; objPos='center top';
+        } else {
+          html=JEANNOT_CONSEILS[getNextJ()].replace(/🇫🇷/g, FR_FLAG);
+          label='🤪 Jeannot part en vrille'; photoSrc='images/jeannot.png'; objPos='center';
+        }
+        tries++;
+      } while(html===_lastBannerHTML && tries<6); // jamais deux fois le même texte de suite
+      _lastBannerHTML=html;
+      _clickVideo=video; _clickLink=link;
+      el.innerHTML=html;
+      if(labelEl) labelEl.textContent=label;
+      if(photoEl){ photoEl.src=photoSrc; photoEl.alt='BGE'; photoEl.style.objectPosition=objPos; }
       el.classList.add('visible');
     },600);
   }
@@ -2012,7 +2017,7 @@ async function cancelPronoMort() {
 // CONTRÔLE DE VERSION — recharge auto quand un nouveau déploiement est détecté
 // (À CHAQUE déploiement : monter APP_VERSION ici ET dans version.json à l'identique)
 // ============================================================
-const APP_VERSION = '2026-07-12-11';
+const APP_VERSION = '2026-07-12-12';
 async function checkAppVersion() {
   try {
     const res = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' });
