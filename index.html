@@ -1612,6 +1612,7 @@ function showFranceFinalCountdown() {
     <div style="background:#0a0e27;border-radius:20px;max-width:420px;width:100%;overflow:hidden;border:2px solid #fff;box-shadow:0 20px 60px rgba(0,0,0,.6);font-family:'Nunito',sans-serif;text-align:center">
       <div style="display:flex;height:6px"><div style="flex:1;background:#0055A4"></div><div style="flex:1;background:#fff"></div><div style="flex:1;background:#EF4135"></div></div>
       <div style="padding:1.6rem">
+        <img src="images/jeannot.png" alt="Jeannot" style="width:90px;height:90px;border-radius:50%;object-fit:cover;border:3px solid #fff;box-shadow:0 0 22px rgba(255,255,255,.35);display:block;margin:0 auto .8rem" onerror="this.style.display='none'">
         <div style="font-family:'Bebas Neue',sans-serif;font-size:1.9rem;letter-spacing:2px;color:#fff;line-height:1.05">EN ROUTE POUR<br>LA 3ᵉ ÉTOILE ⭐</div>
         <div style="font-size:.85rem;color:rgba(255,255,255,.75);font-weight:700;margin:.5rem 0 1.1rem">La France est en FINALE ! <img src="https://flagcdn.com/h20/fr.png" style="height:13px;vertical-align:middle;border-radius:2px" onerror="this.style.display='none'"><br>Rendez-vous dimanche 19 juillet, 21h</div>
         <div id="finalCountdown" style="display:flex;gap:.5rem;justify-content:center;flex-wrap:wrap"></div>
@@ -2146,7 +2147,7 @@ async function cancelPronoMort() {
 // CONTRÔLE DE VERSION — recharge auto quand un nouveau déploiement est détecté
 // (À CHAQUE déploiement : monter APP_VERSION ici ET dans version.json à l'identique)
 // ============================================================
-const APP_VERSION = '2026-07-14-3';
+const APP_VERSION = '2026-07-14-4';
 async function checkAppVersion() {
   try {
     const res = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' });
