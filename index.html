@@ -1463,6 +1463,7 @@ async function startApp() {
   initJuly13Badge();
   // showTiphaineDemiPopup();  // désactivé le 12/07 : annonce des points doublés retirée (le barème 10/5 reste actif)
   showBastilleFireworks();
+  showFranceDemiResultPopup();
 }
 
 // ============================================================
@@ -1566,6 +1567,78 @@ function showFranceLosePopup() {
     </div>`;
   pop.onclick = e => { if (e.target === pop) pop.remove(); };
   document.body.appendChild(pop);
+}
+
+// ============================================================
+// RÉSULTAT DEMI-FINALE FRANCE (France-Espagne)
+// Victoire : compte à rebours bleu-blanc-rouge vers la finale (dim 19 juillet 21h Paris).
+// Défaite : popup Lose.mp4 + Magali + Thierry (réutilise showFranceLosePopup), pendant ~48h.
+// ============================================================
+function matchKickoffDate(m) {
+  const parts = (m.match_date || '').trim().split(' ');
+  const day = parseInt(parts[0]) || 0;
+  const month = _MONTHS_FR[parts[1]] || 0;
+  if (!day || !month) return null;
+  const [h, min] = (m.match_time || '00:00').split(':').map(Number);
+  return new Date(new Date().getFullYear(), month - 1, day, h, min, 0);
+}
+
+function showFranceDemiResultPopup() {
+  const m = allMatches.find(x => x.group_name === 'Demi-finale' && [x.team1, x.team2].includes('France'));
+  if (!m) return;
+  if (getEffectiveStatus(m) !== 'done' || m.score1_real === null || m.score1_real === undefined) return;
+  const franceIsTeam1 = m.team1 === 'France';
+  const fScore = franceIsTeam1 ? m.score1_real : m.score2_real;
+  const oScore = franceIsTeam1 ? m.score2_real : m.score1_real;
+  let franceWon;
+  if (fScore > oScore) franceWon = true;
+  else if (fScore < oScore) franceWon = false;
+  else franceWon = m.winner === (franceIsTeam1 ? 'team1' : 'team2');
+  if (franceWon) {
+    if (new Date() >= new Date('2026-07-19T19:00:00Z')) return; // finale déjà commencée
+    showFranceFinalCountdown();
+  } else {
+    const ko = matchKickoffDate(m);
+    if (ko && (new Date() - ko) >= 50 * 3600000) return; // ~48h après le match
+    showFranceLosePopup();
+  }
+}
+
+function showFranceFinalCountdown() {
+  const pop = document.createElement('div');
+  pop.id = 'franceFinalPopup';
+  pop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem';
+  pop.innerHTML = `
+    <div style="background:#0a0e27;border-radius:20px;max-width:420px;width:100%;overflow:hidden;border:2px solid #fff;box-shadow:0 20px 60px rgba(0,0,0,.6);font-family:'Nunito',sans-serif;text-align:center">
+      <div style="display:flex;height:6px"><div style="flex:1;background:#0055A4"></div><div style="flex:1;background:#fff"></div><div style="flex:1;background:#EF4135"></div></div>
+      <div style="padding:1.6rem">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.9rem;letter-spacing:2px;color:#fff;line-height:1.05">EN ROUTE POUR<br>LA 3ᵉ ÉTOILE ⭐</div>
+        <div style="font-size:.85rem;color:rgba(255,255,255,.75);font-weight:700;margin:.5rem 0 1.1rem">La France est en FINALE ! 🇫🇷<br>Rendez-vous dimanche 19 juillet, 21h</div>
+        <div id="finalCountdown" style="display:flex;gap:.5rem;justify-content:center;flex-wrap:wrap"></div>
+        <button onclick="if(window._finalCdStop)window._finalCdStop();document.getElementById('franceFinalPopup').remove()" style="width:100%;margin-top:1.3rem;background:linear-gradient(135deg,#0055A4 0%,#0055A4 33%,#fff 33%,#fff 66%,#EF4135 66%,#EF4135 100%);border:none;border-radius:12px;padding:.85rem;color:#fff;font-family:'Nunito',sans-serif;font-weight:900;font-size:.9rem;cursor:pointer;text-shadow:0 1px 3px rgba(0,0,0,.8)">Allez les Bleus ! 🇫🇷</button>
+      </div>
+    </div>`;
+  pop.onclick = e => { if (e.target === pop) pop.remove(); };
+  document.body.appendChild(pop);
+  startFinalCountdown();
+}
+
+function startFinalCountdown() {
+  const target = new Date('2026-07-19T19:00:00Z').getTime();
+  const cell = (v, l) => `<div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:10px;padding:.6rem .4rem;min-width:60px"><div style="font-family:'Bebas Neue',sans-serif;font-size:1.9rem;color:#fff;line-height:1">${String(v).padStart(2,'0')}</div><div style="font-size:.6rem;color:rgba(255,255,255,.6);font-weight:700;letter-spacing:1px">${l}</div></div>`;
+  function tick() {
+    const el = document.getElementById('finalCountdown');
+    if (!el) { if (window._finalCdStop) window._finalCdStop(); return; }
+    let diff = Math.max(0, target - Date.now());
+    const d = Math.floor(diff / 86400000); diff -= d * 86400000;
+    const h = Math.floor(diff / 3600000); diff -= h * 3600000;
+    const mi = Math.floor(diff / 60000); diff -= mi * 60000;
+    const s = Math.floor(diff / 1000);
+    el.innerHTML = cell(d, 'JOURS') + cell(h, 'HEURES') + cell(mi, 'MIN') + cell(s, 'SEC');
+  }
+  tick();
+  const timer = setInterval(tick, 1000);
+  window._finalCdStop = function () { clearInterval(timer); };
 }
 
 // ============================================================
@@ -2073,7 +2146,7 @@ async function cancelPronoMort() {
 // CONTRÔLE DE VERSION — recharge auto quand un nouveau déploiement est détecté
 // (À CHAQUE déploiement : monter APP_VERSION ici ET dans version.json à l'identique)
 // ============================================================
-const APP_VERSION = '2026-07-14-1';
+const APP_VERSION = '2026-07-14-2';
 async function checkAppVersion() {
   try {
     const res = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' });
