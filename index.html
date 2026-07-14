@@ -1572,7 +1572,7 @@ function showFranceLosePopup() {
 // ============================================================
 // RÉSULTAT DEMI-FINALE FRANCE (France-Espagne)
 // Victoire : compte à rebours bleu-blanc-rouge vers la finale (dim 19 juillet 21h Paris).
-// Défaite : popup Lose.mp4 + Magali + Thierry (réutilise showFranceLosePopup), pendant ~48h.
+// Défaite : popup Lose.mp4 + Magali + Thierry (réutilise showFranceLosePopup), jusqu'au 15 juillet 19h Paris.
 // ============================================================
 function matchKickoffDate(m) {
   const parts = (m.match_date || '').trim().split(' ');
@@ -1598,8 +1598,7 @@ function showFranceDemiResultPopup() {
     if (new Date() >= new Date('2026-07-19T19:00:00Z')) return; // finale déjà commencée
     showFranceFinalCountdown();
   } else {
-    const ko = matchKickoffDate(m);
-    if (ko && (new Date() - ko) >= 50 * 3600000) return; // ~48h après le match
+    if (new Date() >= new Date('2026-07-15T17:00:00Z')) return; // disparaît mercredi 15 juillet 19h Paris
     showFranceLosePopup();
   }
 }
@@ -2157,7 +2156,7 @@ async function cancelPronoMort() {
 // CONTRÔLE DE VERSION — recharge auto quand un nouveau déploiement est détecté
 // (À CHAQUE déploiement : monter APP_VERSION ici ET dans version.json à l'identique)
 // ============================================================
-const APP_VERSION = '2026-07-14-5';
+const APP_VERSION = '2026-07-14-6';
 async function checkAppVersion() {
   try {
     const res = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' });
