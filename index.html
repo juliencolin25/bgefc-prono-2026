@@ -1461,7 +1461,7 @@ async function startApp() {
   initPronoMort();
   initDailyPoll();
   initJuly13Badge();
-  showTiphaineDemiPopup();
+  // showTiphaineDemiPopup();  // désactivé le 12/07 : annonce des points doublés retirée (le barème 10/5 reste actif)
   showBastilleFireworks();
 }
 
@@ -1609,17 +1609,18 @@ function showTiphaineDemiPopup() {
 }
 
 // ============================================================
-// FEUX D'ARTIFICE — Fête nationale du 14 juillet 2026 (8h → 20h Paris = 06h → 18h UTC)
+// FEUX D'ARTIFICE — Fête nationale du 14 juillet 2026 (8h → 21h Paris = 06h → 19h UTC)
+// Rendu transparent : voile léger, la page reste visible derrière.
 // ============================================================
 function showBastilleFireworks() {
   const now = new Date();
-  if (now < new Date('2026-07-14T06:00:00Z') || now >= new Date('2026-07-14T18:00:00Z')) return;
+  if (now < new Date('2026-07-14T06:00:00Z') || now >= new Date('2026-07-14T19:00:00Z')) return;
   const pop = document.createElement('div');
   pop.id = 'bastillePopup';
-  pop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,12,.9);z-index:10000;display:flex;align-items:center;justify-content:center;padding:1rem;overflow:hidden';
+  pop.style.cssText = 'position:fixed;inset:0;background:rgba(6,6,22,.22);z-index:10000;display:flex;align-items:center;justify-content:center;padding:1rem;overflow:hidden';
   pop.innerHTML = `
     <canvas id="fwCanvas" style="position:absolute;inset:0;width:100%;height:100%"></canvas>
-    <div style="position:relative;text-align:center;font-family:'Nunito',sans-serif;max-width:420px">
+    <div style="position:relative;text-align:center;font-family:'Nunito',sans-serif;max-width:420px;background:rgba(10,10,26,.58);border-radius:18px;padding:1.4rem 1.2rem;backdrop-filter:blur(2px)">
       <div style="font-family:'Bebas Neue',sans-serif;font-size:2.4rem;letter-spacing:2px;color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.7);line-height:1.1">🎆 BONNE FÊTE<br>NATIONALE ! <img src="https://flagcdn.com/h30/fr.png" style="height:22px;vertical-align:middle;border-radius:2px" onerror="this.style.display='none'"></div>
       <div style="font-size:.95rem;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.8);margin-top:.6rem;font-weight:700">Vive le 14 juillet… et bon match ce soir ! 🔵⚪🔴</div>
       <button onclick="if(window._fwStop)window._fwStop();document.getElementById('bastillePopup').remove()" style="margin-top:1.2rem;background:linear-gradient(135deg,#0055A4 0%,#0055A4 33%,#fff 33%,#fff 66%,#EF4135 66%,#EF4135 100%);border:none;border-radius:12px;padding:.85rem 1.6rem;color:#fff;font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:900;cursor:pointer;text-shadow:0 1px 3px rgba(0,0,0,.8)">Vive la France ! <img src="https://flagcdn.com/h20/fr.png" style="height:13px;vertical-align:middle;border-radius:2px" onerror="this.style.display='none'"></button>
@@ -1649,8 +1650,11 @@ function startFireworks() {
   }
   let raf, burstTimer;
   function loop() {
-    ctx.fillStyle = 'rgba(0,0,12,0.18)';
+    // Estompe les traînées vers la transparence (au lieu d'un fond noir)
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.fillStyle = 'rgba(0,0,0,0.12)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.globalCompositeOperation = 'source-over';
     particles.forEach(p => {
       p.x += p.vx; p.y += p.vy; p.vy += 0.04; p.life -= 0.012;
       ctx.globalAlpha = Math.max(p.life, 0);
@@ -2069,7 +2073,7 @@ async function cancelPronoMort() {
 // CONTRÔLE DE VERSION — recharge auto quand un nouveau déploiement est détecté
 // (À CHAQUE déploiement : monter APP_VERSION ici ET dans version.json à l'identique)
 // ============================================================
-const APP_VERSION = '2026-07-12-13';
+const APP_VERSION = '2026-07-14-1';
 async function checkAppVersion() {
   try {
     const res = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' });
