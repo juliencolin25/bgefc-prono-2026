@@ -2156,7 +2156,7 @@ async function cancelPronoMort() {
 // CONTRÔLE DE VERSION — recharge auto quand un nouveau déploiement est détecté
 // (À CHAQUE déploiement : monter APP_VERSION ici ET dans version.json à l'identique)
 // ============================================================
-const APP_VERSION = '2026-07-14-6';
+const APP_VERSION = '2026-07-14-7';
 async function checkAppVersion() {
   try {
     const res = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' });
@@ -2757,6 +2757,7 @@ let _goldenBallIds = new Set();
 let _bluePollIds = new Set();
 let _silverBadgeIds = new Set();
 let _july13Earned = false;
+let _pinkBadgeIds = new Set();
 
 // Prono de la Mort : bonus/malus appliqués AUTOMATIQUEMENT une fois la finale terminée.
 //  +30 : bonne équipe championne + score exact de la finale
@@ -2791,6 +2792,11 @@ async function renderRanking() {
   const exactCountAll = {};
   allPronos.forEach(p => { if (p.points === 5) exactCountAll[p.user_id] = (exactCountAll[p.user_id] || 0) + 1; });
   _goldenBallIds = new Set(Object.entries(exactCountAll).filter(([,v]) => v >= 10).map(([k]) => k));
+
+  // Ballon rose clair : a pronostiqué au moins 100 matchs (sur 104)
+  const pronoCountAll = {};
+  allPronos.forEach(p => { pronoCountAll[p.user_id] = (pronoCountAll[p.user_id] || 0) + 1; });
+  _pinkBadgeIds = new Set(Object.entries(pronoCountAll).filter(([, v]) => v >= 100).map(([k]) => k));
 
   // Ballon bleu clair : voté à TOUS les sondages de la semaine, décerné vendredi 10 juillet 17h Paris (15:00 UTC)
   _bluePollIds = new Set();
@@ -2827,7 +2833,7 @@ async function renderRanking() {
     return `<tr style="${isMe ? 'background:#fff8e1;' : ''}">
       <td class="rank-num ${i < 3 ? 'rank-' + (i + 1) : ''}">${medals[i] || (i + 1)}</td>
       <td><div class="rank-player"><div class="rank-avatar" style="background:${color}">${initials}</div>
-        <div class="rank-name">${p.name}${_goldenBallIds.has(p.id) ? ' <span title="10 pronos exacts ou plus !" style="display:inline-block;background:#FFD700;color:#7c3a00;border-radius:999px;padding:1px 5px;font-size:.75rem;vertical-align:middle">⚽</span>' : ''}${isShootoutChampion(p.name) ? ' <span title="5/5 aux Tirs au But Secret !" style="display:inline-block;background:#16a34a;color:#fff;border-radius:999px;padding:1px 5px;font-size:.75rem;vertical-align:middle">⚽</span>' : ''}${_bluePollIds.has(p.id) ? ' <span title="A voté à tous les sondages de la semaine !" style="display:inline-block;background:#8fd3ff;color:#084c7c;border-radius:999px;padding:1px 5px;font-size:.75rem;vertical-align:middle">⚽</span>' : ''}${_silverBadgeIds.has(p.id) ? ' <span title="Connecté le 13 juillet !" style="display:inline-block;background:linear-gradient(135deg,#eaeaea,#b0b0b0);color:#444;border-radius:999px;padding:1px 5px;font-size:.75rem;vertical-align:middle">⚽</span>' : ''}${isMe ? ' <span style="color:var(--rouge);font-size:.7rem">(moi)</span>' : ''}</div></div></td>
+        <div class="rank-name">${p.name}${_goldenBallIds.has(p.id) ? ' <span title="10 pronos exacts ou plus !" style="display:inline-block;background:#FFD700;color:#7c3a00;border-radius:999px;padding:1px 5px;font-size:.75rem;vertical-align:middle">⚽</span>' : ''}${isShootoutChampion(p.name) ? ' <span title="5/5 aux Tirs au But Secret !" style="display:inline-block;background:#16a34a;color:#fff;border-radius:999px;padding:1px 5px;font-size:.75rem;vertical-align:middle">⚽</span>' : ''}${_bluePollIds.has(p.id) ? ' <span title="A voté à tous les sondages de la semaine !" style="display:inline-block;background:#8fd3ff;color:#084c7c;border-radius:999px;padding:1px 5px;font-size:.75rem;vertical-align:middle">⚽</span>' : ''}${_silverBadgeIds.has(p.id) ? ' <span title="Connecté le 13 juillet !" style="display:inline-block;background:linear-gradient(135deg,#eaeaea,#b0b0b0);color:#444;border-radius:999px;padding:1px 5px;font-size:.75rem;vertical-align:middle">⚽</span>' : ''}${_pinkBadgeIds.has(p.id) ? ' <span title="A pronostiqué au moins 100 matchs !" style="display:inline-block;background:#fbdce8;color:#a02c5a;border-radius:999px;padding:1px 5px;font-size:.75rem;vertical-align:middle">⚽</span>' : ''}${isMe ? ' <span style="color:var(--rouge);font-size:.7rem">(moi)</span>' : ''}</div></div></td>
       <td><span style="font-size:.8rem;font-weight:800;color:${color}">${p.team}</span></td>
       <td class="rank-points">${p.pts}</td>
       <td class="rank-exact">⭐ ${p.exact}</td>
