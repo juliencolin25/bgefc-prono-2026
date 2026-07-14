@@ -1612,16 +1612,26 @@ function showFranceFinalCountdown() {
     <div style="background:#0a0e27;border-radius:20px;max-width:420px;width:100%;overflow:hidden;border:2px solid #fff;box-shadow:0 20px 60px rgba(0,0,0,.6);font-family:'Nunito',sans-serif;text-align:center">
       <div style="display:flex;height:6px"><div style="flex:1;background:#0055A4"></div><div style="flex:1;background:#fff"></div><div style="flex:1;background:#EF4135"></div></div>
       <div style="padding:1.6rem">
+        <audio id="galaAudio" src="images/gala.mp3" preload="auto"></audio>
         <img src="images/jeannot.png" alt="Jeannot" style="width:90px;height:90px;border-radius:50%;object-fit:cover;border:3px solid #fff;box-shadow:0 0 22px rgba(255,255,255,.35);display:block;margin:0 auto .8rem" onerror="this.style.display='none'">
         <div style="font-family:'Bebas Neue',sans-serif;font-size:1.9rem;letter-spacing:2px;color:#fff;line-height:1.05">EN ROUTE POUR<br>LA 3ᵉ ÉTOILE ⭐</div>
         <div style="font-size:.85rem;color:rgba(255,255,255,.75);font-weight:700;margin:.5rem 0 1.1rem">La France est en FINALE ! <img src="https://flagcdn.com/h20/fr.png" style="height:13px;vertical-align:middle;border-radius:2px" onerror="this.style.display='none'"><br>Rendez-vous dimanche 19 juillet, 21h</div>
         <div id="finalCountdown" style="display:flex;gap:.5rem;justify-content:center;flex-wrap:wrap"></div>
-        <button onclick="if(window._finalCdStop)window._finalCdStop();document.getElementById('franceFinalPopup').remove()" style="width:100%;margin-top:1.3rem;background:linear-gradient(135deg,#0055A4 0%,#0055A4 33%,#fff 33%,#fff 66%,#EF4135 66%,#EF4135 100%);border:none;border-radius:12px;padding:.85rem;color:#fff;font-family:'Nunito',sans-serif;font-weight:900;font-size:.9rem;cursor:pointer;text-shadow:0 1px 3px rgba(0,0,0,.8)">Allez les Bleus ! <img src="https://flagcdn.com/h20/fr.png" style="height:13px;vertical-align:middle;border-radius:2px" onerror="this.style.display='none'"></button>
+        <button onclick="if(window._finalCdStop)window._finalCdStop();var a=document.getElementById('galaAudio');if(a){a.pause();}document.getElementById('franceFinalPopup').remove()" style="width:100%;margin-top:1.3rem;background:linear-gradient(135deg,#0055A4 0%,#0055A4 33%,#fff 33%,#fff 66%,#EF4135 66%,#EF4135 100%);border:none;border-radius:12px;padding:.85rem;color:#fff;font-family:'Nunito',sans-serif;font-weight:900;font-size:.9rem;cursor:pointer;text-shadow:0 1px 3px rgba(0,0,0,.8)">Allez les Bleus ! <img src="https://flagcdn.com/h20/fr.png" style="height:13px;vertical-align:middle;border-radius:2px" onerror="this.style.display='none'"></button>
       </div>
     </div>`;
-  pop.onclick = e => { if (e.target === pop) pop.remove(); };
+  pop.onclick = e => { if (e.target === pop) { if (window._finalCdStop) window._finalCdStop(); const a = document.getElementById('galaAudio'); if (a) a.pause(); pop.remove(); } };
   document.body.appendChild(pop);
   startFinalCountdown();
+  // Musique de célébration : tentative de lecture auto, sinon au 1er clic/toucher (navigateurs bloquent le son auto)
+  const audio = document.getElementById('galaAudio');
+  if (audio) {
+    audio.volume = 0.7;
+    audio.play().catch(() => {
+      const h = () => { audio.play().catch(() => {}); document.removeEventListener('pointerdown', h); };
+      document.addEventListener('pointerdown', h, { once: true });
+    });
+  }
 }
 
 function startFinalCountdown() {
@@ -2147,7 +2157,7 @@ async function cancelPronoMort() {
 // CONTRÔLE DE VERSION — recharge auto quand un nouveau déploiement est détecté
 // (À CHAQUE déploiement : monter APP_VERSION ici ET dans version.json à l'identique)
 // ============================================================
-const APP_VERSION = '2026-07-14-4';
+const APP_VERSION = '2026-07-14-5';
 async function checkAppVersion() {
   try {
     const res = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' });
