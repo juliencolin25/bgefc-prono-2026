@@ -848,7 +848,7 @@ function initJeannot(){
         if(rnd < 1/8){
           // Jeannot fait la promo de son site
           link='http://jeannotforever.fr/';
-          html='🌐 Et tant que vous y êtes, filez sur <u>mon site jeannotforever.fr</u> — cliquez ici !';
+          html='🌐 Et tant que vous y êtes, filez sur <u>mon site jeannotforever.fr</u>, cliquez ici !';
           label='⭐ Le site de Jeannot'; photoSrc='images/jeannot.png'; objPos='center';
         } else if(rnd < 2/8){
           // Magali remercie les supporters
@@ -856,7 +856,7 @@ function initJeannot(){
           label='💙 Le mot de Magali'; photoSrc='images/mag.png'; objPos='center';
         } else if(rnd < 3/8){
           // Tiphaine (resp. com') : la compétition continue
-          html='La compétition n\'est pas finie — continuez à pronostiquer ! ✏️💪';
+          html='La compétition n\'est pas finie, continuez à pronostiquer ! ✏️💪';
           label='📣 Tiphaine, resp. com\''; photoSrc='images/TG.jpg'; objPos='center';
         } else {
           // Un cadre des Bleus remercie les supporters
@@ -2222,7 +2222,7 @@ async function cancelPronoMort() {
 // CONTRÔLE DE VERSION — recharge auto quand un nouveau déploiement est détecté
 // (À CHAQUE déploiement : monter APP_VERSION ici ET dans version.json à l'identique)
 // ============================================================
-const APP_VERSION = '2026-07-15-9';
+const APP_VERSION = '2026-07-15-10';
 async function checkAppVersion() {
   try {
     const res = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' });
