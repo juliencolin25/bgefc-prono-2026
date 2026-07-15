@@ -241,6 +241,9 @@ main{max-width:1200px;margin:0 auto;padding:2rem 1.5rem;position:relative;z-inde
 .jeannot-tip{font-size:15px;font-style:italic;opacity:0;transition:opacity 0.6s ease;line-height:1.4;}
 .jeannot-tip.visible{opacity:1;}
 .logo-bge-banner{width:50px;height:50px;object-fit:contain;flex-shrink:0;}
+.banner-countdown{flex-shrink:0;text-align:center;line-height:1.1;}
+.bc-label{font-size:9px;font-weight:800;letter-spacing:1px;color:#e63946;white-space:nowrap;}
+.bc-time{font-family:'Bebas Neue',sans-serif;font-size:1.15rem;letter-spacing:1px;color:#FFD166;white-space:nowrap;}
 /* AJOUT MASTER PROMPT 2026 - Modal equipe */
 .team-modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:1000;align-items:center;justify-content:center;}
 .team-modal-overlay.active{display:flex;}
@@ -305,10 +308,13 @@ main{max-width:1200px;margin:0 auto;padding:2rem 1.5rem;position:relative;z-inde
   <div class="jeannot-banner" id="jeannotBanner" onclick="sonometre()" style="cursor:pointer">
     <img src="images/jeannot.png" alt="Jeannot" class="jeannot-photo" onerror="this.style.display='none'">
     <div class="jeannot-content">
-      <div class="jeannot-label" id="jeannotLabel">😡 Jeannot est dégoûté</div>
+      <div class="jeannot-label" id="jeannotLabel">💙 Merci les Bleus</div>
       <div class="jeannot-tip" id="jeannotTip"></div>
     </div>
-    <img src="images/logo-bge.png" alt="BGE Franche-Comté" class="logo-bge-banner" onerror="this.style.display='none'">
+    <div class="banner-countdown" onclick="event.stopPropagation()">
+      <div class="bc-label">🏆 FINALE DANS</div>
+      <div class="bc-time" id="bannerCountdown">—</div>
+    </div>
   </div>
   <header>
     <div class="header-inner">
@@ -811,6 +817,16 @@ const MAG_VELO = [
 let _magVeloIdx = 0;
 // Drapeau France en image (les emojis drapeaux s'affichent "FR" sous Windows)
 const FR_FLAG = '<img src="https://flagcdn.com/h20/fr.png" style="height:12px;vertical-align:middle;border-radius:2px" onerror="this.style.display=\'none\'">';
+// Cadres des Bleus qui remercient les supporters (photos Wikimedia, libres)
+const FR_PLAYERS = [
+  { name:'Kylian Mbappé', img:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Kylian_Mbappe_-_France_v_Norway_-_26_June_2026_%28cropped%29.jpg/250px-Kylian_Mbappe_-_France_v_Norway_-_26_June_2026_%28cropped%29.jpg' },
+  { name:'Ousmane Dembélé', img:'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Ousmane_Dembele_France_v_Senegal_16_June_2026-341_%28cropped%29.jpg/250px-Ousmane_Dembele_France_v_Senegal_16_June_2026-341_%28cropped%29.jpg' },
+  { name:'Michael Olise', img:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Michael_Olise_-_France_v_Norway_-_26_June_2026_%28cropped%29.jpg/250px-Michael_Olise_-_France_v_Norway_-_26_June_2026_%28cropped%29.jpg' },
+  { name:'Antoine Griezmann', img:'https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Antoine_Griezmann_World_Cup_Trophy.jpg/250px-Antoine_Griezmann_World_Cup_Trophy.jpg' },
+  { name:'Aurélien Tchouaméni', img:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Aurelien_Tchouameni_France_v_Senegal_16_June_2026-447_%28cropped%29.jpg/250px-Aurelien_Tchouameni_France_v_Senegal_16_June_2026-447_%28cropped%29.jpg' },
+  { name:'William Saliba', img:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/William_Saliba_France_v_Senegal_16_June_2026-336_%28cropped%29.jpg/250px-William_Saliba_France_v_Senegal_16_June_2026-336_%28cropped%29.jpg' }
+];
+let _playerIdx = 0;
 function initJeannot(){
   let jPool=[], mPool=[], showCount=0;
   function getNextJ(){if(!jPool.length){jPool=[...Array(JEANNOT_CONSEILS.length).keys()];for(let i=jPool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[jPool[i],jPool[j]]=[jPool[j],jPool[i]];}}return jPool.pop();}
@@ -825,29 +841,33 @@ function initJeannot(){
     setTimeout(()=>{
       showCount++;
       let html, label, photoSrc, objPos, video, link, tries=0;
+      let key;
       do {
         video=null; link=null;
         const rnd = Math.random();
-        if(rnd < 1/6){
+        if(rnd < 1/8){
           // Jeannot fait la promo de son site
           link='http://jeannotforever.fr/';
           html='🌐 Et tant que vous y êtes, filez sur <u>mon site jeannotforever.fr</u> — cliquez ici !';
           label='⭐ Le site de Jeannot'; photoSrc='images/jeannot.png'; objPos='center';
-        } else if(rnd < 2/6){
-          // Thierry mi-ange mi-démon taquine sur la perte de points
-          html=THIERRY_DEMON[_thierryIdx % THIERRY_DEMON.length]; _thierryIdx++;
-          label='😇😈 Thierry, mi-ange mi-démon'; photoSrc='images/TBMAMD.png'; objPos='center top';
-        } else if(rnd < 2.8/6){
-          // Mag s'est mise au vélo
-          html=MAG_VELO[_magVeloIdx % MAG_VELO.length]; _magVeloIdx++;
-          label='🚴 Mag s\'est mise au vélo'; photoSrc='images/mag.png'; objPos='center';
+        } else if(rnd < 2/8){
+          // Magali remercie les supporters
+          html='Merci à tous d\'avoir soutenu l\'équipe de France ! '+FR_FLAG+' 💙';
+          label='💙 Le mot de Magali'; photoSrc='images/mag.png'; objPos='center';
+        } else if(rnd < 3/8){
+          // Tiphaine (resp. com') : la compétition continue
+          html='La compétition n\'est pas finie — continuez à pronostiquer ! ✏️💪';
+          label='📣 Tiphaine, resp. com\''; photoSrc='images/TG.jpg'; objPos='center';
         } else {
-          html=JEANNOT_CONSEILS[getNextJ()].replace(/🇫🇷/g, FR_FLAG);
-          label='😡 Jeannot est dégoûté'; photoSrc='images/jeannot.png'; objPos='center';
+          // Un cadre des Bleus remercie les supporters
+          const pl = FR_PLAYERS[_playerIdx % FR_PLAYERS.length]; _playerIdx++;
+          html='Merci de nous avoir soutenus ! '+FR_FLAG+' 💙';
+          label='💙 '+pl.name; photoSrc=pl.img; objPos='center top';
         }
+        key = photoSrc+'|'+html;
         tries++;
-      } while(html===_lastBannerHTML && tries<6); // jamais deux fois le même texte de suite
-      _lastBannerHTML=html;
+      } while(key===_lastBannerHTML && tries<6); // jamais deux fois le même contenu de suite
+      _lastBannerHTML=key;
       _clickVideo=video; _clickLink=link;
       el.innerHTML=html;
       if(labelEl) labelEl.textContent=label;
@@ -858,6 +878,26 @@ function initJeannot(){
   show(); setInterval(show,5000);
 }
 window.addEventListener('DOMContentLoaded',initJeannot);
+
+// Chronomètre de la bannière — compte à rebours vers la finale (dim 19 juillet 2026 21h Paris = 19h UTC)
+function startBannerCountdown(){
+  const el=document.getElementById('bannerCountdown');
+  if(!el)return;
+  const target=new Date('2026-07-19T19:00:00Z').getTime();
+  const p=n=>String(n).padStart(2,'0');
+  const t=setInterval(tick,1000);
+  function tick(){
+    let diff=target-Date.now();
+    if(diff<=0){ el.textContent='C\'est l\'heure ! ⚽'; clearInterval(t); return; }
+    const d=Math.floor(diff/86400000);diff-=d*86400000;
+    const h=Math.floor(diff/3600000);diff-=h*3600000;
+    const m=Math.floor(diff/60000);diff-=m*60000;
+    const s=Math.floor(diff/1000);
+    el.textContent=(d>0?d+'j ':'')+p(h)+':'+p(m)+':'+p(s);
+  }
+  tick();
+}
+window.addEventListener('DOMContentLoaded',startBannerCountdown);
 
 // ============================================================
 // EASTER EGG KONAMI : haut haut bas bas gauche gauche droite droite -> mini-jeu Tirs au but
@@ -2182,7 +2222,7 @@ async function cancelPronoMort() {
 // CONTRÔLE DE VERSION — recharge auto quand un nouveau déploiement est détecté
 // (À CHAQUE déploiement : monter APP_VERSION ici ET dans version.json à l'identique)
 // ============================================================
-const APP_VERSION = '2026-07-15-5';
+const APP_VERSION = '2026-07-15-6';
 async function checkAppVersion() {
   try {
     const res = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' });
