@@ -76,8 +76,13 @@ main{max-width:1200px;margin:0 auto;padding:2rem 1.5rem;position:relative;z-inde
 
 /* HERO */
 .hero{background:linear-gradient(135deg,var(--navy) 0%,#0a5068 100%);border-radius:24px;padding:2.5rem;margin-bottom:2rem;position:relative;overflow:hidden;color:white;}
-.hero-trophy{position:absolute;right:2rem;top:50%;transform:translateY(-50%);width:150px;opacity:1;cursor:pointer;border-radius:10px;transition:transform .2s;}
-.hero-trophy:hover{transform:translateY(-50%) scale(1.05);}
+.hero-trophy{position:absolute;right:2rem;top:50%;transform:translateY(-50%);width:150px;cursor:pointer;animation:heroPulse 1.6s ease-in-out infinite;}
+.hero-trophy:hover{animation:none;transform:translateY(-50%) scale(1.06);}
+.hero-trophy img{width:100%;display:block;border-radius:10px;}
+.hero-trophy-play{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.55);color:#fff;border-radius:999px;padding:.1rem .55rem;font-size:1rem;line-height:1.2;pointer-events:none;}
+.hero-trophy-hint{position:absolute;top:-16px;left:50%;white-space:nowrap;background:var(--jaune);color:#073B4C;font-family:'Bebas Neue',sans-serif;font-size:.82rem;letter-spacing:1px;padding:.12rem .55rem;border-radius:999px;pointer-events:none;z-index:2;animation:hintBob 1.3s ease-in-out infinite;}
+@keyframes heroPulse{0%,100%{transform:translateY(-50%) scale(1)}50%{transform:translateY(-50%) scale(1.05)}}
+@keyframes hintBob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-4px)}}
 .hero-flags{font-size:1.5rem;letter-spacing:.3rem;margin-bottom:.8rem;}
 .hero h1{font-family:'Bebas Neue',sans-serif;font-size:2.8rem;letter-spacing:4px;line-height:1;margin-bottom:.5rem;}
 .hero h1 span{color:var(--jaune);}
@@ -340,7 +345,11 @@ main{max-width:1200px;margin:0 auto;padding:2rem 1.5rem;position:relative;z-inde
     <!-- MATCHS -->
     <div id="pageMatchs" class="page active">
       <div class="hero">
-        <img src="images/eq.jpg" alt="Voir la vidéo" class="hero-trophy" onclick="showEndVideo()" title="Clique pour la vidéo">
+        <div class="hero-trophy" onclick="showEndVideo()" title="Clique pour la vidéo">
+          <div class="hero-trophy-hint">🎬 Clique !</div>
+          <img src="images/eq.jpg" alt="Voir la vidéo">
+          <div class="hero-trophy-play">▶️</div>
+        </div>
         <div class="hero-flags"><img src="https://flagcdn.com/h40/us.png" style="height:24px;border-radius:3px;vertical-align:middle;margin-right:.4rem" onerror="this.style.display='none'"><img src="https://flagcdn.com/h40/ca.png" style="height:24px;border-radius:3px;vertical-align:middle;margin-right:.4rem" onerror="this.style.display='none'"><img src="https://flagcdn.com/h40/mx.png" style="height:24px;border-radius:3px;vertical-align:middle" onerror="this.style.display='none'"></div>
         <h1>COUPE DU MONDE <span>FIFA 2026</span></h1>
         <p>11 juin — 19 juillet 2026 • États-Unis, Canada, Mexique</p>
@@ -2173,7 +2182,7 @@ async function cancelPronoMort() {
 // CONTRÔLE DE VERSION — recharge auto quand un nouveau déploiement est détecté
 // (À CHAQUE déploiement : monter APP_VERSION ici ET dans version.json à l'identique)
 // ============================================================
-const APP_VERSION = '2026-07-15-2';
+const APP_VERSION = '2026-07-15-3';
 async function checkAppVersion() {
   try {
     const res = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' });
