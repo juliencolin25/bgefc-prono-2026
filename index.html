@@ -863,7 +863,7 @@ function initJeannot(){
         } else if(rnd < 4/9){
           // Pauline : apéro de vacances
           html='🍹 Jeudi 23 juillet à partir de 18h, c\'est apéro de vacances à Palente ! Tout le monde est le bienvenu 😎🎉';
-          label='🍹 Le mot de Pauline'; photoSrc='images/PD.jpg'; objPos='center';
+          label='🍹 Le mot de Pauline'; photoSrc='images/PD.jpg'; objPos='center 25%';
         } else {
           // Un cadre des Bleus remercie les supporters
           const pl = FR_PLAYERS[_playerIdx % FR_PLAYERS.length]; _playerIdx++;
@@ -2228,7 +2228,7 @@ async function cancelPronoMort() {
 // CONTRÔLE DE VERSION — recharge auto quand un nouveau déploiement est détecté
 // (À CHAQUE déploiement : monter APP_VERSION ici ET dans version.json à l'identique)
 // ============================================================
-const APP_VERSION = '2026-07-15-13';
+const APP_VERSION = '2026-07-15-14';
 async function checkAppVersion() {
   try {
     const res = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' });
