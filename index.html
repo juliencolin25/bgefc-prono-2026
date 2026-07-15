@@ -861,7 +861,7 @@ function initJeannot(){
         } else {
           // Un cadre des Bleus remercie les supporters
           const pl = FR_PLAYERS[_playerIdx % FR_PLAYERS.length]; _playerIdx++;
-          html='Merci de nous avoir soutenus ! '+FR_FLAG+' 💙';
+          html='Merci à tous chez BGE de nous avoir soutenus ! '+FR_FLAG+' 💙';
           label='💙 '+pl.name; photoSrc=pl.img; objPos='center top';
         }
         key = photoSrc+'|'+html;
@@ -2222,7 +2222,7 @@ async function cancelPronoMort() {
 // CONTRÔLE DE VERSION — recharge auto quand un nouveau déploiement est détecté
 // (À CHAQUE déploiement : monter APP_VERSION ici ET dans version.json à l'identique)
 // ============================================================
-const APP_VERSION = '2026-07-15-6';
+const APP_VERSION = '2026-07-15-7';
 async function checkAppVersion() {
   try {
     const res = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' });
