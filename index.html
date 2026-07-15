@@ -47,9 +47,9 @@ main{max-width:1200px;margin:0 auto;padding:2rem 1.5rem;position:relative;z-inde
 .page{display:none;} .page.active{display:block;}
 
 /* LOGIN */
-.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#002395 0%,#1a3db5 35%,#ffffff 55%,#c8102e 80%,#ED2939 100%);position:relative;z-index:1;padding:2rem;}
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#073B4C 0%,#0a5068 45%,#118AB2 100%);position:relative;z-index:1;padding:2rem;}
 .login-card{background:rgba(255,255,255,.97);border-radius:24px;padding:3rem;width:100%;max-width:460px;box-shadow:0 20px 60px rgba(0,0,0,.25);position:relative;overflow:hidden;}
-.login-card::before{content:'';position:absolute;top:0;left:0;right:0;height:8px;background:#ffffff;}
+.login-card::before{content:'';position:absolute;top:0;left:0;right:0;height:8px;background:linear-gradient(90deg,#073B4C,#118AB2,#FFD166);}
 .login-hero{text-align:center;margin-bottom:2rem;}
 .login-emoji{font-size:5rem;display:block;animation:bounce 2s ease-in-out infinite;}
 @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
@@ -61,13 +61,13 @@ main{max-width:1200px;margin:0 auto;padding:2rem 1.5rem;position:relative;z-inde
 @keyframes cocktailAppear{0%{opacity:0;transform:scale(0.3) rotate(-25deg)}25%{opacity:1;transform:scale(2.2) rotate(12deg)}45%{opacity:0.6;transform:scale(1.6) rotate(-8deg)}60%{opacity:1;transform:scale(1.9) rotate(6deg)}75%{opacity:0.5;transform:scale(1.3) rotate(-4deg)}88%{opacity:0.8;transform:scale(1.1) rotate(2deg)}100%{opacity:0.28;transform:scale(1) rotate(0deg)}}
 .mag-coin-btn{background:none;border:1px dashed #c89b3c;border-radius:20px;padding:.25rem .7rem;font-size:.72rem;font-weight:800;color:#c89b3c;cursor:pointer;font-family:'Nunito',sans-serif;transition:all .2s;}
 .mag-coin-btn:hover{background:#fff8e1;border-color:#a07828;}
-.login-title{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;letter-spacing:4px;background:linear-gradient(135deg,#002395,#ED2939);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.login-title{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;letter-spacing:4px;background:linear-gradient(135deg,#073B4C,#118AB2);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .login-sub{font-size:.85rem;color:var(--gris);font-weight:600;margin-top:.3rem;}
 .form-group{margin-bottom:1.2rem;}
 .form-group label{display:block;font-size:.8rem;font-weight:800;color:var(--navy);margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.5px;}
 .form-group input,.form-group select{width:100%;background:var(--gris-clair);border:2px solid var(--gris-med);border-radius:12px;padding:.8rem 1rem;color:var(--navy);font-family:'Nunito',sans-serif;font-size:.95rem;font-weight:600;outline:none;transition:border-color .2s;}
 .form-group input:focus,.form-group select:focus{border-color:var(--orange);background:white;}
-.btn-primary{width:100%;background:linear-gradient(135deg,#002395,#1a3db5);border:none;border-radius:12px;padding:1rem;color:white;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:900;cursor:pointer;transition:all .2s;box-shadow:0 4px 15px rgba(0,35,149,.4);}
+.btn-primary{width:100%;background:linear-gradient(135deg,#118AB2,#073B4C);border:none;border-radius:12px;padding:1rem;color:white;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:900;cursor:pointer;transition:all .2s;box-shadow:0 4px 15px rgba(7,59,76,.4);}
 .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(0,35,149,.5);}
 .btn-primary:disabled{opacity:.6;cursor:not-allowed;transform:none;}
 .login-toggle{text-align:center;margin-top:1.2rem;font-size:.85rem;color:var(--gris);font-weight:600;}
@@ -781,13 +781,24 @@ const TIPH_CONSEILS = [
 // AJOUT MASTER PROMPT 2026 - Rotation aleatoire Jeannot/Mag alternés
 let _clickVideo = null; // src de la vidéo à lancer au clic sur la bannière, ou null
 let _clickLink = null;  // URL à ouvrir au clic sur la bannière, ou null
-// Thierry mi-ange mi-démon : petites piques sur le Prono de la Mort
+// Thierry mi-ange mi-démon : piques sarcastiques sur la perte de points du Prono de la Mort
 const THIERRY_DEMON = [
-  "Alors… on commence à avoir un peu peur ? 😈",
-  "Le Prono de la Mort vous terrifie ? Vous avez bien raison… 😇😈",
-  "Bientôt la révélation… et certains vont pleurer. 😈🔥"
+  "Alors… elle arrive, la petite perte de points ? 😈 Ça va faire TRÈS mal 🔥",
+  "J'en connais qui doivent pleurer ce matin ☕😭 et moi je souris… c'est vilain, mais je souris 😈",
+  "Le Prono de la Mort n'oublie personne 😈 les comptes se règlent après la finale… tic, tac ⏳",
+  "Vous l'aviez oublié le malus, hein ? 😏 Pas moi. −20 points, ça calme un supporter 💀🔥",
+  "Ce petit −20 qui approche… 😈 je le sens d'ici, il est délicieux 🍿",
+  "Courage. Enfin non, pas trop. 😈 J'ai besoin de vos larmes pour mon teint 💅🔥"
 ];
 let _thierryIdx = 0;
+// Mag s'est mise au cyclisme (complètement à côté de la plaque)
+const MAG_VELO = [
+  "Bon, moi je passe au cyclisme, je m'y connais bien mieux 🚴 je viens de m'y mettre 😌",
+  "Cette année je sens bien Virenque pour gagner le Tour 🚴🏔️ quelle forme ! (je suis une spécialiste 😏)",
+  "Il est bon Thomas Voeckler quand même, non ? 🚴😅 enfin je crois, je débute mais j'ai l'œil 👁️",
+  "Le foot c'est fini pour moi, place au vélo 🚴💨 franchement le maillot jaune, quelle élégance 💛"
+];
+let _magVeloIdx = 0;
 // Drapeau France en image (les emojis drapeaux s'affichent "FR" sous Windows)
 const FR_FLAG = '<img src="https://flagcdn.com/h20/fr.png" style="height:12px;vertical-align:middle;border-radius:2px" onerror="this.style.display=\'none\'">';
 function initJeannot(){
@@ -813,9 +824,13 @@ function initJeannot(){
           html='🌐 Et tant que vous y êtes, filez sur <u>mon site jeannotforever.fr</u> — cliquez ici !';
           label='⭐ Le site de Jeannot'; photoSrc='images/jeannot.png'; objPos='center';
         } else if(rnd < 2/6){
-          // Thierry mi-ange mi-démon taquine sur le Prono de la Mort
+          // Thierry mi-ange mi-démon taquine sur la perte de points
           html=THIERRY_DEMON[_thierryIdx % THIERRY_DEMON.length]; _thierryIdx++;
           label='😇😈 Thierry, mi-ange mi-démon'; photoSrc='images/TBMAMD.png'; objPos='center top';
+        } else if(rnd < 2.8/6){
+          // Mag s'est mise au vélo
+          html=MAG_VELO[_magVeloIdx % MAG_VELO.length]; _magVeloIdx++;
+          label='🚴 Mag s\'est mise au vélo'; photoSrc='images/mag.png'; objPos='center';
         } else {
           html=JEANNOT_CONSEILS[getNextJ()].replace(/🇫🇷/g, FR_FLAG);
           label='😡 Jeannot est dégoûté'; photoSrc='images/jeannot.png'; objPos='center';
@@ -2146,7 +2161,7 @@ async function cancelPronoMort() {
 // CONTRÔLE DE VERSION — recharge auto quand un nouveau déploiement est détecté
 // (À CHAQUE déploiement : monter APP_VERSION ici ET dans version.json à l'identique)
 // ============================================================
-const APP_VERSION = '2026-07-14-8';
+const APP_VERSION = '2026-07-14-9';
 async function checkAppVersion() {
   try {
     const res = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' });
