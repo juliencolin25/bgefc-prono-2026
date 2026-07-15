@@ -260,10 +260,9 @@ main{max-width:1200px;margin:0 auto;padding:2rem 1.5rem;position:relative;z-inde
 <div id="loginPage" class="login-wrap">
   <div class="login-card">
     <div class="login-hero">
-      <img id="loginHero" src="images/Dem.jpg" alt="Demi-finales" class="login-emoji" style="width:100%;max-width:320px;height:auto;display:block;margin:0 auto;border-radius:12px;" onerror="this.style.display='none'">
+      <img id="loginHero" src="images/fifa.png" alt="Coupe du Monde FIFA 2026" class="login-emoji" style="width:100%;max-width:260px;height:auto;display:block;margin:0 auto;border-radius:12px;" onerror="this.style.display='none'">
       <div class="login-title">PRONOS 2026</div>
       <div class="login-sub">🏆 Coupe du Monde FIFA 2026 — BGE Franche-Comté</div>
-      <div id="loginAllezBleus" class="login-sub" style="font-style:italic;margin-top:.4rem;color:#002395;font-weight:800">Allez les Bleus !</div>
     </div>
     <div id="loginError" class="login-error"></div>
 
@@ -300,7 +299,7 @@ main{max-width:1200px;margin:0 auto;padding:2rem 1.5rem;position:relative;z-inde
   <div class="jeannot-banner" id="jeannotBanner" onclick="sonometre()" style="cursor:pointer">
     <img src="images/jeannot.png" alt="Jeannot" class="jeannot-photo" onerror="this.style.display='none'">
     <div class="jeannot-content">
-      <div class="jeannot-label" id="jeannotLabel">🤪 Jeannot part en vrille</div>
+      <div class="jeannot-label" id="jeannotLabel">😡 Jeannot est dégoûté</div>
       <div class="jeannot-tip" id="jeannotTip"></div>
     </div>
     <img src="images/logo-bge.png" alt="BGE Franche-Comté" class="logo-bge-banner" onerror="this.style.display='none'">
@@ -706,30 +705,21 @@ Object.assign(TEAM_DATA, {
 "À déterminer":{"flag":"🏳️","forme":["W","D","W","D","W"],"lineup":"Composition à déterminer","anecdote":"Cette équipe sera désignée à l'issue des matchs qualificatifs ou de barrage."},
 "TBD":{"flag":"🏳️","forme":["W","D","W","D","W"],"lineup":"Composition à déterminer","anecdote":"Cette équipe sera désignée à l'issue des matchs qualificatifs ou de barrage."}
 });
-// Conseils de Jeannot — version "il pète les plombs" : la Coupe du Monde + la demie de la France
-// lui font perdre la tête, il ne parle plus que de Saint-Étienne et des Bleus, avec plein de smileys.
+// Conseils de Jeannot — version "dégoûté" : la France éliminée par l'Espagne, il a la haine
+// contre l'arbitrage, l'Argentine (toujours), l'Espagne (évidemment) et le monde entier.
 const JEANNOT_CONSEILS = [
-  "ALLEZ LES VERTS 💚💚💚 ... pardon pardon, je reprends vos pronos 😅⚽",
-  "La France en demie ET Sainté dans mon cœur 😭🇫🇷💚 je vais pas tenir les gars 🥵",
-  "Le CHAUDRON 🔥🔥🔥 vous l'entendez ?? MOI JE L'ENTENDS 💚😳🟢",
-  "Mbappé il est fort 🇫🇷⚽ mais il aurait dû signer à Sainté 💚😤 j'dis ça j'dis rien 🤫",
-  "Allez les Bleus 🇫🇷 allez les Verts 💚 allez... euh... j'ai perdu le fil 😵‍💫💚🔥",
-  "La France championne du monde 🇫🇷🏆 ET Sainté qui remonte 💚 ce serait le plus beau jour de MA VIE 😭🔥",
-  "Vous avez vu ?? VOUS AVEZ VU ?? 😱⚽🇫🇷 ... non rien, je m'emballe 😅💚",
-  "Je dors plus 🥵 je mange vert 💚 je rêve en bleu-blanc-rouge 🇫🇷 tout va bien 😵‍💫🔥",
-  "SAINTÉÉÉÉ 💚💚💚🔥🟢 ... bon, sinon, misez raisonnable hein 😅⚽",
-  "Deschamps si tu m'entends 📣🇫🇷 prends un Vert en sélection 💚 UN SEUL 😤🔥",
-  "Mon cardiologue m'a dit d'éviter les émotions fortes 😅 alors forcément, cette Coupe du Monde... 🥵🇫🇷💚",
-  "L'Argentine... 😤 me parlez PAS de 2022 😤😤 cette finale je m'en remets PAS 😭⚽ j'en dors toujours pas 🥵🇫🇷",
-  "Messi champion 2022 aux tirs au but 🙄😤 dans mon cœur ça compte pas 💔🇫🇷 JE VEUX LA REVANCHE 🔥⚔️",
-  "2022 j'ai éteint la télé après les tabs 📺💥 j'ai boudé TROIS jours 😤 ma femme a cru que j'étais malade 🤒😭",
-  "Mbappé TRIPLÉ en finale 2022 🤯⚽🇫🇷 et on perd QUAND MÊME 😭 y'a pas de justice en ce bas monde 💔😤",
-  "Si on recroise l'Argentine en finale 😤🔥 je veux ma REVANCHE 🇫🇷⚔️ 2022 doit être VENGÉ 💪😭🔥",
-  "J'ÉTAIS à la finale 98 🇫🇷🏆😭 j'ai vu Zizou de mes yeux 👀📸 j'ai 400 photos toutes floues mais chaque pixel est un TRÉSOR 💎🔥",
-  "Visage peint en bleu-blanc-rouge depuis ce matin 🔵⚪🔴😤 ma femme veut plus sortir avec moi mais BON 🇫🇷 les priorités 🤷💚",
-  "Dominique Rocheteau... L'ANGE VERT 😇💚🟢 le plus beau joueur de TOUTE l'histoire 😭 quelqu'un m'écoute au moins ?? 😳🔥",
-  "Euro 84, Platini, NEUF buts 🤯🇫🇷 j'y étais, j'avais 19 ans, j'ai pleuré 💧😭 ... et je repleure là en vous parlant 😭💚",
-  "Évite de cliquer plusieurs fois sur cette bannière.... STP.... 😵‍💫💚"
+  "L'ESPAGNE... 😤 leur possession à deux à l'heure, ça m'a rendu MALADE 🤢 bravo la fête 🙄",
+  "L'arbitrage ?? 🤬 NON mais vous avez VU l'arbitrage ?? 😡 je porte plainte 📣 (à qui, je sais pas, mais je porte plainte)",
+  "Sortis par l'Espagne 😤 après l'Argentine en 2022 😡 le foot me DOIT des excuses 💔",
+  "Je suis dégoûté 🤢 dé-goû-té 😤 j'ai plus de mots, juste de la rancune 💢",
+  "L'arbitre a DÛ parier sur l'Espagne 🤨💰 y'a pas d'autre explication 😤🟥",
+  "L'Argentine, l'Espagne, l'arbitrage... 😡 tout le monde est contre nous 🇫🇷💔 c'est un COMPLOT 🕵️",
+  "Le VAR il sert à quoi au juste ?? 📺🤬 à nous briser le cœur, voilà à quoi 💔😤",
+  "J'ai éteint la télé, le téléphone, la lumière 😑 laissez-moi ruminer en paix 😤💢",
+  "Même pas les tirs au but cette fois 😤 même pas le droit à un peu de suspense 🙄💔",
+  "L'Espagne championne ? Si ça arrive j'avale mon écharpe 🧣😤 en direct 📸",
+  "Bon... au moins il me reste mon site 😤 (allez le voir, ça me remontera un peu le moral 🙏)",
+  "Et arrêtez de cliquer sur cette bannière 😤 j'suis PAS d'humeur là 💢"
 ];
 // AJOUT MASTER PROMPT 2026 - Modal fiche equipe
 function openTeamModal(teamName){
@@ -828,7 +818,7 @@ function initJeannot(){
           label='😇😈 Thierry, mi-ange mi-démon'; photoSrc='images/TBMAMD.png'; objPos='center top';
         } else {
           html=JEANNOT_CONSEILS[getNextJ()].replace(/🇫🇷/g, FR_FLAG);
-          label='🤪 Jeannot part en vrille'; photoSrc='images/jeannot.png'; objPos='center';
+          label='😡 Jeannot est dégoûté'; photoSrc='images/jeannot.png'; objPos='center';
         }
         tries++;
       } while(html===_lastBannerHTML && tries<6); // jamais deux fois le même texte de suite
@@ -2156,7 +2146,7 @@ async function cancelPronoMort() {
 // CONTRÔLE DE VERSION — recharge auto quand un nouveau déploiement est détecté
 // (À CHAQUE déploiement : monter APP_VERSION ici ET dans version.json à l'identique)
 // ============================================================
-const APP_VERSION = '2026-07-14-7';
+const APP_VERSION = '2026-07-14-8';
 async function checkAppVersion() {
   try {
     const res = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' });
