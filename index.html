@@ -1604,8 +1604,7 @@ function showFranceDemiResultPopup() {
     if (new Date() >= new Date('2026-07-19T19:00:00Z')) return; // finale déjà commencée
     showFranceFinalCountdown();
   } else {
-    if (new Date() >= new Date('2026-07-15T17:00:00Z')) return; // disparaît mercredi 15 juillet 19h Paris
-    showFranceLosePopup();
+    return; // popup défaite désactivé (retiré le 15/07 à la demande)
   }
 }
 
@@ -2174,7 +2173,7 @@ async function cancelPronoMort() {
 // CONTRÔLE DE VERSION — recharge auto quand un nouveau déploiement est détecté
 // (À CHAQUE déploiement : monter APP_VERSION ici ET dans version.json à l'identique)
 // ============================================================
-const APP_VERSION = '2026-07-15-1';
+const APP_VERSION = '2026-07-15-2';
 async function checkAppVersion() {
   try {
     const res = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' });
