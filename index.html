@@ -828,7 +828,7 @@ const FR_PLAYERS = [
   { name:'Mike Maignan', img:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Mike_Maignan_France_v_Senegal_16_June_2026-210.jpg/250px-Mike_Maignan_France_v_Senegal_16_June_2026-210.jpg' },
   { name:'Didier Deschamps', img:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Didier_Deschamps_France_v_Senegal_16_June_2026-294.jpg/250px-Didier_Deschamps_France_v_Senegal_16_June_2026-294.jpg' }
 ];
-let _playerIdx = 0;
+let _playerIdx = Math.floor(Math.random() * FR_PLAYERS.length); // départ aléatoire pour ne pas toujours commencer par le même joueur
 function initJeannot(){
   let jPool=[], mPool=[], showCount=0;
   function getNextJ(){if(!jPool.length){jPool=[...Array(JEANNOT_CONSEILS.length).keys()];for(let i=jPool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[jPool[i],jPool[j]]=[jPool[j],jPool[i]];}}return jPool.pop();}
@@ -2228,7 +2228,7 @@ async function cancelPronoMort() {
 // CONTRÔLE DE VERSION — recharge auto quand un nouveau déploiement est détecté
 // (À CHAQUE déploiement : monter APP_VERSION ici ET dans version.json à l'identique)
 // ============================================================
-const APP_VERSION = '2026-07-15-12';
+const APP_VERSION = '2026-07-15-13';
 async function checkAppVersion() {
   try {
     const res = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' });
