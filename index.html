@@ -2161,7 +2161,7 @@ async function cancelPronoMort() {
 // CONTRÔLE DE VERSION — recharge auto quand un nouveau déploiement est détecté
 // (À CHAQUE déploiement : monter APP_VERSION ici ET dans version.json à l'identique)
 // ============================================================
-const APP_VERSION = '2026-07-14-9';
+const APP_VERSION = '2026-07-14-10';
 async function checkAppVersion() {
   try {
     const res = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' });
@@ -2667,6 +2667,10 @@ function magCoinFlip(team1, team2) {
     (w) => `Mon intuition a hésité entre les deux équipes exactement 4 secondes. Puis elle a lâché ${w}. L'intuition ne ment pas. Elle se trompe, mais elle ment pas.`,
     (w) => `J'ai dormi sur mes deux oreilles. L'oreille droite a rêvé de victoire. ${w} vient d'un pays plutôt à droite sur la carte. Donc ${w}.`,
     (w) => `${w} a quelque chose dans les yeux sur les photos. Je sais pas quoi. Mais quelque chose.`,
+    (w) => `Ouais bon… maintenant que la France est éliminée, moi je me suis mise au vélo 🚴 je monte des cols de 1ère catégorie en Haute-Saône. Mais si tu insistes : ${w}.`,
+    (w) => `Le foot, très peu pour moi désormais, je fais du dénivelé 🚴🏔️ Enfin bref, va pour ${w}, si tu veux l'avis d'une cycliste.`,
+    (w) => `J'ai troqué mes cartes de tarot contre un vélo 🚴 Là je pense à ma sortie de dimanche en Haute-Saône, pas trop à ${w}… mais allez, ${w}.`,
+    (w) => `Franchement le maillot à pois me va mieux que ces pronos 🚴 Bon, ${w}, et je retourne grimper.`,
   ];
   const winner = Math.random() < 0.5 ? team1 : team2;
   const verdict = VERDICTS[Math.floor(Math.random() * VERDICTS.length)](winner);
