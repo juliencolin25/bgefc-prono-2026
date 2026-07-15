@@ -241,9 +241,9 @@ main{max-width:1200px;margin:0 auto;padding:2rem 1.5rem;position:relative;z-inde
 .jeannot-tip{font-size:15px;font-style:italic;opacity:0;transition:opacity 0.6s ease;line-height:1.4;}
 .jeannot-tip.visible{opacity:1;}
 .logo-bge-banner{width:50px;height:50px;object-fit:contain;flex-shrink:0;}
-.banner-countdown{flex-shrink:0;text-align:center;line-height:1.1;}
-.bc-label{font-size:9px;font-weight:800;letter-spacing:1px;color:#e63946;white-space:nowrap;}
-.bc-time{font-family:'Bebas Neue',sans-serif;font-size:1.15rem;letter-spacing:1px;color:#FFD166;white-space:nowrap;}
+.banner-countdown{flex-shrink:0;text-align:center;line-height:1.05;}
+.bc-label{font-size:11px;font-weight:800;letter-spacing:1px;color:#e63946;white-space:nowrap;margin-bottom:2px;}
+.bc-time{font-family:'Bebas Neue',sans-serif;font-size:1.9rem;letter-spacing:1.5px;color:#FFD166;white-space:nowrap;}
 /* AJOUT MASTER PROMPT 2026 - Modal equipe */
 .team-modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:1000;align-items:center;justify-content:center;}
 .team-modal-overlay.active{display:flex;}
@@ -847,19 +847,23 @@ function initJeannot(){
       do {
         video=null; link=null;
         const rnd = Math.random();
-        if(rnd < 1/8){
+        if(rnd < 1/9){
           // Jeannot fait la promo de son site
           link='http://jeannotforever.fr/';
           html='🌐 Et tant que vous y êtes, filez sur <u>mon site jeannotforever.fr</u>, cliquez ici !';
           label='⭐ Le site de Jeannot'; photoSrc='images/jeannot.png'; objPos='center';
-        } else if(rnd < 2/8){
+        } else if(rnd < 2/9){
           // Magali remercie les supporters
           html='Merci à tous d\'avoir soutenu l\'équipe de France ! '+FR_FLAG+' 💙 Et retrouvez-moi sur le Tour de France ! 🚴';
           label='💙 Le mot de Magali'; photoSrc='images/mag.png'; objPos='center';
-        } else if(rnd < 3/8){
+        } else if(rnd < 3/9){
           // Tiphaine (resp. com') : la compétition continue
           html='La compétition n\'est pas finie, continuez à pronostiquer ! ✏️💪';
           label='📣 Tiphaine, resp. com\''; photoSrc='images/TG.jpg'; objPos='center';
+        } else if(rnd < 4/9){
+          // Pauline : apéro de vacances
+          html='🍹 Jeudi 23 juillet à partir de 18h, c\'est apéro de vacances à Palente ! Tout le monde est le bienvenu 😎🎉';
+          label='🍹 Le mot de Pauline'; photoSrc='images/PD.jpg'; objPos='center';
         } else {
           // Un cadre des Bleus remercie les supporters
           const pl = FR_PLAYERS[_playerIdx % FR_PLAYERS.length]; _playerIdx++;
@@ -2224,7 +2228,7 @@ async function cancelPronoMort() {
 // CONTRÔLE DE VERSION — recharge auto quand un nouveau déploiement est détecté
 // (À CHAQUE déploiement : monter APP_VERSION ici ET dans version.json à l'identique)
 // ============================================================
-const APP_VERSION = '2026-07-15-11';
+const APP_VERSION = '2026-07-15-12';
 async function checkAppVersion() {
   try {
     const res = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' });
