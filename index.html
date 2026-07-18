@@ -7,8 +7,7 @@
 <link rel="icon" type="image/png" href="images/fifa.png">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
 :root {
   --rouge:#E63946; --orange:#F4A261; --jaune:#FFD166;
@@ -2235,7 +2234,7 @@ async function cancelPronoMort() {
 // CONTRÔLE DE VERSION — recharge auto quand un nouveau déploiement est détecté
 // (À CHAQUE déploiement : monter APP_VERSION ici ET dans version.json à l'identique)
 // ============================================================
-const APP_VERSION = '2026-07-18-2';
+const APP_VERSION = '2026-07-18-3';
 async function checkAppVersion() {
   try {
     const res = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' });
@@ -2269,29 +2268,30 @@ function _classifyProno(p, m) {
   return matchOutcome(p.score1, p.score2, p.winner) === matchOutcome(m.score1_real, m.score2_real, m.winner) ? 'bon' : 'rate';
 }
 
-const REPORT_PUNCHLINES = {
-  'Jeannot': [
+const REPORT_CHARACTERS = [
+  { name: 'Jeannot', img: 'images/jeannot.png', color: '#06D6A0', lines: [
     "ALLEZ LES VERTS ! ... pardon pardon, je reprends vos pronos.",
-    "J'etais a la finale 98, j'ai vu Zizou de mes yeux, j'ai 400 photos toutes floues.",
-    "Le CHAUDRON, vous l'entendez ?? MOI JE L'ENTENDS.",
-    "L'arbitre a du parier sur l'Espagne, y'a pas d'autre explication."
-  ],
-  'Magali': [
-    "Bon, moi je passe au cyclisme, je m'y connais bien mieux.",
-    "Cette annee je sens bien Virenque pour gagner le Tour, quelle forme !",
-    "En tant que patronne, j'accorde des points bonus. Je suis pas connaisseuse en foot mais je suis genereuse."
-  ],
-  'Thierry': [
-    "Alors... on commence a avoir un peu peur ?",
+    "J'étais à la finale 98, j'ai vu Zizou de mes yeux, j'ai 400 photos toutes floues, mais chaque pixel est un trésor.",
+    "Le CHAUDRON, vous l'entendez ?? MOI JE L'ENTENDS !",
+    "L'arbitre a dû parier sur l'Espagne, y'a pas d'autre explication."
+  ] },
+  { name: 'Magali', img: 'images/mag.png', color: '#9B5DE5', lines: [
+    "En tant que patronne, j'accorde des points bonus. Je suis pas connaisseuse en foot, mais je suis généreuse !",
+    "Bon, moi je passe au cyclisme, je m'y connais bien mieux, je viens de m'y mettre.",
+    "Cette année je sens bien Virenque pour gagner le Tour, quelle forme ! (je suis une spécialiste)",
+    "Merci à tous d'avoir soutenu l'équipe de France, et retrouvez-moi sur le Tour de France !"
+  ] },
+  { name: "L'Oracle de Mag", img: 'images/MCO.jpg', color: '#c89b3c', lines: [
+    "Mon chat a regardé vers la gauche puis vers la droite. Clairement une victoire.",
+    "J'ai tiré les cartes à l'envers comme d'habitude. La carte du soleil est sortie.",
+    "Mon intuition cosmique, née d'une totale ignorance du football, ne ment jamais. Enfin, elle se trompe, mais elle ne ment pas."
+  ] },
+  { name: 'Thierry, mi-ange mi-démon', img: 'images/TBMAMD.png', color: '#cc0000', lines: [
+    "Alors... on commence à avoir un peu peur ?",
     "J'en connais qui doivent pleurer ce matin, et moi je souris. C'est vilain, mais je souris.",
-    "Le Prono de la Mort n'oublie personne. Les comptes se reglent apres la finale."
-  ],
-  'Tiphaine': [
-    "Derechef, je m'execute et plussoie de dire que d'Anais et de fleches, j'ai fait 5.",
-    "La competition n'est pas finie, continuez a pronostiquer !",
-    "Magali a ENCORE fait une annonce toute seule, c'est la com' qui court derriere."
-  ]
-};
+    "Le Prono de la Mort n'oublie personne. Les comptes se règlent après la finale…"
+  ] }
+];
 
 async function buildReportData() {
   const allPronos = await loadAllPronos();
@@ -2344,14 +2344,14 @@ async function buildReportData() {
   // Badges
   const exactCountAll = myPr.filter(p => _classifyProno(p, allMatches.find(m => m.id === p.match_id)) === 'exact').length;
   const badges = [];
-  if (exactCountAll >= 10) badges.push('Ballon d\'or - 10 pronos exacts ou plus');
-  if (isShootoutChampion(me.name)) badges.push('Ballon vert - 5/5 au mini-jeu secret');
+  if (exactCountAll >= 10) badges.push('Ballon d\'or : 10 pronos exacts ou plus');
+  if (isShootoutChampion(me.name)) badges.push('Ballon vert : 5/5 au mini-jeu secret');
   const { data: pv } = await db.from('poll_votes').select('poll_date,choice').eq('user_id', me.id);
   const voteMap = {}; (pv || []).forEach(v => voteMap[v.poll_date] = v.choice);
-  if (DAILY_POLLS.every(pl => voteMap[pl.date])) badges.push('Ballon bleu - a vote a tous les sondages');
+  if (DAILY_POLLS.every(pl => voteMap[pl.date])) badges.push('Ballon bleu : a voté à tous les sondages');
   const { data: sb } = await db.from('july13_badge').select('user_id').eq('user_id', me.id).maybeSingle();
-  if (sb) badges.push('Ballon argente - connecte le 13 juillet');
-  if (myPr.length >= 100) badges.push('Ballon rose - 100 matchs pronostiques ou plus');
+  if (sb) badges.push('Ballon argenté : connecté le 13 juillet');
+  if (myPr.length >= 100) badges.push('Ballon rose : 100 matchs pronostiqués ou plus');
 
   // Sondages : ce que j'ai voté
   const pollVotes = DAILY_POLLS.filter(pl => voteMap[pl.date]).map(pl => ({
@@ -2364,14 +2364,14 @@ async function buildReportData() {
 
   // Titre d'honneur
   let title;
-  if (pronoMort && pronoMort.delta > 0) title = 'L\'Audacieux - a ose (et reussi) le Prono de la Mort';
-  else if (nbExact >= 10) title = 'Le Visionnaire - 10 scores exacts ou plus';
-  else if (rankGen === 1) title = 'Le Champion - 1er au classement general';
-  else if (rankGen <= 3 && rankGen > 0) title = 'Le Podium - sur le podium general';
-  else if (badges.some(b => b.includes('bleu'))) title = 'Le Fidele - a vote a tous les sondages';
-  else if (myPr.length >= 100) title = 'L\'Assidu - 100 pronostics ou plus';
-  else if (isShootoutChampion(me.name)) title = 'Le Malin - 5/5 au mini-jeu secret';
-  else title = 'Le Passionne - a vecu la Coupe du Monde a fond';
+  if (pronoMort && pronoMort.delta > 0) title = 'L\'Audacieux : a osé (et réussi) le Prono de la Mort';
+  else if (nbExact >= 10) title = 'Le Visionnaire : 10 scores exacts ou plus';
+  else if (rankGen === 1) title = 'Le Champion : 1er au classement général';
+  else if (rankGen <= 3 && rankGen > 0) title = 'Le Podium : sur le podium général';
+  else if (badges.some(b => b.includes('bleu'))) title = 'Le Fidèle : a voté à tous les sondages';
+  else if (myPr.length >= 100) title = 'L\'Assidu : 100 pronostics ou plus';
+  else if (isShootoutChampion(me.name)) title = 'Le Malin : 5/5 au mini-jeu secret';
+  else title = 'Le Passionné : a vécu la Coupe du Monde à fond';
 
   const cocktail = PAULINE_RECETTES[Math.floor(Math.random() * PAULINE_RECETTES.length)];
 
@@ -2380,124 +2380,60 @@ async function buildReportData() {
 
 function _loadImg(src) { return new Promise(res => { const i = new Image(); i.onload = () => res(i); i.onerror = () => res(null); i.src = src; }); }
 
-async function downloadWorldCupReport() {
-  if (!window.jspdf) { showToast('Génération PDF indisponible (librairie non chargée)'); return; }
-  showToast('📄 Génération de ton rapport...');
-  const d = await buildReportData();
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ unit: 'pt', format: 'a4' });
-  const W = 595, M = 40, CW = W - 2 * M;
-  let y = M;
-  const logo = await _loadImg('images/logo-bge.png');
-  const julienImg = await _loadImg('images/Julien.jpg');
-  const ensure = h => { if (y + h > 800) { doc.addPage(); y = M; } };
-  const heading = t => { ensure(34); doc.setFillColor(7, 59, 76); doc.roundedRect(M, y, CW, 22, 4, 4, 'F'); doc.setTextColor(255, 209, 102); doc.setFont('helvetica', 'bold'); doc.setFontSize(12); doc.text(_stripEmoji(t), M + 10, y + 15); y += 32; doc.setTextColor(45, 45, 45); doc.setFont('helvetica', 'normal'); doc.setFontSize(10); };
-  const para = (t, opt = {}) => { doc.setFont('helvetica', opt.bold ? 'bold' : 'normal'); doc.setFontSize(opt.size || 10); if (opt.color) doc.setTextColor(...opt.color); else doc.setTextColor(45, 45, 45); const lines = doc.splitTextToSize(_stripEmoji(t), CW - (opt.indent || 0)); lines.forEach(ln => { ensure(opt.lh || 14); doc.text(ln, M + (opt.indent || 0), y); y += opt.lh || 14; }); };
+function _badgeStyle(label) {
+  if (label.includes("d'or")) return { bg: '#FFD700', fg: '#7c3a00' };
+  if (label.includes('vert')) return { bg: '#06D6A0', fg: '#04463a' };
+  if (label.includes('bleu')) return { bg: '#8fd3ff', fg: '#084c7c' };
+  if (label.includes('argenté')) return { bg: 'linear-gradient(135deg,#eaeaea,#b0b0b0)', fg: '#444' };
+  if (label.includes('rose')) return { bg: '#fbdce8', fg: '#a02c5a' };
+  return { bg: '#eee', fg: '#333' };
+}
+function _badgeChip(label) { const s = _badgeStyle(label); return `<span style="display:inline-block;background:${s.bg};color:${s.fg};border-radius:20px;padding:5px 12px;font-size:12px;font-weight:800;margin:3px 5px 3px 0">⚽ ${label}</span>`; }
 
-  // En-tête
-  if (logo) { try { doc.addImage(logo, 'PNG', M, y, 46, 46); } catch (e) {} }
-  doc.setTextColor(7, 59, 76); doc.setFont('helvetica', 'bold'); doc.setFontSize(20);
-  doc.text('Ma Coupe du Monde a moi', M + 58, y + 20);
-  doc.setFontSize(11); doc.setTextColor(90, 90, 90); doc.setFont('helvetica', 'normal');
-  doc.text('BGE Franche-Comte - Pronos Coupe du Monde 2026', M + 58, y + 38);
-  y += 62;
-  doc.setDrawColor(255, 209, 102); doc.setLineWidth(2); doc.line(M, y, M + CW, y); y += 20;
-  doc.setFontSize(14); doc.setFont('helvetica', 'bold'); doc.setTextColor(7, 59, 76);
-  doc.text(_stripEmoji(d.me.name), M, y); y += 18;
-  doc.setFontSize(10); doc.setFont('helvetica', 'normal'); doc.setTextColor(90, 90, 90);
-  doc.text(`Equipe ${d.me.team}   -   ${d.rankGen > 0 ? 'Rang general : #' + d.rankGen : ''}`, M, y); y += 24;
-
-  // Chiffres clés
-  heading('Tes chiffres cles');
-  para(`Total de points : ${d.totalPts}      Pronostics : ${d.nbPronos}      Scores exacts : ${d.nbExact}      Bons resultats : ${d.nbBon}`);
-  para(`Classement general : #${d.rankGen}      Coupe Jean Tarbouriech : #${d.rankKO}`);
-  y += 6;
-
-  // Titre d'honneur
-  heading('Ton titre d\'honneur');
-  para(d.title, { bold: true, size: 12, color: [124, 47, 214] });
-  y += 6;
-
-  // Badges
-  heading('Tes badges remportes');
-  if (d.badges.length) d.badges.forEach(b => para('- ' + b));
-  else para('Pas encore de badge... mais tu as joue, et c\'est deja une victoire !');
-  y += 6;
-
-  // Classement général
-  heading('Classement general (Coupe du Monde BGE)');
-  doc.autoTable({ startY: y, margin: { left: M, right: M }, styles: { fontSize: 9, cellPadding: 3 }, headStyles: { fillColor: [7, 59, 76], textColor: [255, 209, 102] }, head: [['#', 'Joueur', 'Equipe', 'Pts']], body: d.gen.slice(0, 10).map((p, i) => [i + 1, _stripEmoji(p.name), p.team, p.pts]), didParseCell: c => { if (c.row.raw && c.section === 'body' && d.gen[c.row.index] && d.gen[c.row.index].id === d.me.id) { c.cell.styles.fillColor = [255, 245, 200]; c.cell.styles.fontStyle = 'bold'; } } });
-  y = doc.lastAutoTable.finalY + 14;
-
-  // Classement Jean Tarbouriech
-  heading('Classement Coupe Jean Tarbouriech (phase finale)');
-  doc.autoTable({ startY: y, margin: { left: M, right: M }, styles: { fontSize: 9, cellPadding: 3 }, headStyles: { fillColor: [139, 0, 0], textColor: [255, 255, 255] }, head: [['#', 'Joueur', 'Equipe', 'Pts']], body: d.ko.slice(0, 10).map((p, i) => [i + 1, _stripEmoji(p.name), p.team, p.pts]) });
-  y = doc.lastAutoTable.finalY + 14;
-
-  // Classement équipes
-  heading('Classement par equipe');
-  doc.autoTable({ startY: y, margin: { left: M, right: M }, styles: { fontSize: 9, cellPadding: 3 }, headStyles: { fillColor: [17, 138, 178], textColor: [255, 255, 255] }, head: [['#', 'Equipe', 'Moy. /5']], body: d.teamRank.map((t, i) => [i + 1, t.name, t.avg.toFixed(2)]) });
-  y = doc.lastAutoTable.finalY + 14;
-
-  // Parcours match par match
-  heading('Ton parcours match par match');
-  doc.autoTable({
-    startY: y, margin: { left: M, right: M }, styles: { fontSize: 8, cellPadding: 2.5 },
-    headStyles: { fillColor: [7, 59, 76], textColor: [255, 209, 102] },
-    head: [['Match', 'Mon prono', 'Score reel', 'Resultat']],
-    body: d.matchRows.map(r => [_stripEmoji(r.match), r.prono, r.real, r.res === 'exact' ? 'EXACT' : r.res === 'bon' ? 'BON' : r.res === 'rate' ? 'RATE' : '-']),
-    didParseCell: c => { if (c.section === 'body' && c.column.index === 3) { const v = c.cell.raw; if (v === 'EXACT') { c.cell.styles.textColor = [184, 134, 11]; c.cell.styles.fontStyle = 'bold'; } else if (v === 'BON') { c.cell.styles.textColor = [22, 163, 74]; c.cell.styles.fontStyle = 'bold'; } else if (v === 'RATE') { c.cell.styles.textColor = [204, 0, 0]; } } }
-  });
-  y = doc.lastAutoTable.finalY + 14;
-
-  // Sondages
-  if (d.pollVotes.length) {
-    heading('Tes votes aux sondages du jour');
-    d.pollVotes.forEach(v => para(`- ${v.q}  ->  ${_stripEmoji(v.choice)}`));
-    y += 6;
-  }
-
-  // Prono de la Mort
-  if (d.pronoMort) {
-    heading('Ton Prono de la Mort');
-    para(`Champion parie : ${d.pronoMort.team}   -   Score finale parie : ${d.pronoMort.score}`);
-    if (d.pronoMort.delta !== null) para(`Resultat : ${d.pronoMort.delta > 0 ? '+' : ''}${d.pronoMort.delta} points`, { bold: true, color: d.pronoMort.delta > 0 ? [22, 163, 74] : [204, 0, 0] });
-    else para('Resultat : sera calcule apres la finale.');
-    y += 6;
-  }
-
-  // Punchlines
-  heading('Le best-of des punchlines');
-  Object.entries(REPORT_PUNCHLINES).forEach(([who, lines]) => {
-    para(who, { bold: true, color: [7, 59, 76] });
-    lines.forEach(l => para('  " ' + _stripEmoji(l) + ' "', { indent: 6 }));
-    y += 2;
-  });
-  y += 4;
-
-  // Recette de Pauline
+function buildReportHTML(d) {
+  const NAVY = '#073B4C', TEAL = '#118AB2', JAUNE = '#FFD166';
+  const sec = (title, inner) => `<div style="page-break-inside:avoid;margin:0 0 16px"><div style="background:${NAVY};color:${JAUNE};font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;padding:8px 14px;border-radius:10px 10px 0 0">${title}</div><div style="border:1px solid #e6e6e6;border-top:none;border-radius:0 0 10px 10px;padding:14px;background:#fff">${inner}</div></div>`;
+  const tile = (label, val, bg, fg) => `<div style="flex:1;min-width:118px;background:${bg};border-radius:12px;padding:12px 8px;text-align:center"><div style="font-family:'Bebas Neue',sans-serif;font-size:30px;color:${fg};line-height:1">${val}</div><div style="font-size:11px;color:${fg};font-weight:800;letter-spacing:.5px;opacity:.92;margin-top:3px">${label}</div></div>`;
+  const rankTbl = (rows, headBg) => `<table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr style="background:${headBg};color:#fff"><th style="padding:6px 8px">#</th><th style="padding:6px 8px;text-align:left">Joueur</th><th style="padding:6px 8px;text-align:left">Équipe</th><th style="padding:6px 8px;text-align:right">Pts</th></tr></thead><tbody>${rows.map(r => { const mine = r.name === d.me.name; const m = r.rank <= 3 ? ['🥇', '🥈', '🥉'][r.rank - 1] : r.rank; return `<tr style="${mine ? 'background:#FFF3C4' : ''}"><td style="padding:5px 8px;border-bottom:1px solid #eee;text-align:center;${mine ? 'font-weight:800' : ''}">${m}</td><td style="padding:5px 8px;border-bottom:1px solid #eee;${mine ? 'font-weight:800' : ''}">${r.name}${mine ? ' <span style="color:#E63946;font-size:11px">(moi)</span>' : ''}</td><td style="padding:5px 8px;border-bottom:1px solid #eee;font-size:12px;color:#666">${r.team || ''}</td><td style="padding:5px 8px;border-bottom:1px solid #eee;text-align:right;font-weight:800">${r.pts}</td></tr>`; }).join('')}</tbody></table>`;
+  const chip = r => r === 'exact' ? '<span style="background:#FFF3C4;color:#8a6d00;border-radius:20px;padding:2px 9px;font-weight:800;font-size:11px">⭐ EXACT</span>' : r === 'bon' ? '<span style="background:#dcfce7;color:#166534;border-radius:20px;padding:2px 9px;font-weight:800;font-size:11px">✅ BON</span>' : r === 'rate' ? '<span style="background:#fee2e2;color:#991b1b;border-radius:20px;padding:2px 9px;font-weight:800;font-size:11px">❌ RATÉ</span>' : '—';
+  const genRows = d.gen.slice(0, 10).map((p, i) => ({ name: p.name, team: p.team, pts: p.pts, rank: i + 1 }));
+  const koRows = d.ko.slice(0, 10).map((p, i) => ({ name: p.name, team: p.team, pts: p.pts, rank: i + 1 }));
+  const meOutGen = d.rankGen > 10 ? `<div style="margin-top:8px;background:#FFF3C4;border-radius:8px;padding:6px 10px;font-size:13px;font-weight:800;color:${NAVY}">Toi : #${d.rankGen} avec ${d.totalPts} pts</div>` : '';
+  const p = [];
+  p.push(`<div style="background:linear-gradient(135deg,${NAVY},${TEAL});border-radius:16px;padding:20px;display:flex;align-items:center;gap:16px;margin-bottom:16px"><img src="images/logo-bge.png" style="width:66px;height:66px;object-fit:contain;background:#fff;border-radius:12px;padding:6px"><div><div style="font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:2px;color:${JAUNE};line-height:1">MA COUPE DU MONDE À MOI</div><div style="color:#dcedf2;font-size:13px;font-weight:600;margin-top:3px">BGE Franche-Comté · Pronos Coupe du Monde 2026</div></div></div>`);
+  p.push(`<div style="display:flex;align-items:center;justify-content:space-between;background:#FFF7E0;border:2px solid ${JAUNE};border-radius:14px;padding:12px 18px;margin-bottom:16px"><div><div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:${NAVY};letter-spacing:1px">${d.me.name}</div><div style="color:#777;font-size:13px;font-weight:700">Équipe ${d.me.team}</div></div><div style="text-align:right"><div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:#E63946;line-height:1">#${d.rankGen}</div><div style="font-size:11px;color:#999;font-weight:800;letter-spacing:1px">RANG GÉNÉRAL</div></div></div>`);
+  p.push(sec('📊 Tes chiffres clés', `<div style="display:flex;gap:10px;flex-wrap:wrap">${tile('POINTS', d.totalPts, '#073B4C', '#FFD166')}${tile('PRONOS', d.nbPronos, '#118AB2', '#fff')}${tile('SCORES EXACTS', d.nbExact, '#FFD166', '#7a5c00')}${tile('BONS RÉSULTATS', d.nbBon, '#06D6A0', '#04463a')}</div><div style="margin-top:10px;font-size:13px;color:#555">Classement général : <strong>#${d.rankGen}</strong> · Coupe Jean Tarbouriech : <strong>#${d.rankKO}</strong></div>`));
+  p.push(sec('🏅 Ton titre d\'honneur', `<div style="text-align:center;background:linear-gradient(135deg,#7c2fd6,#9B5DE5);border-radius:12px;padding:14px;color:#fff"><div style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px">${d.title}</div></div>`));
+  p.push(sec('🎖️ Tes badges remportés', d.badges.length ? d.badges.map(_badgeChip).join('') : '<div style="color:#777;font-style:italic">Pas encore de badge... mais tu as joué, et c\'est déjà une victoire !</div>'));
+  p.push(sec('🏆 Classement général (Coupe du Monde BGE)', rankTbl(genRows, NAVY) + meOutGen));
+  p.push(sec('💀 Classement Coupe Jean Tarbouriech', rankTbl(koRows, '#8b0000')));
+  p.push(sec('👥 Classement par équipe', `<table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr style="background:${TEAL};color:#fff"><th style="padding:6px 8px">#</th><th style="padding:6px 8px;text-align:left">Équipe</th><th style="padding:6px 8px;text-align:right">Moy. /5</th></tr></thead><tbody>${d.teamRank.map((t, i) => { const mine = t.name === d.me.team; return `<tr style="${mine ? 'background:#FFF3C4' : ''}"><td style="padding:5px 8px;border-bottom:1px solid #eee;text-align:center">${i < 3 ? ['🥇', '🥈', '🥉'][i] : i + 1}</td><td style="padding:5px 8px;border-bottom:1px solid #eee;${mine ? 'font-weight:800' : ''}">${t.name}${mine ? ' <span style="color:#E63946;font-size:11px">(mon équipe)</span>' : ''}</td><td style="padding:5px 8px;border-bottom:1px solid #eee;text-align:right;font-weight:800">${t.avg.toFixed(2)}</td></tr>`; }).join('')}</tbody></table>`));
+  p.push(sec('📋 Ton parcours match par match', `<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr style="background:${NAVY};color:#fff"><th style="padding:6px 8px;text-align:left">Match</th><th style="padding:6px 8px">Mon prono</th><th style="padding:6px 8px">Score réel</th><th style="padding:6px 8px">Résultat</th></tr></thead><tbody>${d.matchRows.map(r => `<tr><td style="padding:4px 8px;border-bottom:1px solid #eee">${r.match}</td><td style="padding:4px 8px;border-bottom:1px solid #eee;text-align:center;font-weight:700">${r.prono}</td><td style="padding:4px 8px;border-bottom:1px solid #eee;text-align:center">${r.real}</td><td style="padding:4px 8px;border-bottom:1px solid #eee;text-align:center">${chip(r.res)}</td></tr>`).join('')}</tbody></table>`));
+  if (d.pollVotes.length) p.push(sec('🗳️ Tes votes aux sondages du jour', d.pollVotes.map(v => `<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0f0f0;font-size:13px"><span style="color:#555">${v.q}</span><strong style="color:${NAVY}">${v.choice}</strong></div>`).join('')));
+  if (d.pronoMort) { const pos = d.pronoMort.delta > 0; p.push(sec('💀 Ton Prono de la Mort', `<div style="font-size:13px">Champion parié : <strong>${d.pronoMort.team}</strong> · Score finale parié : <strong>${d.pronoMort.score}</strong></div>${d.pronoMort.delta !== null ? `<div style="margin-top:8px;display:inline-block;background:${pos ? '#dcfce7' : '#fee2e2'};color:${pos ? '#166534' : '#991b1b'};border-radius:20px;padding:4px 14px;font-weight:800">${pos ? '+' : ''}${d.pronoMort.delta} points</div>` : '<div style="margin-top:8px;color:#777;font-style:italic">Résultat calculé après la finale.</div>'}`)); }
+  p.push(sec('😄 Le best-of des punchlines', REPORT_CHARACTERS.map(c => `<div style="page-break-inside:avoid;display:flex;gap:12px;align-items:flex-start;background:#f7fafb;border:1px solid #e6eef0;border-radius:14px;padding:12px;margin-bottom:10px"><img src="${c.img}" style="width:58px;height:58px;border-radius:50%;object-fit:cover;object-position:center top;border:3px solid ${c.color};flex-shrink:0"><div><div style="font-weight:800;color:${c.color};margin-bottom:5px">${c.name}</div>${c.lines.map(l => `<div style="font-style:italic;color:#444;font-size:13px;margin-bottom:3px">« ${l} »</div>`).join('')}</div></div>`).join('')));
   const ck = d.cocktail;
-  heading('La recette de Pauline : ' + _stripEmoji(ck.nom));
-  para(_stripEmoji(ck.citation), { color: [110, 110, 110] });
-  y += 2;
-  para('Ingredients :', { bold: true });
-  ck.ingredients.forEach(ig => para(`  - ${ig[1] ? ig[1] + '  ' : ''}${_stripEmoji(ig[2])}`));
-  y += 2;
-  para('Preparation :', { bold: true });
-  para(_stripEmoji(ck.methode));
-  y += 8;
+  p.push(`<div style="page-break-inside:avoid;margin:0 0 16px"><div style="background:${NAVY};color:${JAUNE};font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;padding:8px 14px;border-radius:10px 10px 0 0">🍹 La recette de Pauline</div><div style="border:1px solid #e6e6e6;border-top:none;border-radius:0 0 10px 10px;overflow:hidden"><div style="background:${ck.gradient};padding:16px;text-align:center"><img src="images/PD.jpg" style="width:88px;height:88px;border-radius:50%;object-fit:cover;object-position:center 15%;border:4px solid #fff;display:block;margin:0 auto 8px"><div style="color:#fff;font-size:16px;font-weight:900;letter-spacing:1px">${ck.nom}</div></div><div style="padding:14px"><div style="font-size:13px;color:#666;font-style:italic;text-align:center;margin-bottom:10px">« ${ck.citation} »</div>${ck.ingredients.map(([ic, qty, ing]) => `<div style="display:flex;align-items:center;gap:10px;padding:6px 10px;background:#fafafa;border-radius:10px;border-left:3px solid ${ck.accent};margin-bottom:6px"><span>${ic}</span><span style="font-weight:900;color:${ck.accent};min-width:56px;font-size:13px">${qty}</span><span style="color:#333;font-size:13px">${ing}</span></div>`).join('')}<div style="margin-top:10px;padding:10px;background:${ck.accentBg};border:1px solid ${ck.accentBorder};border-radius:10px;font-size:12px;color:${ck.accentText}"><strong>👩‍🍳 La méthode Pauline :</strong> ${ck.methode}</div></div></div></div>`);
+  p.push(`<div style="page-break-inside:avoid;background:linear-gradient(135deg,#073B4C,#0a5068);border-radius:16px;padding:18px;color:#fff"><div style="display:flex;gap:14px;align-items:center;margin-bottom:10px"><img src="images/Julien.jpg" style="width:60px;height:60px;border-radius:50%;object-fit:cover;border:3px solid ${JAUNE}"><div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:${JAUNE}">Le mot de la fin</div></div><div style="font-size:13px;line-height:1.7;color:#eaf4f7">Merci d'avoir joué, merci d'avoir vibré, et merci d'avoir fait de cette Coupe du Monde un beau moment collectif chez BGE Franche-Comté. J'espère vous avoir apporté du bonheur et du fun. Passez de très bonnes vacances, et à très vite pour de nouvelles aventures !</div><div style="text-align:right;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;color:#fff;margin-top:8px">Julien</div></div>`);
+  return p.join('');
+}
 
-  // Mot de la fin
-  heading('Le mot de la fin');
-  para('Merci d\'avoir joue, merci d\'avoir vibre, et merci d\'avoir fait de cette Coupe du Monde un beau moment collectif chez BGE Franche-Comte. A tres vite pour de nouvelles aventures.', { lh: 15 });
-  y += 8;
-  ensure(46);
-  if (julienImg) { try { doc.addImage(julienImg, 'JPEG', M, y, 40, 40); } catch (e) {} }
-  doc.setFont('helvetica', 'bold'); doc.setFontSize(13); doc.setTextColor(7, 59, 76);
-  doc.text('Julien', M + (julienImg ? 50 : 0), y + 25);
-
-  doc.save(`Ma-Coupe-du-Monde-${_stripEmoji(d.me.name).replace(/\s+/g, '-')}.pdf`);
-  showToast('✅ Ton rapport est pret !');
+async function downloadWorldCupReport() {
+  if (!window.html2pdf) { showToast('Génération PDF indisponible (librairie non chargée)'); return; }
+  showToast('📄 Génération de ton rapport...');
+  let d; try { d = await buildReportData(); } catch (e) { showToast('⚠️ Erreur lors du calcul des données'); return; }
+  const holder = document.createElement('div');
+  holder.style.cssText = 'position:fixed;left:-99999px;top:0;z-index:-1';
+  const inner = document.createElement('div');
+  inner.style.cssText = 'width:800px;background:#fff;padding:22px;box-sizing:border-box;font-family:Nunito,\'Segoe UI\',Arial,sans-serif;color:#222';
+  inner.innerHTML = buildReportHTML(d);
+  holder.appendChild(inner);
+  document.body.appendChild(holder);
+  await Promise.all(Array.from(inner.querySelectorAll('img')).map(im => (im.complete && im.naturalWidth) ? Promise.resolve() : new Promise(r => { im.onload = im.onerror = r; setTimeout(r, 3000); })));
+  const opt = { margin: [6, 6, 6, 6], filename: `Ma-Coupe-du-Monde-${_stripEmoji(d.me.name).replace(/\s+/g, '-')}.pdf`, image: { type: 'jpeg', quality: 0.95 }, html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }, pagebreak: { mode: ['css', 'legacy'] } };
+  try { await html2pdf().set(opt).from(inner).save(); showToast('✅ Ton rapport est prêt !'); }
+  catch (e) { showToast('⚠️ Erreur lors de la génération du PDF'); }
+  finally { holder.remove(); }
 }
 
 function updateBannerRight() {
@@ -2507,13 +2443,23 @@ function updateBannerRight() {
   if (el) el.innerHTML = `<button class="report-btn" onclick="event.stopPropagation();downloadWorldCupReport()">🏆 Ma Coupe<br>du Monde à moi</button>`;
 }
 
+// Flash bref et semi-transparent du portrait de Zidane (clin d'oeil de fin, apres la finale)
+function flashZidane() {
+  const z = document.createElement('div');
+  z.style.cssText = 'position:fixed;inset:0;z-index:10001;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;transition:opacity .18s ease';
+  z.innerHTML = '<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Zinedine_Zidane_by_Tasnim_03.jpg/500px-Zinedine_Zidane_by_Tasnim_03.jpg" style="max-height:72vh;max-width:82vw;border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,.4)" onerror="this.style.display=\'none\'">';
+  document.body.appendChild(z);
+  requestAnimationFrame(() => { z.style.opacity = '0.45'; });
+  setTimeout(() => { z.style.opacity = '0'; setTimeout(() => z.remove(), 200); }, 450);
+}
+
 function showFinalThanksPopup() {
   if (!(isFinalDone() || REPORT_TEST)) return;
   const pop = document.createElement('div');
   pop.id = 'finalThanksPopup';
   pop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem';
   pop.innerHTML = `
-    <div style="background:#fff;border-radius:20px;max-width:460px;width:100%;max-height:88vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.4)">
+    <div style="background:#fff;border-radius:20px;max-width:600px;width:100%;max-height:90vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.4)">
       <div style="background:linear-gradient(135deg,#073B4C,#0a5068);padding:1.4rem;text-align:center">
         <img src="images/Julien.jpg" style="width:78px;height:78px;border-radius:50%;object-fit:cover;border:3px solid #FFD166;box-shadow:0 0 20px rgba(255,209,102,.4);display:block;margin:0 auto .55rem" onerror="this.src='images/logo-bge.png';this.style.borderRadius='0';this.style.border='none'">
         <div style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:2px;color:#FFD166">Le mot de la fin</div>
@@ -2522,13 +2468,14 @@ function showFinalThanksPopup() {
       <div style="padding:1.4rem;font-size:.9rem;line-height:1.75;color:#333">
         <p style="margin:0 0 .8rem">Voilà, c'est terminé. 🏆</p>
         <p style="margin:0 0 .8rem">Je tenais à vous <strong>remercier très solennellement</strong>, toutes et tous, pour votre participation à cette Coupe du Monde des pronos.</p>
-        <p style="margin:0 0 .8rem">Un immense merci à celles et ceux que j'ai pris comme muses — <strong>Magali, Tiphaine, Anaïs, Jeannot, Pauline, Thierry</strong> — qui ont accepté, souvent malgré elles, de faire vivre ce jeu et de lui donner son âme. 💙</p>
-        <p style="margin:0 0 .8rem">Ce fut une <strong>belle expérience</strong>, une belle collaboration avec la com' — merci à <strong>Tiphaine</strong> de m'avoir lancé sur cette voie. Être une trentaine à jouer au sein de <strong>BGE Franche-Comté</strong>, c'est une belle victoire.</p>
-        <p style="margin:0 0 .8rem">Dommage que la France n'ait pas gagné… mais ça, on n'y peut rien. 🇫🇷</p>
-        <p style="margin:0 0 1rem">J'espère vous avoir apporté du bonheur et du fun. Et en guise de <strong>dernier cadeau</strong>, je vous invite à télécharger votre petit rapport personnalisé. 🎁</p>
+        <p style="margin:0 0 .8rem">Un immense merci à celles et ceux que j'ai pris comme muses : <strong>Magali, Tiphaine, Anaïs, Jeannot, Pauline, Thierry</strong>, qui ont accepté, souvent malgré elles, de faire vivre ce jeu et de lui donner son âme. 💙</p>
+        <p style="margin:0 0 .8rem">Ce fut une <strong>belle expérience</strong>, une belle collaboration avec la com'. Merci à <strong>Tiphaine</strong> de m'avoir lancé sur cette voie. Être une trentaine à jouer au sein de <strong>BGE Franche-Comté</strong>, c'est une belle victoire.</p>
+        <p style="margin:0 0 .8rem">Dommage que la France n'ait pas gagné, mais ça, on n'y peut rien. ${FR_FLAG}</p>
+        <p style="margin:0 0 .8rem">J'espère vous avoir apporté du bonheur et du fun. Et en guise de <strong>dernier cadeau</strong>, je vous invite à télécharger votre petit rapport personnalisé. 🎁</p>
+        <p style="margin:0 0 1rem">Je vous souhaite à toutes et à tous de <strong>très bonnes vacances</strong> ! ☀️🏖️</p>
         <div style="text-align:right;font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:1px;color:#073B4C">Julien</div>
-        <button onclick="document.getElementById('finalThanksPopup').remove();downloadWorldCupReport()" style="width:100%;margin-top:1rem;background:linear-gradient(135deg,#FFD166,#f0a500);border:none;border-radius:12px;padding:.9rem;color:#073B4C;font-family:'Nunito',sans-serif;font-size:.95rem;font-weight:900;cursor:pointer">🏆 Télécharger ma Coupe du Monde à moi</button>
-        <button onclick="document.getElementById('finalThanksPopup').remove()" style="width:100%;margin-top:.5rem;background:transparent;border:1px solid #ccc;border-radius:12px;padding:.6rem;color:#888;font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:700;cursor:pointer">Fermer</button>
+        <button onclick="flashZidane();document.getElementById('finalThanksPopup').remove();downloadWorldCupReport()" style="width:100%;margin-top:1rem;background:linear-gradient(135deg,#FFD166,#f0a500);border:none;border-radius:12px;padding:.9rem;color:#073B4C;font-family:'Nunito',sans-serif;font-size:.95rem;font-weight:900;cursor:pointer">🏆 Télécharger ma Coupe du Monde à moi</button>
+        <button onclick="flashZidane();document.getElementById('finalThanksPopup').remove()" style="width:100%;margin-top:.5rem;background:transparent;border:1px solid #ccc;border-radius:12px;padding:.6rem;color:#888;font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:700;cursor:pointer">Fermer</button>
       </div>
     </div>`;
   pop.onclick = e => { if (e.target === pop) pop.remove(); };
