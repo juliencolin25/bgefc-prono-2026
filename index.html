@@ -2235,7 +2235,7 @@ async function cancelPronoMort() {
 // CONTRÔLE DE VERSION — recharge auto quand un nouveau déploiement est détecté
 // (À CHAQUE déploiement : monter APP_VERSION ici ET dans version.json à l'identique)
 // ============================================================
-const APP_VERSION = '2026-07-18-1';
+const APP_VERSION = '2026-07-18-2';
 async function checkAppVersion() {
   try {
     const res = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' });
@@ -2389,6 +2389,7 @@ async function downloadWorldCupReport() {
   const W = 595, M = 40, CW = W - 2 * M;
   let y = M;
   const logo = await _loadImg('images/logo-bge.png');
+  const julienImg = await _loadImg('images/Julien.jpg');
   const ensure = h => { if (y + h > 800) { doc.addPage(); y = M; } };
   const heading = t => { ensure(34); doc.setFillColor(7, 59, 76); doc.roundedRect(M, y, CW, 22, 4, 4, 'F'); doc.setTextColor(255, 209, 102); doc.setFont('helvetica', 'bold'); doc.setFontSize(12); doc.text(_stripEmoji(t), M + 10, y + 15); y += 32; doc.setTextColor(45, 45, 45); doc.setFont('helvetica', 'normal'); doc.setFontSize(10); };
   const para = (t, opt = {}) => { doc.setFont('helvetica', opt.bold ? 'bold' : 'normal'); doc.setFontSize(opt.size || 10); if (opt.color) doc.setTextColor(...opt.color); else doc.setTextColor(45, 45, 45); const lines = doc.splitTextToSize(_stripEmoji(t), CW - (opt.indent || 0)); lines.forEach(ln => { ensure(opt.lh || 14); doc.text(ln, M + (opt.indent || 0), y); y += opt.lh || 14; }); };
@@ -2489,8 +2490,11 @@ async function downloadWorldCupReport() {
   // Mot de la fin
   heading('Le mot de la fin');
   para('Merci d\'avoir joue, merci d\'avoir vibre, et merci d\'avoir fait de cette Coupe du Monde un beau moment collectif chez BGE Franche-Comte. A tres vite pour de nouvelles aventures.', { lh: 15 });
-  y += 6;
-  para('Julien', { bold: true, size: 12, color: [7, 59, 76] });
+  y += 8;
+  ensure(46);
+  if (julienImg) { try { doc.addImage(julienImg, 'JPEG', M, y, 40, 40); } catch (e) {} }
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(13); doc.setTextColor(7, 59, 76);
+  doc.text('Julien', M + (julienImg ? 50 : 0), y + 25);
 
   doc.save(`Ma-Coupe-du-Monde-${_stripEmoji(d.me.name).replace(/\s+/g, '-')}.pdf`);
   showToast('✅ Ton rapport est pret !');
@@ -2511,8 +2515,9 @@ function showFinalThanksPopup() {
   pop.innerHTML = `
     <div style="background:#fff;border-radius:20px;max-width:460px;width:100%;max-height:88vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.4)">
       <div style="background:linear-gradient(135deg,#073B4C,#0a5068);padding:1.4rem;text-align:center">
-        <img src="images/logo-bge.png" style="width:60px;height:60px;object-fit:contain;display:block;margin:0 auto .6rem" onerror="this.style.display='none'">
+        <img src="images/Julien.jpg" style="width:78px;height:78px;border-radius:50%;object-fit:cover;border:3px solid #FFD166;box-shadow:0 0 20px rgba(255,209,102,.4);display:block;margin:0 auto .55rem" onerror="this.src='images/logo-bge.png';this.style.borderRadius='0';this.style.border='none'">
         <div style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:2px;color:#FFD166">Le mot de la fin</div>
+        <div style="font-size:.72rem;color:rgba(255,255,255,.75);font-weight:700;letter-spacing:1px">par Julien</div>
       </div>
       <div style="padding:1.4rem;font-size:.9rem;line-height:1.75;color:#333">
         <p style="margin:0 0 .8rem">Voilà, c'est terminé. 🏆</p>
