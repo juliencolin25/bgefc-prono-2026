@@ -2234,7 +2234,7 @@ async function cancelPronoMort() {
 // CONTRÔLE DE VERSION — recharge auto quand un nouveau déploiement est détecté
 // (À CHAQUE déploiement : monter APP_VERSION ici ET dans version.json à l'identique)
 // ============================================================
-const APP_VERSION = '2026-07-18-3';
+const APP_VERSION = '2026-07-18-4';
 async function checkAppVersion() {
   try {
     const res = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' });
@@ -2430,7 +2430,7 @@ async function downloadWorldCupReport() {
   holder.appendChild(inner);
   document.body.appendChild(holder);
   await Promise.all(Array.from(inner.querySelectorAll('img')).map(im => (im.complete && im.naturalWidth) ? Promise.resolve() : new Promise(r => { im.onload = im.onerror = r; setTimeout(r, 3000); })));
-  const opt = { margin: [6, 6, 6, 6], filename: `Ma-Coupe-du-Monde-${_stripEmoji(d.me.name).replace(/\s+/g, '-')}.pdf`, image: { type: 'jpeg', quality: 0.95 }, html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }, pagebreak: { mode: ['css', 'legacy'] } };
+  const opt = { margin: [6, 6, 6, 6], filename: `Ma-Coupe-du-Monde-${_stripEmoji(d.me.name).replace(/\s+/g, '-')}.pdf`, image: { type: 'jpeg', quality: 0.95 }, html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false, windowWidth: 800, width: 800, scrollX: 0, scrollY: 0 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }, pagebreak: { mode: ['css', 'legacy'] } };
   try { await html2pdf().set(opt).from(inner).save(); showToast('✅ Ton rapport est prêt !'); }
   catch (e) { showToast('⚠️ Erreur lors de la génération du PDF'); }
   finally { holder.remove(); }
@@ -2446,11 +2446,11 @@ function updateBannerRight() {
 // Flash bref et semi-transparent du portrait de Zidane (clin d'oeil de fin, apres la finale)
 function flashZidane() {
   const z = document.createElement('div');
-  z.style.cssText = 'position:fixed;inset:0;z-index:10001;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;transition:opacity .18s ease';
-  z.innerHTML = '<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Zinedine_Zidane_by_Tasnim_03.jpg/500px-Zinedine_Zidane_by_Tasnim_03.jpg" style="max-height:72vh;max-width:82vw;border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,.4)" onerror="this.style.display=\'none\'">';
+  z.style.cssText = 'position:fixed;inset:0;z-index:10001;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;transition:opacity .22s ease';
+  z.innerHTML = '<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Zinedine_Zidane_by_Tasnim_03.jpg/640px-Zinedine_Zidane_by_Tasnim_03.jpg" style="max-height:92vh;max-width:94vw;border-radius:16px;box-shadow:0 12px 55px rgba(0,0,0,.55)" onerror="this.style.display=\'none\'"><div style="position:absolute;bottom:10%;left:0;right:0;text-align:center;font-family:\'Bebas Neue\',sans-serif;font-size:clamp(30px,8vw,72px);letter-spacing:3px;color:#fff;text-shadow:0 3px 20px rgba(0,0,0,.85)">Coming soon…</div>';
   document.body.appendChild(z);
-  requestAnimationFrame(() => { z.style.opacity = '0.45'; });
-  setTimeout(() => { z.style.opacity = '0'; setTimeout(() => z.remove(), 200); }, 450);
+  requestAnimationFrame(() => { z.style.opacity = '0.6'; });
+  setTimeout(() => { z.style.opacity = '0'; setTimeout(() => z.remove(), 250); }, 950);
 }
 
 function showFinalThanksPopup() {
