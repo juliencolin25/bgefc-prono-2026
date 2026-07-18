@@ -7,6 +7,8 @@
 <link rel="icon" type="image/png" href="images/fifa.png">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <style>
 :root {
   --rouge:#E63946; --orange:#F4A261; --jaune:#FFD166;
@@ -244,6 +246,8 @@ main{max-width:1200px;margin:0 auto;padding:2rem 1.5rem;position:relative;z-inde
 .banner-countdown{flex-shrink:0;text-align:center;line-height:1.05;}
 .bc-label{font-size:11px;font-weight:800;letter-spacing:1px;color:#e63946;white-space:nowrap;margin-bottom:2px;}
 .bc-time{font-family:'Bebas Neue',sans-serif;font-size:1.9rem;letter-spacing:1.5px;color:#FFD166;white-space:nowrap;}
+.report-btn{background:linear-gradient(135deg,#FFD166,#f0a500);border:none;border-radius:12px;padding:.55rem .8rem;color:#073B4C;font-family:'Bebas Neue',sans-serif;font-size:.95rem;letter-spacing:1px;line-height:1.05;cursor:pointer;flex-shrink:0;box-shadow:0 3px 12px rgba(0,0,0,.3);animation:heroPulse2 1.8s ease-in-out infinite;}
+@keyframes heroPulse2{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
 /* AJOUT MASTER PROMPT 2026 - Modal equipe */
 .team-modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:1000;align-items:center;justify-content:center;}
 .team-modal-overlay.active{display:flex;}
@@ -892,6 +896,7 @@ function startBannerCountdown(){
   const target=new Date('2026-07-19T19:00:00Z').getTime();
   const p=n=>String(n).padStart(2,'0');
   const t=setInterval(tick,1000);
+  window._bannerCdTimer=t;
   function tick(){
     let diff=target-Date.now();
     if(diff<=0){ el.textContent='C\'est l\'heure ! ⚽'; clearInterval(t); return; }
@@ -1525,6 +1530,8 @@ async function startApp() {
   // showTiphaineDemiPopup();  // désactivé le 12/07 : annonce des points doublés retirée (le barème 10/5 reste actif)
   showBastilleFireworks();
   showFranceDemiResultPopup();
+  updateBannerRight();
+  showFinalThanksPopup();
 }
 
 // ============================================================
@@ -2228,7 +2235,7 @@ async function cancelPronoMort() {
 // CONTRÔLE DE VERSION — recharge auto quand un nouveau déploiement est détecté
 // (À CHAQUE déploiement : monter APP_VERSION ici ET dans version.json à l'identique)
 // ============================================================
-const APP_VERSION = '2026-07-15-15';
+const APP_VERSION = '2026-07-18-1';
 async function checkAppVersion() {
   try {
     const res = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' });
@@ -2239,6 +2246,288 @@ async function checkAppVersion() {
       location.reload();
     }
   } catch (e) { /* hors ligne : on réessaiera plus tard */ }
+}
+
+// ============================================================
+// RAPPORT PDF « Ma Coupe du Monde à moi » + popup final
+// Activé une fois la finale terminée (ou en mode test via ?report dans l'URL)
+// ============================================================
+const REPORT_TEST = new URLSearchParams(location.search).has('report');
+
+function isFinalDone() {
+  const f = allMatches.find(m => m.group_name === 'Finale');
+  return !!(f && getEffectiveStatus(f) === 'done' && f.score1_real !== null && f.score1_real !== undefined);
+}
+
+function _stripEmoji(s) {
+  return String(s).replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2190}-\u{21FF}\u{2B00}-\u{2BFF}\u{FE0F}\u{1F1E6}-\u{1F1FF}\u{200D}]/gu, '').replace(/\s+/g, ' ').trim();
+}
+
+function _classifyProno(p, m) {
+  if (!p || getEffectiveStatus(m) !== 'done' || m.score1_real === null || m.score1_real === undefined) return null;
+  if (p.score1 === m.score1_real && p.score2 === m.score2_real) return 'exact';
+  return matchOutcome(p.score1, p.score2, p.winner) === matchOutcome(m.score1_real, m.score2_real, m.winner) ? 'bon' : 'rate';
+}
+
+const REPORT_PUNCHLINES = {
+  'Jeannot': [
+    "ALLEZ LES VERTS ! ... pardon pardon, je reprends vos pronos.",
+    "J'etais a la finale 98, j'ai vu Zizou de mes yeux, j'ai 400 photos toutes floues.",
+    "Le CHAUDRON, vous l'entendez ?? MOI JE L'ENTENDS.",
+    "L'arbitre a du parier sur l'Espagne, y'a pas d'autre explication."
+  ],
+  'Magali': [
+    "Bon, moi je passe au cyclisme, je m'y connais bien mieux.",
+    "Cette annee je sens bien Virenque pour gagner le Tour, quelle forme !",
+    "En tant que patronne, j'accorde des points bonus. Je suis pas connaisseuse en foot mais je suis genereuse."
+  ],
+  'Thierry': [
+    "Alors... on commence a avoir un peu peur ?",
+    "J'en connais qui doivent pleurer ce matin, et moi je souris. C'est vilain, mais je souris.",
+    "Le Prono de la Mort n'oublie personne. Les comptes se reglent apres la finale."
+  ],
+  'Tiphaine': [
+    "Derechef, je m'execute et plussoie de dire que d'Anais et de fleches, j'ai fait 5.",
+    "La competition n'est pas finie, continuez a pronostiquer !",
+    "Magali a ENCORE fait une annonce toute seule, c'est la com' qui court derriere."
+  ]
+};
+
+async function buildReportData() {
+  const allPronos = await loadAllPronos();
+  const koIds = new Set(allMatches.filter(m => KO_GROUPS.includes(m.group_name)).map(m => m.id));
+  const pmDeltas = await getPronoMortDeltas();
+  const doneMatches = allMatches.filter(m => getEffectiveStatus(m) === 'done' && m.score1_real !== null);
+
+  // Classement général
+  const gen = allUsers.map(u => {
+    const up = allPronos.filter(p => p.user_id === u.id);
+    const pts = up.reduce((s, p) => s + (p.points || 0), 0) + (pmDeltas[u.id] || 0);
+    return { id: u.id, name: u.name, team: u.team, pts };
+  }).sort((a, b) => b.pts - a.pts);
+  // Classement Coupe Jean Tarbouriech (phase finale)
+  const ko = allUsers.map(u => {
+    const up = allPronos.filter(p => p.user_id === u.id && koIds.has(p.match_id));
+    return { name: u.name, team: u.team, pts: up.reduce((s, p) => s + (p.points || 0), 0) };
+  }).sort((a, b) => b.pts - a.pts);
+  // Classement équipes (moyenne /5)
+  const finishedCount = doneMatches.length || 1;
+  const EXCLUDE = ['Olivier SIMON', 'Lucile SIGWALTE'];
+  const tScore = {};
+  (typeof TEAMS_BGE !== 'undefined' ? TEAMS_BGE : []).forEach(t => tScore[t] = { total: 0, count: 0 });
+  allUsers.forEach(u => {
+    if (EXCLUDE.includes(u.name)) return;
+    const pts = allPronos.filter(p => p.user_id === u.id && p.points !== null).reduce((s, p) => s + p.points, 0);
+    if (tScore[u.team]) { tScore[u.team].total += pts; tScore[u.team].count++; }
+  });
+  const teamRank = Object.entries(tScore).map(([name, s]) => ({ name, avg: s.count ? s.total / (s.count * finishedCount) : 0, count: s.count })).sort((a, b) => b.avg - a.avg);
+
+  // Données du joueur
+  const me = currentUser;
+  const rankGen = gen.findIndex(x => x.id === me.id) + 1;
+  const rankKO = ko.findIndex(x => x.name === me.name) + 1;
+  const myPr = allPronos.filter(p => p.user_id === me.id);
+  const totalPts = (myPr.reduce((s, p) => s + (p.points || 0), 0)) + (pmDeltas[me.id] || 0);
+
+  // Tableau des matchs pronostiqués
+  const matchRows = [];
+  let nbExact = 0, nbBon = 0;
+  allMatches.slice().sort((a, b) => parseFrDate(a.match_date, a.match_time) - parseFrDate(b.match_date, b.match_time)).forEach(m => {
+    const p = myPr.find(x => x.match_id === m.id);
+    if (!p) return;
+    const res = _classifyProno(p, m);
+    if (res === 'exact') nbExact++; else if (res === 'bon') nbBon++;
+    const real = (m.score1_real !== null && m.score1_real !== undefined) ? `${m.score1_real}-${m.score2_real}` : '-';
+    matchRows.push({ match: `${m.team1} - ${m.team2}`, prono: `${p.score1}-${p.score2}`, real, res });
+  });
+
+  // Badges
+  const exactCountAll = myPr.filter(p => _classifyProno(p, allMatches.find(m => m.id === p.match_id)) === 'exact').length;
+  const badges = [];
+  if (exactCountAll >= 10) badges.push('Ballon d\'or - 10 pronos exacts ou plus');
+  if (isShootoutChampion(me.name)) badges.push('Ballon vert - 5/5 au mini-jeu secret');
+  const { data: pv } = await db.from('poll_votes').select('poll_date,choice').eq('user_id', me.id);
+  const voteMap = {}; (pv || []).forEach(v => voteMap[v.poll_date] = v.choice);
+  if (DAILY_POLLS.every(pl => voteMap[pl.date])) badges.push('Ballon bleu - a vote a tous les sondages');
+  const { data: sb } = await db.from('july13_badge').select('user_id').eq('user_id', me.id).maybeSingle();
+  if (sb) badges.push('Ballon argente - connecte le 13 juillet');
+  if (myPr.length >= 100) badges.push('Ballon rose - 100 matchs pronostiques ou plus');
+
+  // Sondages : ce que j'ai voté
+  const pollVotes = DAILY_POLLS.filter(pl => voteMap[pl.date]).map(pl => ({
+    q: pl.q, choice: voteMap[pl.date] === 'A' ? pl.a : pl.b
+  }));
+
+  // Prono de la Mort
+  const { data: pm } = await db.from('prono_mort').select('*').eq('user_id', me.id).maybeSingle();
+  const pronoMort = pm ? { team: pm.team, score: `${pm.score_win}-${pm.score_lose}`, delta: (pmDeltas[me.id] ?? null) } : null;
+
+  // Titre d'honneur
+  let title;
+  if (pronoMort && pronoMort.delta > 0) title = 'L\'Audacieux - a ose (et reussi) le Prono de la Mort';
+  else if (nbExact >= 10) title = 'Le Visionnaire - 10 scores exacts ou plus';
+  else if (rankGen === 1) title = 'Le Champion - 1er au classement general';
+  else if (rankGen <= 3 && rankGen > 0) title = 'Le Podium - sur le podium general';
+  else if (badges.some(b => b.includes('bleu'))) title = 'Le Fidele - a vote a tous les sondages';
+  else if (myPr.length >= 100) title = 'L\'Assidu - 100 pronostics ou plus';
+  else if (isShootoutChampion(me.name)) title = 'Le Malin - 5/5 au mini-jeu secret';
+  else title = 'Le Passionne - a vecu la Coupe du Monde a fond';
+
+  const cocktail = PAULINE_RECETTES[Math.floor(Math.random() * PAULINE_RECETTES.length)];
+
+  return { me, rankGen, rankKO, totalPts, nbPronos: myPr.length, nbExact, nbBon, badges, title, gen, ko, teamRank, matchRows, pollVotes, pronoMort, cocktail };
+}
+
+function _loadImg(src) { return new Promise(res => { const i = new Image(); i.onload = () => res(i); i.onerror = () => res(null); i.src = src; }); }
+
+async function downloadWorldCupReport() {
+  if (!window.jspdf) { showToast('Génération PDF indisponible (librairie non chargée)'); return; }
+  showToast('📄 Génération de ton rapport...');
+  const d = await buildReportData();
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+  const W = 595, M = 40, CW = W - 2 * M;
+  let y = M;
+  const logo = await _loadImg('images/logo-bge.png');
+  const ensure = h => { if (y + h > 800) { doc.addPage(); y = M; } };
+  const heading = t => { ensure(34); doc.setFillColor(7, 59, 76); doc.roundedRect(M, y, CW, 22, 4, 4, 'F'); doc.setTextColor(255, 209, 102); doc.setFont('helvetica', 'bold'); doc.setFontSize(12); doc.text(_stripEmoji(t), M + 10, y + 15); y += 32; doc.setTextColor(45, 45, 45); doc.setFont('helvetica', 'normal'); doc.setFontSize(10); };
+  const para = (t, opt = {}) => { doc.setFont('helvetica', opt.bold ? 'bold' : 'normal'); doc.setFontSize(opt.size || 10); if (opt.color) doc.setTextColor(...opt.color); else doc.setTextColor(45, 45, 45); const lines = doc.splitTextToSize(_stripEmoji(t), CW - (opt.indent || 0)); lines.forEach(ln => { ensure(opt.lh || 14); doc.text(ln, M + (opt.indent || 0), y); y += opt.lh || 14; }); };
+
+  // En-tête
+  if (logo) { try { doc.addImage(logo, 'PNG', M, y, 46, 46); } catch (e) {} }
+  doc.setTextColor(7, 59, 76); doc.setFont('helvetica', 'bold'); doc.setFontSize(20);
+  doc.text('Ma Coupe du Monde a moi', M + 58, y + 20);
+  doc.setFontSize(11); doc.setTextColor(90, 90, 90); doc.setFont('helvetica', 'normal');
+  doc.text('BGE Franche-Comte - Pronos Coupe du Monde 2026', M + 58, y + 38);
+  y += 62;
+  doc.setDrawColor(255, 209, 102); doc.setLineWidth(2); doc.line(M, y, M + CW, y); y += 20;
+  doc.setFontSize(14); doc.setFont('helvetica', 'bold'); doc.setTextColor(7, 59, 76);
+  doc.text(_stripEmoji(d.me.name), M, y); y += 18;
+  doc.setFontSize(10); doc.setFont('helvetica', 'normal'); doc.setTextColor(90, 90, 90);
+  doc.text(`Equipe ${d.me.team}   -   ${d.rankGen > 0 ? 'Rang general : #' + d.rankGen : ''}`, M, y); y += 24;
+
+  // Chiffres clés
+  heading('Tes chiffres cles');
+  para(`Total de points : ${d.totalPts}      Pronostics : ${d.nbPronos}      Scores exacts : ${d.nbExact}      Bons resultats : ${d.nbBon}`);
+  para(`Classement general : #${d.rankGen}      Coupe Jean Tarbouriech : #${d.rankKO}`);
+  y += 6;
+
+  // Titre d'honneur
+  heading('Ton titre d\'honneur');
+  para(d.title, { bold: true, size: 12, color: [124, 47, 214] });
+  y += 6;
+
+  // Badges
+  heading('Tes badges remportes');
+  if (d.badges.length) d.badges.forEach(b => para('- ' + b));
+  else para('Pas encore de badge... mais tu as joue, et c\'est deja une victoire !');
+  y += 6;
+
+  // Classement général
+  heading('Classement general (Coupe du Monde BGE)');
+  doc.autoTable({ startY: y, margin: { left: M, right: M }, styles: { fontSize: 9, cellPadding: 3 }, headStyles: { fillColor: [7, 59, 76], textColor: [255, 209, 102] }, head: [['#', 'Joueur', 'Equipe', 'Pts']], body: d.gen.slice(0, 10).map((p, i) => [i + 1, _stripEmoji(p.name), p.team, p.pts]), didParseCell: c => { if (c.row.raw && c.section === 'body' && d.gen[c.row.index] && d.gen[c.row.index].id === d.me.id) { c.cell.styles.fillColor = [255, 245, 200]; c.cell.styles.fontStyle = 'bold'; } } });
+  y = doc.lastAutoTable.finalY + 14;
+
+  // Classement Jean Tarbouriech
+  heading('Classement Coupe Jean Tarbouriech (phase finale)');
+  doc.autoTable({ startY: y, margin: { left: M, right: M }, styles: { fontSize: 9, cellPadding: 3 }, headStyles: { fillColor: [139, 0, 0], textColor: [255, 255, 255] }, head: [['#', 'Joueur', 'Equipe', 'Pts']], body: d.ko.slice(0, 10).map((p, i) => [i + 1, _stripEmoji(p.name), p.team, p.pts]) });
+  y = doc.lastAutoTable.finalY + 14;
+
+  // Classement équipes
+  heading('Classement par equipe');
+  doc.autoTable({ startY: y, margin: { left: M, right: M }, styles: { fontSize: 9, cellPadding: 3 }, headStyles: { fillColor: [17, 138, 178], textColor: [255, 255, 255] }, head: [['#', 'Equipe', 'Moy. /5']], body: d.teamRank.map((t, i) => [i + 1, t.name, t.avg.toFixed(2)]) });
+  y = doc.lastAutoTable.finalY + 14;
+
+  // Parcours match par match
+  heading('Ton parcours match par match');
+  doc.autoTable({
+    startY: y, margin: { left: M, right: M }, styles: { fontSize: 8, cellPadding: 2.5 },
+    headStyles: { fillColor: [7, 59, 76], textColor: [255, 209, 102] },
+    head: [['Match', 'Mon prono', 'Score reel', 'Resultat']],
+    body: d.matchRows.map(r => [_stripEmoji(r.match), r.prono, r.real, r.res === 'exact' ? 'EXACT' : r.res === 'bon' ? 'BON' : r.res === 'rate' ? 'RATE' : '-']),
+    didParseCell: c => { if (c.section === 'body' && c.column.index === 3) { const v = c.cell.raw; if (v === 'EXACT') { c.cell.styles.textColor = [184, 134, 11]; c.cell.styles.fontStyle = 'bold'; } else if (v === 'BON') { c.cell.styles.textColor = [22, 163, 74]; c.cell.styles.fontStyle = 'bold'; } else if (v === 'RATE') { c.cell.styles.textColor = [204, 0, 0]; } } }
+  });
+  y = doc.lastAutoTable.finalY + 14;
+
+  // Sondages
+  if (d.pollVotes.length) {
+    heading('Tes votes aux sondages du jour');
+    d.pollVotes.forEach(v => para(`- ${v.q}  ->  ${_stripEmoji(v.choice)}`));
+    y += 6;
+  }
+
+  // Prono de la Mort
+  if (d.pronoMort) {
+    heading('Ton Prono de la Mort');
+    para(`Champion parie : ${d.pronoMort.team}   -   Score finale parie : ${d.pronoMort.score}`);
+    if (d.pronoMort.delta !== null) para(`Resultat : ${d.pronoMort.delta > 0 ? '+' : ''}${d.pronoMort.delta} points`, { bold: true, color: d.pronoMort.delta > 0 ? [22, 163, 74] : [204, 0, 0] });
+    else para('Resultat : sera calcule apres la finale.');
+    y += 6;
+  }
+
+  // Punchlines
+  heading('Le best-of des punchlines');
+  Object.entries(REPORT_PUNCHLINES).forEach(([who, lines]) => {
+    para(who, { bold: true, color: [7, 59, 76] });
+    lines.forEach(l => para('  " ' + _stripEmoji(l) + ' "', { indent: 6 }));
+    y += 2;
+  });
+  y += 4;
+
+  // Recette de Pauline
+  const ck = d.cocktail;
+  heading('La recette de Pauline : ' + _stripEmoji(ck.nom));
+  para(_stripEmoji(ck.citation), { color: [110, 110, 110] });
+  y += 2;
+  para('Ingredients :', { bold: true });
+  ck.ingredients.forEach(ig => para(`  - ${ig[1] ? ig[1] + '  ' : ''}${_stripEmoji(ig[2])}`));
+  y += 2;
+  para('Preparation :', { bold: true });
+  para(_stripEmoji(ck.methode));
+  y += 8;
+
+  // Mot de la fin
+  heading('Le mot de la fin');
+  para('Merci d\'avoir joue, merci d\'avoir vibre, et merci d\'avoir fait de cette Coupe du Monde un beau moment collectif chez BGE Franche-Comte. A tres vite pour de nouvelles aventures.', { lh: 15 });
+  y += 6;
+  para('Julien', { bold: true, size: 12, color: [7, 59, 76] });
+
+  doc.save(`Ma-Coupe-du-Monde-${_stripEmoji(d.me.name).replace(/\s+/g, '-')}.pdf`);
+  showToast('✅ Ton rapport est pret !');
+}
+
+function updateBannerRight() {
+  if (!(isFinalDone() || REPORT_TEST)) return;
+  if (window._bannerCdTimer) { clearInterval(window._bannerCdTimer); window._bannerCdTimer = null; }
+  const el = document.querySelector('.banner-countdown');
+  if (el) el.innerHTML = `<button class="report-btn" onclick="event.stopPropagation();downloadWorldCupReport()">🏆 Ma Coupe<br>du Monde à moi</button>`;
+}
+
+function showFinalThanksPopup() {
+  if (!(isFinalDone() || REPORT_TEST)) return;
+  const pop = document.createElement('div');
+  pop.id = 'finalThanksPopup';
+  pop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem';
+  pop.innerHTML = `
+    <div style="background:#fff;border-radius:20px;max-width:460px;width:100%;max-height:88vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.4)">
+      <div style="background:linear-gradient(135deg,#073B4C,#0a5068);padding:1.4rem;text-align:center">
+        <img src="images/logo-bge.png" style="width:60px;height:60px;object-fit:contain;display:block;margin:0 auto .6rem" onerror="this.style.display='none'">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:2px;color:#FFD166">Le mot de la fin</div>
+      </div>
+      <div style="padding:1.4rem;font-size:.9rem;line-height:1.75;color:#333">
+        <p style="margin:0 0 .8rem">Voilà, c'est terminé. 🏆</p>
+        <p style="margin:0 0 .8rem">Je tenais à vous <strong>remercier très solennellement</strong>, toutes et tous, pour votre participation à cette Coupe du Monde des pronos.</p>
+        <p style="margin:0 0 .8rem">Un immense merci à celles et ceux que j'ai pris comme muses — <strong>Magali, Tiphaine, Anaïs, Jeannot, Pauline, Thierry</strong> — qui ont accepté, souvent malgré elles, de faire vivre ce jeu et de lui donner son âme. 💙</p>
+        <p style="margin:0 0 .8rem">Ce fut une <strong>belle expérience</strong>, une belle collaboration avec la com' — merci à <strong>Tiphaine</strong> de m'avoir lancé sur cette voie. Être une trentaine à jouer au sein de <strong>BGE Franche-Comté</strong>, c'est une belle victoire.</p>
+        <p style="margin:0 0 .8rem">Dommage que la France n'ait pas gagné… mais ça, on n'y peut rien. 🇫🇷</p>
+        <p style="margin:0 0 1rem">J'espère vous avoir apporté du bonheur et du fun. Et en guise de <strong>dernier cadeau</strong>, je vous invite à télécharger votre petit rapport personnalisé. 🎁</p>
+        <div style="text-align:right;font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:1px;color:#073B4C">Julien</div>
+        <button onclick="document.getElementById('finalThanksPopup').remove();downloadWorldCupReport()" style="width:100%;margin-top:1rem;background:linear-gradient(135deg,#FFD166,#f0a500);border:none;border-radius:12px;padding:.9rem;color:#073B4C;font-family:'Nunito',sans-serif;font-size:.95rem;font-weight:900;cursor:pointer">🏆 Télécharger ma Coupe du Monde à moi</button>
+        <button onclick="document.getElementById('finalThanksPopup').remove()" style="width:100%;margin-top:.5rem;background:transparent;border:1px solid #ccc;border-radius:12px;padding:.6rem;color:#888;font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:700;cursor:pointer">Fermer</button>
+      </div>
+    </div>`;
+  pop.onclick = e => { if (e.target === pop) pop.remove(); };
+  document.body.appendChild(pop);
 }
 
 // ============================================================
