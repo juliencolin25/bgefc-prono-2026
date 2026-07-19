@@ -2234,7 +2234,7 @@ async function cancelPronoMort() {
 // CONTRÔLE DE VERSION — recharge auto quand un nouveau déploiement est détecté
 // (À CHAQUE déploiement : monter APP_VERSION ici ET dans version.json à l'identique)
 // ============================================================
-const APP_VERSION = '2026-07-18-13';
+const APP_VERSION = '2026-07-18-14';
 async function checkAppVersion() {
   try {
     const res = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' });
@@ -2305,10 +2305,10 @@ async function buildReportData() {
     const pts = up.reduce((s, p) => s + (p.points || 0), 0) + (pmDeltas[u.id] || 0);
     return { id: u.id, name: u.name, team: u.team, pts };
   }).sort((a, b) => b.pts - a.pts);
-  // Classement Coupe Jean Tarbouriech (phase finale)
+  // Classement Coupe Jean Tarbouriech (phase finale) — inclut le Prono de la Mort, comme l'appli
   const ko = allUsers.map(u => {
     const up = allPronos.filter(p => p.user_id === u.id && koIds.has(p.match_id));
-    return { name: u.name, team: u.team, pts: up.reduce((s, p) => s + (p.points || 0), 0) };
+    return { name: u.name, team: u.team, pts: up.reduce((s, p) => s + (p.points || 0), 0) + (pmDeltas[u.id] || 0) };
   }).sort((a, b) => b.pts - a.pts);
   // Classement équipes (moyenne /5)
   const finishedCount = doneMatches.length || 1;
@@ -2465,7 +2465,7 @@ async function showFinalThanksPopup() {
     const koIds = new Set(allMatches.filter(m => KO_GROUPS.includes(m.group_name)).map(m => m.id));
     const pmDeltas = await getPronoMortDeltas();
     const gen = allUsers.map(u => ({ name: u.name, pts: allPronos.filter(p => p.user_id === u.id).reduce((s, p) => s + (p.points || 0), 0) + (pmDeltas[u.id] || 0) })).sort((a, b) => b.pts - a.pts);
-    const ko = allUsers.map(u => ({ name: u.name, pts: allPronos.filter(p => p.user_id === u.id && koIds.has(p.match_id)).reduce((s, p) => s + (p.points || 0), 0) })).sort((a, b) => b.pts - a.pts);
+    const ko = allUsers.map(u => ({ name: u.name, pts: allPronos.filter(p => p.user_id === u.id && koIds.has(p.match_id)).reduce((s, p) => s + (p.points || 0), 0) + (pmDeltas[u.id] || 0) })).sort((a, b) => b.pts - a.pts);
     genWinner = gen[0] ? gen[0].name : '';
     koWinner = ko[0] ? ko[0].name : '';
   } catch (e) { }
