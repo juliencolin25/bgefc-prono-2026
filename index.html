@@ -2234,7 +2234,7 @@ async function cancelPronoMort() {
 // CONTRÔLE DE VERSION — recharge auto quand un nouveau déploiement est détecté
 // (À CHAQUE déploiement : monter APP_VERSION ici ET dans version.json à l'identique)
 // ============================================================
-const APP_VERSION = '2026-07-18-12';
+const APP_VERSION = '2026-07-18-13';
 async function checkAppVersion() {
   try {
     const res = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' });
@@ -2469,7 +2469,7 @@ async function showFinalThanksPopup() {
     genWinner = gen[0] ? gen[0].name : '';
     koWinner = ko[0] ? ko[0].name : '';
   } catch (e) { }
-  const congrats = (genWinner || koWinner) ? `<p style="margin:0 0 .8rem">Bravo et un immense merci à <strong>${genWinner}</strong>, vainqueur du <strong>classement général</strong> 🥇, et bravo également à <strong>${koWinner}</strong>, en tête du <strong>trophée Jean Tarbouriech</strong> 🏆 !</p>` : '';
+  const congrats = (genWinner || koWinner) ? `<p style="margin:0 0 .8rem">Bravo à <strong>${genWinner}</strong>, vainqueur du <strong>classement général</strong> 🥇, et bravo également à <strong>${koWinner}</strong>, en tête du <strong>trophée Jean Tarbouriech</strong> 🏆 !</p>` : '';
   const pop = document.createElement('div');
   pop.id = 'finalThanksPopup';
   pop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem';
