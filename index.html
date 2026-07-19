@@ -2234,7 +2234,7 @@ async function cancelPronoMort() {
 // CONTRÔLE DE VERSION — recharge auto quand un nouveau déploiement est détecté
 // (À CHAQUE déploiement : monter APP_VERSION ici ET dans version.json à l'identique)
 // ============================================================
-const APP_VERSION = '2026-07-18-7';
+const APP_VERSION = '2026-07-18-8';
 async function checkAppVersion() {
   try {
     const res = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' });
@@ -2323,7 +2323,10 @@ async function buildReportData() {
   const teamRank = Object.entries(tScore).map(([name, s]) => ({ name, avg: s.count ? s.total / (s.count * finishedCount) : 0, count: s.count })).sort((a, b) => b.avg - a.avg);
 
   // Données du joueur
-  const me = currentUser;
+  // Mode aperçu admin : ?user=Prénom génère le rapport d'un autre joueur
+  let me = currentUser;
+  const _forced = new URLSearchParams(location.search).get('user');
+  if (_forced) { const u = allUsers.find(x => x.name.toLowerCase().includes(_forced.toLowerCase())); if (u) me = u; }
   const rankGen = gen.findIndex(x => x.id === me.id) + 1;
   const rankKO = ko.findIndex(x => x.name === me.name) + 1;
   const myPr = allPronos.filter(p => p.user_id === me.id);
