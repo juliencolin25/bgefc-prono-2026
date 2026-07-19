@@ -2234,7 +2234,7 @@ async function cancelPronoMort() {
 // CONTRÔLE DE VERSION — recharge auto quand un nouveau déploiement est détecté
 // (À CHAQUE déploiement : monter APP_VERSION ici ET dans version.json à l'identique)
 // ============================================================
-const APP_VERSION = '2026-07-18-9';
+const APP_VERSION = '2026-07-18-10';
 async function checkAppVersion() {
   try {
     const res = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' });
@@ -2458,8 +2458,19 @@ function flashZidane() {
   setTimeout(() => { z.style.opacity = '0'; setTimeout(() => z.remove(), 250); }, 950);
 }
 
-function showFinalThanksPopup() {
+async function showFinalThanksPopup() {
   if (!(isFinalDone() || REPORT_TEST)) return;
+  let genWinner = '', koWinner = '';
+  try {
+    const allPronos = await loadAllPronos();
+    const koIds = new Set(allMatches.filter(m => KO_GROUPS.includes(m.group_name)).map(m => m.id));
+    const pmDeltas = await getPronoMortDeltas();
+    const gen = allUsers.map(u => ({ name: u.name, pts: allPronos.filter(p => p.user_id === u.id).reduce((s, p) => s + (p.points || 0), 0) + (pmDeltas[u.id] || 0) })).sort((a, b) => b.pts - a.pts);
+    const ko = allUsers.map(u => ({ name: u.name, pts: allPronos.filter(p => p.user_id === u.id && koIds.has(p.match_id)).reduce((s, p) => s + (p.points || 0), 0) })).sort((a, b) => b.pts - a.pts);
+    genWinner = gen[0] ? gen[0].name : '';
+    koWinner = ko[0] ? ko[0].name : '';
+  } catch (e) { }
+  const congrats = (genWinner || koWinner) ? `<p style="margin:0 0 .8rem">Bravo et un immense merci à <strong>${genWinner}</strong>, vainqueur du <strong>classement général</strong> 🥇, et bravo également à <strong>${koWinner}</strong>, en tête du <strong>trophée Jean Tarbouriech</strong> 💀 !</p>` : '';
   const pop = document.createElement('div');
   pop.id = 'finalThanksPopup';
   pop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem';
@@ -2472,6 +2483,7 @@ function showFinalThanksPopup() {
       </div>
       <div style="padding:1.4rem;font-size:.9rem;line-height:1.75;color:#333">
         <p style="margin:0 0 .8rem">Voilà, c'est terminé. 🏆</p>
+        ${congrats}
         <p style="margin:0 0 .8rem">Je tenais à vous <strong>remercier très sincèrement</strong>, toutes et tous, pour votre participation à cette Coupe du Monde des pronos.</p>
         <p style="margin:0 0 .8rem">Un immense merci à celles et ceux que j'ai pris comme muses : <strong>Magali, Tiphaine, Anaïs, Jeannot, Pauline, Thierry, Fabien</strong>, qui ont accepté, souvent malgré eux, de faire vivre ce jeu et de lui donner son âme. 💙</p>
         <p style="margin:0 0 .8rem">Ce fut une <strong>belle expérience</strong>, une belle collaboration avec la com'. Merci à <strong>Tiphaine</strong> de m'avoir lancé sur cette voie. Être une trentaine à jouer au sein de <strong>BGE Franche-Comté</strong>, c'est une belle victoire.</p>
