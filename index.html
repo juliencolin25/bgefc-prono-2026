@@ -2234,7 +2234,7 @@ async function cancelPronoMort() {
 // CONTRÔLE DE VERSION — recharge auto quand un nouveau déploiement est détecté
 // (À CHAQUE déploiement : monter APP_VERSION ici ET dans version.json à l'identique)
 // ============================================================
-const APP_VERSION = '2026-07-18-8';
+const APP_VERSION = '2026-07-18-9';
 async function checkAppVersion() {
   try {
     const res = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' });
@@ -2332,15 +2332,16 @@ async function buildReportData() {
   const myPr = allPronos.filter(p => p.user_id === me.id);
   const totalPts = (myPr.reduce((s, p) => s + (p.points || 0), 0)) + (pmDeltas[me.id] || 0);
 
-  // Tableau des matchs pronostiqués
+  // Tableau : tous les matchs joués (les non pronostiqués sont marqués NP)
   const matchRows = [];
   let nbExact = 0, nbBon = 0;
   allMatches.slice().sort((a, b) => parseFrDate(a.match_date, a.match_time) - parseFrDate(b.match_date, b.match_time)).forEach(m => {
+    if (getEffectiveStatus(m) !== 'done' || m.score1_real === null || m.score1_real === undefined) return;
+    const real = `${m.score1_real}-${m.score2_real}`;
     const p = myPr.find(x => x.match_id === m.id);
-    if (!p) return;
+    if (!p) { matchRows.push({ match: `${m.team1} - ${m.team2}`, prono: 'NP', real, res: 'np' }); return; }
     const res = _classifyProno(p, m);
     if (res === 'exact') nbExact++; else if (res === 'bon') nbBon++;
-    const real = (m.score1_real !== null && m.score1_real !== undefined) ? `${m.score1_real}-${m.score2_real}` : '-';
     matchRows.push({ match: `${m.team1} - ${m.team2}`, prono: `${p.score1}-${p.score2}`, real, res });
   });
 
@@ -2400,7 +2401,7 @@ function buildReportHTML(d) {
   const sec = (title, inner) => `<div style="page-break-inside:avoid;margin:0 0 16px"><div style="background:${NAVY};color:${JAUNE};font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;padding:8px 14px;border-radius:10px 10px 0 0">${title}</div><div style="border:1px solid #e6e6e6;border-top:none;border-radius:0 0 10px 10px;padding:14px;background:#fff">${inner}</div></div>`;
   const tile = (label, val, bg, fg) => `<div style="flex:1;min-width:118px;background:${bg};border-radius:12px;padding:12px 8px;text-align:center"><div style="font-family:'Bebas Neue',sans-serif;font-size:30px;color:${fg};line-height:1">${val}</div><div style="font-size:11px;color:${fg};font-weight:800;letter-spacing:.5px;opacity:.92;margin-top:3px">${label}</div></div>`;
   const rankTbl = (rows, headBg) => `<table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr style="background:${headBg};color:#fff"><th style="padding:6px 8px">#</th><th style="padding:6px 8px;text-align:left">Joueur</th><th style="padding:6px 8px;text-align:left">Équipe</th><th style="padding:6px 8px;text-align:right">Pts</th></tr></thead><tbody>${rows.map(r => { const mine = r.name === d.me.name; const m = r.rank <= 3 ? ['🥇', '🥈', '🥉'][r.rank - 1] : r.rank; return `<tr style="${mine ? 'background:#FFF3C4' : ''}"><td style="padding:5px 8px;border-bottom:1px solid #eee;text-align:center;${mine ? 'font-weight:800' : ''}">${m}</td><td style="padding:5px 8px;border-bottom:1px solid #eee;${mine ? 'font-weight:800' : ''}">${r.name}${mine ? ' <span style="color:#E63946;font-size:11px">(moi)</span>' : ''}</td><td style="padding:5px 8px;border-bottom:1px solid #eee;font-size:12px;color:#666">${r.team || ''}</td><td style="padding:5px 8px;border-bottom:1px solid #eee;text-align:right;font-weight:800">${r.pts}</td></tr>`; }).join('')}</tbody></table>`;
-  const chip = r => r === 'exact' ? '<span style="background:#FFF3C4;color:#8a6d00;border-radius:20px;padding:2px 9px;font-weight:800;font-size:11px">⭐ EXACT</span>' : r === 'bon' ? '<span style="background:#dcfce7;color:#166534;border-radius:20px;padding:2px 9px;font-weight:800;font-size:11px">✅ BON</span>' : r === 'rate' ? '<span style="background:#fee2e2;color:#991b1b;border-radius:20px;padding:2px 9px;font-weight:800;font-size:11px">❌ RATÉ</span>' : '—';
+  const chip = r => r === 'exact' ? '<span style="background:#FFF3C4;color:#8a6d00;border-radius:20px;padding:2px 9px;font-weight:800;font-size:11px">⭐ EXACT</span>' : r === 'bon' ? '<span style="background:#dcfce7;color:#166534;border-radius:20px;padding:2px 9px;font-weight:800;font-size:11px">✅ BON</span>' : r === 'rate' ? '<span style="background:#fee2e2;color:#991b1b;border-radius:20px;padding:2px 9px;font-weight:800;font-size:11px">❌ RATÉ</span>' : r === 'np' ? '<span style="background:#eee;color:#888;border-radius:20px;padding:2px 9px;font-weight:800;font-size:11px">NP</span>' : '—';
   const genRows = d.gen.map((p, i) => ({ name: p.name, team: p.team, pts: p.pts, rank: i + 1 }));
   const koRows = d.ko.map((p, i) => ({ name: p.name, team: p.team, pts: p.pts, rank: i + 1 }));
   const p = [];
