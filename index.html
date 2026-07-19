@@ -2234,7 +2234,7 @@ async function cancelPronoMort() {
 // CONTRÔLE DE VERSION — recharge auto quand un nouveau déploiement est détecté
 // (À CHAQUE déploiement : monter APP_VERSION ici ET dans version.json à l'identique)
 // ============================================================
-const APP_VERSION = '2026-07-18-15';
+const APP_VERSION = '2026-07-18-16';
 async function checkAppVersion() {
   try {
     const res = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' });
@@ -2427,7 +2427,7 @@ async function downloadWorldCupReport() {
   showToast('📄 Génération de ton rapport...');
   let d; try { d = await buildReportData(); } catch (e) { showToast('⚠️ Erreur lors du calcul des données'); return; }
   const holder = document.createElement('div');
-  holder.style.cssText = 'position:fixed;left:-99999px;top:0;z-index:-1';
+  holder.style.cssText = 'position:fixed;left:0;top:0;width:800px;background:#fff;z-index:-1';
   const inner = document.createElement('div');
   inner.style.cssText = 'width:800px;background:#fff;padding:22px;box-sizing:border-box;font-family:Nunito,\'Segoe UI\',Arial,sans-serif;color:#222';
   inner.innerHTML = buildReportHTML(d);
@@ -2435,7 +2435,7 @@ async function downloadWorldCupReport() {
   document.body.appendChild(holder);
   await Promise.all(Array.from(inner.querySelectorAll('img')).map(im => (im.complete && im.naturalWidth) ? Promise.resolve() : new Promise(r => { im.onload = im.onerror = r; setTimeout(r, 3000); })));
   window.scrollTo(0, 0);
-  const opt = { margin: 0, filename: `Ma-Coupe-du-Monde-${_stripEmoji(d.me.name).replace(/\s+/g, '-')}.pdf`, image: { type: 'jpeg', quality: 0.95 }, html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false, scrollX: 0, scrollY: 0, windowWidth: 800 }, jsPDF: { unit: 'px', hotfixes: ['px_scaling'], format: [800, 1131], orientation: 'portrait' }, pagebreak: { mode: ['css', 'legacy'] } };
+  const opt = { margin: 0, filename: `Ma-Coupe-du-Monde-${_stripEmoji(d.me.name).replace(/\s+/g, '-')}.pdf`, image: { type: 'jpeg', quality: 0.95 }, html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false, scrollX: 0, scrollY: 0 }, jsPDF: { unit: 'px', hotfixes: ['px_scaling'], format: [800, 1131], orientation: 'portrait' }, pagebreak: { mode: ['css', 'legacy'] } };
   try { await html2pdf().set(opt).from(inner).save(); showToast('✅ Ton rapport est prêt !'); }
   catch (e) { showToast('⚠️ Erreur lors de la génération du PDF'); }
   finally { holder.remove(); }
