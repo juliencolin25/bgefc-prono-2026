@@ -2234,7 +2234,7 @@ async function cancelPronoMort() {
 // CONTRÔLE DE VERSION — recharge auto quand un nouveau déploiement est détecté
 // (À CHAQUE déploiement : monter APP_VERSION ici ET dans version.json à l'identique)
 // ============================================================
-const APP_VERSION = '2026-07-18-6';
+const APP_VERSION = '2026-07-18-7';
 async function checkAppVersion() {
   try {
     const res = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' });
@@ -2276,10 +2276,10 @@ const REPORT_CHARACTERS = [
     "L'arbitre a dû parier sur l'Espagne, y'a pas d'autre explication."
   ] },
   { name: 'Magali', img: 'images/mag.png', color: '#9B5DE5', lines: [
-    "En tant que patronne, j'accorde des points bonus. Je suis pas connaisseuse en foot, mais je suis généreuse !",
-    "Bon, moi je passe au cyclisme, je m'y connais bien mieux, je viens de m'y mettre.",
-    "Cette année je sens bien Virenque pour gagner le Tour, quelle forme ! (je suis une spécialiste)",
-    "Merci à tous d'avoir soutenu l'équipe de France, et retrouvez-moi sur le Tour de France !"
+    "Franchement le foot j'y connais rien, mais mon intuition cosmique ne se trompe jamais. Enfin, elle se trompe, mais elle ne ment pas.",
+    "J'ai choisi selon la couleur des maillots. Le bleu ça porte chance, non ?",
+    "Mon chat a regardé vers la gauche puis vers la droite. Clairement une victoire quelque part.",
+    "Je suis pas connaisseuse en foot, mais je suis généreuse : j'accorde des points bonus, na !"
   ] },
   { name: "L'Oracle de Mag", img: 'images/MCO.jpg', color: '#c89b3c', lines: [
     "Mon chat a regardé vers la gauche puis vers la droite. Clairement une victoire.",
@@ -2373,9 +2373,11 @@ async function buildReportData() {
   else if (isShootoutChampion(me.name)) title = 'Le Malin : 5/5 au mini-jeu secret';
   else title = 'Le Passionné : a vécu la Coupe du Monde à fond';
 
-  const cocktail = PAULINE_RECETTES[Math.floor(Math.random() * PAULINE_RECETTES.length)];
+  const _idxs = [...Array(PAULINE_RECETTES.length).keys()];
+  for (let i = _idxs.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));[_idxs[i], _idxs[j]] = [_idxs[j], _idxs[i]]; }
+  const cocktails = [PAULINE_RECETTES[_idxs[0]], PAULINE_RECETTES[_idxs[1]]].filter(Boolean);
 
-  return { me, rankGen, rankKO, totalPts, nbPronos: myPr.length, nbExact, nbBon, badges, title, gen, ko, teamRank, matchRows, pollVotes, pronoMort, cocktail };
+  return { me, rankGen, rankKO, totalPts, nbPronos: myPr.length, nbExact, nbBon, badges, title, gen, ko, teamRank, matchRows, pollVotes, pronoMort, cocktails };
 }
 
 function _loadImg(src) { return new Promise(res => { const i = new Image(); i.onload = () => res(i); i.onerror = () => res(null); i.src = src; }); }
@@ -2411,8 +2413,8 @@ function buildReportHTML(d) {
   if (d.pollVotes.length) p.push(sec('🗳️ Tes votes aux sondages du jour', d.pollVotes.map(v => `<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0f0f0;font-size:13px"><span style="color:#555">${v.q}</span><strong style="color:${NAVY}">${v.choice}</strong></div>`).join('')));
   if (d.pronoMort) { const pos = d.pronoMort.delta > 0; p.push(sec('💀 Ton Prono de la Mort', `<div style="font-size:13px">Champion parié : <strong>${d.pronoMort.team}</strong> · Score finale parié : <strong>${d.pronoMort.score}</strong></div>${d.pronoMort.delta !== null ? `<div style="margin-top:8px;display:inline-block;background:${pos ? '#dcfce7' : '#fee2e2'};color:${pos ? '#166534' : '#991b1b'};border-radius:20px;padding:4px 14px;font-weight:800">${pos ? '+' : ''}${d.pronoMort.delta} points</div>` : '<div style="margin-top:8px;color:#777;font-style:italic">Résultat calculé après la finale.</div>'}`)); }
   p.push(sec('😄 Le best-of des punchlines', REPORT_CHARACTERS.map(c => `<div style="page-break-inside:avoid;display:flex;gap:12px;align-items:flex-start;background:#f7fafb;border:1px solid #e6eef0;border-radius:14px;padding:12px;margin-bottom:10px"><img src="${c.img}" style="width:58px;height:58px;border-radius:50%;object-fit:cover;object-position:center top;border:3px solid ${c.color};flex-shrink:0"><div><div style="font-weight:800;color:${c.color};margin-bottom:5px">${c.name}</div>${c.lines.map(l => `<div style="font-style:italic;color:#444;font-size:13px;margin-bottom:3px">« ${l} »</div>`).join('')}</div></div>`).join('')));
-  const ck = d.cocktail;
-  p.push(`<div style="page-break-inside:avoid;margin:0 0 16px"><div style="background:${NAVY};color:${JAUNE};font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;padding:8px 14px;border-radius:10px 10px 0 0">🍹 La recette de Pauline</div><div style="border:1px solid #e6e6e6;border-top:none;border-radius:0 0 10px 10px;overflow:hidden"><div style="background:${ck.gradient};padding:16px;text-align:center"><img src="images/PD.jpg" style="width:88px;height:88px;border-radius:50%;object-fit:cover;object-position:center 15%;border:4px solid #fff;display:block;margin:0 auto 8px"><div style="color:#fff;font-size:16px;font-weight:900;letter-spacing:1px">${ck.nom}</div></div><div style="padding:14px"><div style="font-size:13px;color:#666;font-style:italic;text-align:center;margin-bottom:10px">« ${ck.citation} »</div>${ck.ingredients.map(([ic, qty, ing]) => `<div style="display:flex;align-items:center;gap:10px;padding:6px 10px;background:#fafafa;border-radius:10px;border-left:3px solid ${ck.accent};margin-bottom:6px"><span>${ic}</span><span style="font-weight:900;color:${ck.accent};min-width:56px;font-size:13px">${qty}</span><span style="color:#333;font-size:13px">${ing}</span></div>`).join('')}<div style="margin-top:10px;padding:10px;background:${ck.accentBg};border:1px solid ${ck.accentBorder};border-radius:10px;font-size:12px;color:${ck.accentText}"><strong>👩‍🍳 La méthode Pauline :</strong> ${ck.methode}</div></div></div></div>`);
+  const cocktailCard = ck => `<div style="flex:1;min-width:0;border:1px solid #e6e6e6;border-radius:12px;overflow:hidden"><div style="background:${ck.gradient};padding:12px;text-align:center"><img src="images/PD.jpg" style="width:64px;height:64px;border-radius:50%;object-fit:cover;object-position:center 15%;border:3px solid #fff;display:block;margin:0 auto 6px"><div style="color:#fff;font-size:14px;font-weight:900;letter-spacing:1px">${ck.nom}</div></div><div style="padding:11px"><div style="font-size:11px;color:#666;font-style:italic;text-align:center;margin-bottom:8px">« ${ck.citation} »</div>${ck.ingredients.map(([ic, qty, ing]) => `<div style="display:flex;align-items:center;gap:7px;padding:4px 7px;background:#fafafa;border-radius:8px;border-left:3px solid ${ck.accent};margin-bottom:5px"><span style="font-size:12px">${ic}</span><span style="font-weight:900;color:${ck.accent};min-width:44px;font-size:11px">${qty}</span><span style="color:#333;font-size:11px">${ing}</span></div>`).join('')}<div style="margin-top:8px;padding:8px;background:${ck.accentBg};border:1px solid ${ck.accentBorder};border-radius:8px;font-size:10.5px;color:${ck.accentText}"><strong>👩‍🍳 Méthode :</strong> ${ck.methode}</div></div></div>`;
+  p.push(`<div style="page-break-inside:avoid;margin:0 0 16px"><div style="background:${NAVY};color:${JAUNE};font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;padding:8px 14px;border-radius:10px 10px 0 0">🍹 Les recettes de Pauline</div><div style="border:1px solid #e6e6e6;border-top:none;border-radius:0 0 10px 10px;padding:14px;background:#fff"><div style="display:flex;gap:12px;align-items:stretch">${d.cocktails.map(cocktailCard).join('')}</div></div></div>`);
   p.push(`<div style="page-break-inside:avoid;background:linear-gradient(135deg,#073B4C,#0a5068);border-radius:16px;padding:18px;color:#fff"><div style="display:flex;gap:14px;align-items:center;margin-bottom:10px"><img src="images/Julien.jpg" style="width:60px;height:60px;border-radius:50%;object-fit:cover;border:3px solid ${JAUNE}"><div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:${JAUNE}">Le mot de la fin</div></div><div style="font-size:13px;line-height:1.7;color:#eaf4f7">Merci d'avoir joué, merci d'avoir vibré, et merci d'avoir fait de cette Coupe du Monde un beau moment collectif chez BGE Franche-Comté. J'espère vous avoir apporté du bonheur et du fun. Passez de très bonnes vacances, et à très vite pour de nouvelles aventures !</div><div style="text-align:right;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;color:#fff;margin-top:8px">Julien</div></div>`);
   return p.join('');
 }
@@ -2466,10 +2468,10 @@ function showFinalThanksPopup() {
       </div>
       <div style="padding:1.4rem;font-size:.9rem;line-height:1.75;color:#333">
         <p style="margin:0 0 .8rem">Voilà, c'est terminé. 🏆</p>
-        <p style="margin:0 0 .8rem">Je tenais à vous <strong>remercier très solennellement</strong>, toutes et tous, pour votre participation à cette Coupe du Monde des pronos.</p>
-        <p style="margin:0 0 .8rem">Un immense merci à celles et ceux que j'ai pris comme muses : <strong>Magali, Tiphaine, Anaïs, Jeannot, Pauline, Thierry</strong>, qui ont accepté, souvent malgré elles, de faire vivre ce jeu et de lui donner son âme. 💙</p>
+        <p style="margin:0 0 .8rem">Je tenais à vous <strong>remercier très sincèrement</strong>, toutes et tous, pour votre participation à cette Coupe du Monde des pronos.</p>
+        <p style="margin:0 0 .8rem">Un immense merci à celles et ceux que j'ai pris comme muses : <strong>Magali, Tiphaine, Anaïs, Jeannot, Pauline, Thierry, Fabien</strong>, qui ont accepté, souvent malgré eux, de faire vivre ce jeu et de lui donner son âme. 💙</p>
         <p style="margin:0 0 .8rem">Ce fut une <strong>belle expérience</strong>, une belle collaboration avec la com'. Merci à <strong>Tiphaine</strong> de m'avoir lancé sur cette voie. Être une trentaine à jouer au sein de <strong>BGE Franche-Comté</strong>, c'est une belle victoire.</p>
-        <p style="margin:0 0 .8rem">Dommage que la France n'ait pas gagné, mais ça, on n'y peut rien. ${FR_FLAG}</p>
+        <p style="margin:0 0 .8rem">Dommage que la France n'ait pas gagné, mais ce n'est que partie remise dans quatre ans ! ${FR_FLAG}</p>
         <p style="margin:0 0 .8rem">J'espère vous avoir apporté du bonheur et du fun. Et en guise de <strong>dernier cadeau</strong>, je vous invite à télécharger votre petit rapport personnalisé. 🎁</p>
         <p style="margin:0 0 1rem">Je vous souhaite à toutes et à tous de <strong>très bonnes vacances</strong> ! ☀️🏖️</p>
         <div style="text-align:right;font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:1px;color:#073B4C">Julien</div>
