@@ -2234,7 +2234,7 @@ async function cancelPronoMort() {
 // CONTRÔLE DE VERSION — recharge auto quand un nouveau déploiement est détecté
 // (À CHAQUE déploiement : monter APP_VERSION ici ET dans version.json à l'identique)
 // ============================================================
-const APP_VERSION = '2026-07-18-14';
+const APP_VERSION = '2026-07-18-15';
 async function checkAppVersion() {
   try {
     const res = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' });
@@ -2407,7 +2407,7 @@ function buildReportHTML(d) {
   const p = [];
   p.push(`<div style="background:linear-gradient(135deg,${NAVY},${TEAL});border-radius:16px;padding:20px;display:flex;align-items:center;gap:16px;margin-bottom:16px"><img src="images/logo-bge.png" style="width:66px;height:66px;object-fit:contain;background:#fff;border-radius:12px;padding:6px"><div><div style="font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:2px;color:${JAUNE};line-height:1">MA COUPE DU MONDE À MOI</div><div style="color:#dcedf2;font-size:13px;font-weight:600;margin-top:3px">BGE Franche-Comté · Pronos Coupe du Monde 2026</div></div></div>`);
   p.push(`<div style="display:flex;align-items:center;justify-content:space-between;background:#FFF7E0;border:2px solid ${JAUNE};border-radius:14px;padding:12px 18px;margin-bottom:16px"><div><div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:${NAVY};letter-spacing:1px">${d.me.name}</div><div style="color:#777;font-size:13px;font-weight:700">Équipe ${d.me.team}</div></div><div style="text-align:right"><div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:#E63946;line-height:1">#${d.rankGen}</div><div style="font-size:11px;color:#999;font-weight:800;letter-spacing:1px">RANG GÉNÉRAL</div></div></div>`);
-  p.push(sec('📊 Tes chiffres clés', `<div style="display:flex;gap:10px;flex-wrap:wrap">${tile('POINTS', d.totalPts, '#073B4C', '#FFD166')}${tile('PRONOS', d.nbPronos, '#118AB2', '#fff')}${tile('SCORES EXACTS', d.nbExact, '#FFD166', '#7a5c00')}${tile('BONS RÉSULTATS', d.nbBon, '#06D6A0', '#04463a')}</div><div style="margin-top:10px;font-size:13px;color:#555">Classement général : <strong>#${d.rankGen}</strong> · Coupe Jean Tarbouriech : <strong>#${d.rankKO}</strong></div>`));
+  p.push(sec('📊 Tes chiffres clés', `<div style="display:flex;gap:10px;flex-wrap:wrap">${tile('POINTS', d.totalPts, '#073B4C', '#FFD166')}${tile('PRONOS', d.nbPronos, '#118AB2', '#fff')}${tile('SCORES EXACTS', d.nbExact, '#FFD166', '#7a5c00')}${tile('BONS RÉSULTATS', d.nbBon, '#06D6A0', '#04463a')}</div><div style="margin-top:10px;font-size:13px;color:#555">Classement général : <strong>#${d.rankGen}</strong> · Coupe Jean Tarbouriech : <strong>#${d.rankKO}</strong></div>${(d.pronoMort && d.pronoMort.delta !== null && d.pronoMort.delta !== undefined) ? `<div style="margin-top:6px;font-size:13px;color:#555">Dont Prono de la Mort : <strong style="color:${d.pronoMort.delta > 0 ? '#166534' : '#991b1b'}">${d.pronoMort.delta > 0 ? '+' : ''}${d.pronoMort.delta} pts</strong> (déjà inclus dans ton total)</div>` : ''}`));
   p.push(sec('🏅 Ton titre d\'honneur', `<div style="text-align:center;background:linear-gradient(135deg,#7c2fd6,#9B5DE5);border-radius:12px;padding:14px;color:#fff"><div style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px">${d.title}</div></div>`));
   p.push(sec('🎖️ Tes badges remportés', d.badges.length ? d.badges.map(_badgeChip).join('') : '<div style="color:#777;font-style:italic">Pas encore de badge... mais tu as joué, et c\'est déjà une victoire !</div>'));
   p.push(sec('🏆 Classement général (Coupe du Monde BGE)', rankTbl(genRows, NAVY)));
@@ -2434,7 +2434,8 @@ async function downloadWorldCupReport() {
   holder.appendChild(inner);
   document.body.appendChild(holder);
   await Promise.all(Array.from(inner.querySelectorAll('img')).map(im => (im.complete && im.naturalWidth) ? Promise.resolve() : new Promise(r => { im.onload = im.onerror = r; setTimeout(r, 3000); })));
-  const opt = { margin: 0, filename: `Ma-Coupe-du-Monde-${_stripEmoji(d.me.name).replace(/\s+/g, '-')}.pdf`, image: { type: 'jpeg', quality: 0.95 }, html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }, jsPDF: { unit: 'px', hotfixes: ['px_scaling'], format: [800, 1131], orientation: 'portrait' }, pagebreak: { mode: ['css', 'legacy'] } };
+  window.scrollTo(0, 0);
+  const opt = { margin: 0, filename: `Ma-Coupe-du-Monde-${_stripEmoji(d.me.name).replace(/\s+/g, '-')}.pdf`, image: { type: 'jpeg', quality: 0.95 }, html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false, scrollX: 0, scrollY: 0, windowWidth: 800 }, jsPDF: { unit: 'px', hotfixes: ['px_scaling'], format: [800, 1131], orientation: 'portrait' }, pagebreak: { mode: ['css', 'legacy'] } };
   try { await html2pdf().set(opt).from(inner).save(); showToast('✅ Ton rapport est prêt !'); }
   catch (e) { showToast('⚠️ Erreur lors de la génération du PDF'); }
   finally { holder.remove(); }
